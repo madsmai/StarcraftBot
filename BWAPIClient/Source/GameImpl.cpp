@@ -6,7 +6,7 @@
 #include <BWAPI/Client/UnitImpl.h>
 #include <BWAPI/Client/BulletImpl.h>
 
-#include "TemplatesImpl.h"
+#include "Templates.h"
 
 #include "Convenience.h"
 #include <string>
@@ -178,7 +178,8 @@ namespace BWAPI
       playerSet.insert(&playerVector[i]);
     for(int i = 0; i < data->initialUnitCount; ++i)
     {
-      accessibleUnits.insert(&unitVector[i]);
+      if (unitVector[i].exists())
+        accessibleUnits.insert(&unitVector[i]);
       //save the initial state of each initial unit
       unitVector[i].saveInitialState();
     }

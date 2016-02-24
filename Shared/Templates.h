@@ -2,6 +2,8 @@
 #include <BWAPI.h>
 #include <algorithm>
 
+#include "UnitImpl.h"
+
 namespace BWAPI
 {
   using namespace Filter;
@@ -90,19 +92,19 @@ namespace BWAPI
       finder finderVal;
 
       // Search for the values using built-in binary search algorithm and comparator
-      const auto cmp = [](const finder &a,const finder &b){ return a.searchValue < b.searchValue; };
+      const auto cmp = [](const finder& a,const finder& b){ return a.searchValue < b.searchValue; };
 
       finderVal.searchValue = left;
-      finder *pLeft   = std::lower_bound<finder*>(finder_x, p_xend, finderVal, cmp);
+      finder *pLeft   = std::lower_bound(finder_x, p_xend, finderVal, cmp);
 
       finderVal.searchValue = top;
-      finder *pTop    = std::lower_bound<finder*>(finder_y, p_yend, finderVal, cmp);
+      finder *pTop    = std::lower_bound(finder_y, p_yend, finderVal, cmp);
 
       finderVal.searchValue = r+1;
-      finder *pRight  = std::upper_bound<finder*>(pLeft, p_xend, finderVal, cmp);
+      finder *pRight  = std::upper_bound(pLeft, p_xend, finderVal, cmp);
 
       finderVal.searchValue = b+1;
-      finder *pBottom = std::upper_bound<finder*>(pTop, p_yend, finderVal, cmp);
+      finder *pBottom = std::upper_bound(pTop, p_yend, finderVal, cmp);
 
       // Iterate the X entries of the finder
       for ( finder *px = pLeft; px < pRight; ++px )
@@ -375,30 +377,12 @@ namespace BWAPI
         return Broodwar->setLastError(Errors::Insufficient_Supply);
 
       UnitType addon = UnitTypes::None;
-      std::map<UnitType, int>::const_iterator requiredEnd = type.requiredUnits().end();
-      for(std::map<UnitType, int>::const_iterator i = type.requiredUnits().begin(); i != requiredEnd; ++i)
+      for (auto &it : type.requiredUnits())
       {
-        if (i->first.isAddon())
-          addon = i->first;
+        if (it.first.isAddon())
+          addon = it.first;
 
-        bool pass = false;
-        if (pSelf->completedUnitCount(i->first) >= i->second)
-          pass = true;
-        if ( i->first == UnitTypes::Zerg_Hatchery &&
-             pSelf->completedUnitCount(UnitTypes::Zerg_Hatchery) +
-             pSelf->completedUnitCount(UnitTypes::Zerg_Lair)     +
-             pSelf->completedUnitCount(UnitTypes::Zerg_Hive)     >= i->second )
-          pass = true;
-        if ( i->first == UnitTypes::Zerg_Lair && 
-             pSelf->completedUnitCount(UnitTypes::Zerg_Lair) + 
-             pSelf->completedUnitCount(UnitTypes::Zerg_Hive) >= i->second)
-          pass = true;
-        if ( i->first == UnitTypes::Zerg_Spire && 
-             pSelf->completedUnitCount(UnitTypes::Zerg_Spire) +
-             pSelf->completedUnitCount(UnitTypes::Zerg_Greater_Spire) >= i->second )
-          pass = true;
-        
-        if ( !pass )
+        if (!pSelf->hasUnitTypeRequirement(it.first, it.second))
           return Broodwar->setLastError(Errors::Insufficient_Tech);
       }
 
@@ -674,17 +658,25 @@ namespace BWAPI
       if ( targetUnit->isInvincible() )
         return Broodwar->setLastError(Errors::Unable_To_Hit);
 
+      UnitType type = thisUnit->getType();
       bool targetInAir = targetUnit->isFlying();
-      WeaponType weapon = targetInAir ? thisUnit->getType().airWeapon() : thisUnit->getType().groundWeapon();
-      bool canAttack = ( weapon != WeaponTypes::None );
-
-      if ( !canAttack )
+      WeaponType weapon = targetInAir ? type.airWeapon() : type.groundWeapon();
+      
+      if (weapon == WeaponTypes::None)
       {
-        if ( ( thisUnit->getType() == UnitTypes::Protoss_Carrier || thisUnit->getType() == UnitTypes::Hero_Gantrithor ) ||
-             ( !targetInAir && (thisUnit->getType() == UnitTypes::Protoss_Reaver  || thisUnit->getType() == UnitTypes::Hero_Warbringer) ) )
-          canAttack = true;
-        else
+        switch (type)
+        {
+        case UnitTypes::Enum::Protoss_Carrier:
+        case UnitTypes::Enum::Hero_Gantrithor:
+          break;
+        case UnitTypes::Enum::Protoss_Reaver:
+        case UnitTypes::Enum::Hero_Warbringer:
+          if (targetInAir)
+            Broodwar->setLastError(Errors::Unable_To_Hit);
+          break;
+        default:
           return Broodwar->setLastError(Errors::Unable_To_Hit);
+        }
       }
 
       if ( !thisUnit->getType().canMove() && !thisUnit->isInWeaponRange(targetUnit) )
@@ -1070,7 +1062,7 @@ namespace BWAPI
       if (Broodwar->self()->gas() < type.gasPrice())
         return Broodwar->setLastError(Errors::Insufficient_Gas);
 
-      if (type == TechTypes::Lurker_Aspect && !Broodwar->self()->completedUnitCount(UnitTypes::Zerg_Lair) && !Broodwar->self()->allUnitCount(UnitTypes::Zerg_Hive))
+      if (!Broodwar->self()->hasUnitTypeRequirement(type.requiredUnit()))
         return Broodwar->setLastError(Errors::Insufficient_Tech);
 
       return Broodwar->setLastError();
@@ -1107,49 +1099,12 @@ namespace BWAPI
       }
       int nextLvl = self->getUpgradeLevel(type)+1;
       
-      UnitType what = type.whatUpgrades();
-      if ( what != UnitTypes::None )
-      {
-        if ( what == UnitTypes::Zerg_Hatchery && 
-             !self->completedUnitCount(UnitTypes::Zerg_Hatchery) &&
-             !self->completedUnitCount(UnitTypes::Zerg_Lair) &&
-             !self->completedUnitCount(UnitTypes::Zerg_Hive) )
-          return Broodwar->setLastError(Errors::Unit_Does_Not_Exist);
-        else if ( what == UnitTypes::Zerg_Lair &&
-                  !self->completedUnitCount(UnitTypes::Zerg_Lair) &&
-                  !self->completedUnitCount(UnitTypes::Zerg_Hive) )
-          return Broodwar->setLastError(Errors::Unit_Does_Not_Exist);
-        else if ( what == UnitTypes::Zerg_Spire &&
-                  !self->completedUnitCount(UnitTypes::Zerg_Spire) &&
-                  !self->completedUnitCount(UnitTypes::Zerg_Greater_Spire) )
-          return Broodwar->setLastError(Errors::Unit_Does_Not_Exist);
-        else if ( !self->completedUnitCount(what) )
-          return Broodwar->setLastError(Errors::Unit_Does_Not_Exist);
-      }
+      if (!self->hasUnitTypeRequirement(type.whatUpgrades()))
+        return Broodwar->setLastError(Errors::Unit_Does_Not_Exist);
       
-      UnitType req = type.whatsRequired(nextLvl);
-      if ( req != UnitTypes::None )
-      {
-        if ( req == UnitTypes::Zerg_Hatchery && !self->completedUnitCount(UnitTypes::Zerg_Hatchery) )
-        {
-          if ( !self->allUnitCount(UnitTypes::Zerg_Lair) &&
-               !self->allUnitCount(UnitTypes::Zerg_Hive) )
-            return Broodwar->setLastError(Errors::Insufficient_Tech);
-        }
-        else if ( req == UnitTypes::Zerg_Lair && !self->completedUnitCount(UnitTypes::Zerg_Lair) )
-        {
-          if ( !self->allUnitCount(UnitTypes::Zerg_Hive) )
-            return Broodwar->setLastError(Errors::Insufficient_Tech);
-        }
-        else if ( req == UnitTypes::Zerg_Spire && !self->completedUnitCount(UnitTypes::Zerg_Spire) )
-        {
-          if ( !self->allUnitCount(UnitTypes::Zerg_Greater_Spire) )
-            return Broodwar->setLastError(Errors::Insufficient_Tech);
-        }
-        else if ( !self->completedUnitCount(req) )
-          return Broodwar->setLastError(Errors::Insufficient_Tech);
-      }
-
+      if (!self->hasUnitTypeRequirement(type.whatsRequired(nextLvl)))
+        return Broodwar->setLastError(Errors::Insufficient_Tech);
+      
       if (self->isUpgrading(type))
         return Broodwar->setLastError(Errors::Currently_Upgrading);
 
@@ -1735,11 +1690,10 @@ namespace BWAPI
       }
 
       int freeSpace = ( thisUnitSpaceProvided > 0 ? thisUnitSpaceProvided : targetSpaceProvided );
-      int requiredSpace;
       Unitset loadedUnits = unitThatLoads->getLoadedUnits();
       for (Unit u : loadedUnits)
       {
-        requiredSpace = u->getType().spaceRequired();
+        const int requiredSpace = u->getType().spaceRequired();
         if ( requiredSpace > 0 && requiredSpace < 8 )
           freeSpace -= requiredSpace;
       }
@@ -2503,7 +2457,7 @@ namespace BWAPI
       if ( !thisUnit->getType().isFlagBeacon() )
         return Broodwar->setLastError(Errors::Incompatible_UnitType);
 
-      if ( ((UnitImpl*)thisUnit)->self->buttonset == 228 || thisUnit->getOrder() != BWAPI::Orders::CTFCOPInit )
+      if ( static_cast<UnitImpl*>(thisUnit)->self->buttonset == 228 || thisUnit->getOrder() != BWAPI::Orders::CTFCOPInit )
         return Broodwar->setLastError(Errors::Incompatible_State);
 
       return true;

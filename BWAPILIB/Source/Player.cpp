@@ -9,7 +9,7 @@ using namespace BWAPI;
 //--------------------------------------------- INCOMPLETE UNIT COUNT --------------------------------------
 int PlayerInterface::incompleteUnitCount(UnitType unit) const
 {
-  return this->completedUnitCount(unit) - this->allUnitCount(unit);
+  return this->allUnitCount(unit) - this->completedUnitCount(unit);
 }
 //--------------------------------------------- MAX ENERGY -------------------------------------------------
 int PlayerInterface::maxEnergy(UnitType unit) const
@@ -141,5 +141,23 @@ char PlayerInterface::getTextColor() const
     return Text::GreyBlue;
   default:
     return Text::Default;
+  }
+}
+//-------------------------------------- UNIT TYPE REQUIREMENT ---------------------------------------------
+bool PlayerInterface::hasUnitTypeRequirement(UnitType unit, int amount) const
+{
+  if (unit == UnitTypes::None)
+    return true;
+
+  switch (unit)
+  {
+  case UnitTypes::Enum::Zerg_Hatchery:
+    return completedUnitCount(UnitTypes::Zerg_Hatchery) + allUnitCount(UnitTypes::Zerg_Lair) + allUnitCount(UnitTypes::Zerg_Hive) >= amount;
+  case UnitTypes::Enum::Zerg_Lair:
+    return completedUnitCount(UnitTypes::Zerg_Lair) + allUnitCount(UnitTypes::Zerg_Hive) >= amount;
+  case UnitTypes::Enum::Zerg_Spire:
+    return completedUnitCount(UnitTypes::Zerg_Spire) + allUnitCount(UnitTypes::Zerg_Greater_Spire) >= amount;
+  default:
+    return completedUnitCount(unit) >= amount;
   }
 }

@@ -6,6 +6,15 @@
 class ExampleAIModule : public BWAPI::AIModule
 {
 public:
+
+	bool refinery;
+	bool refineryFinished;
+	int refineryWorkers;
+	int workers;
+	void buildRefinery(BWAPI::Unit unit);
+	int mineralsReserved;
+
+
   // Virtual functions for callbacks, leave these as they are.
   virtual void onStart();
   virtual void onEnd(bool isWinner);
@@ -25,5 +34,7 @@ public:
   virtual void onSaveGame(std::string gameName);
   virtual void onUnitComplete(BWAPI::Unit unit);
   // Everything below this line is safe to modify.
+
+	
 
 };
