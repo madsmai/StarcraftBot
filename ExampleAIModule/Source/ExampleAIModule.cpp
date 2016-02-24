@@ -180,8 +180,7 @@ void ExampleAIModule::onFrame()
 		{
 
 			// Order the depot to construct more workers! But only when it is idle.
-			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice() 
-				&& !u -> isIdle){
+			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice() ){
 				Broodwar->sendText("Tha shitteren");
 				workers++;
 				if (u->isIdle() && !u->train(u->getType().getRace().getWorker())) {
