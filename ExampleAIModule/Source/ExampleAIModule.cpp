@@ -62,12 +62,17 @@ void ExampleAIModule::onStart()
 	pendingBuildings;
 	scout = NULL;
 	firstPylon = true;
+	startPositions;
 
 	// BWTA2 MAP ANALYSIS YO
 	BWTA::readMap();
 	BWTA::analyze();
 	analyzed = false;
 	analysis_just_finished = false;
+
+
+	Broodwar << "Analyzing map... this may take a minute" << std::endl;;
+	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -221,16 +226,10 @@ void ExampleAIModule::onFrame()
 
 void ExampleAIModule::onSendText(std::string text) {
 
-	if (text == "/analyze") {
-		if (analyzed == false) {
-			Broodwar << "Analyzing map... this may take a minute" << std::endl;;
-			CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
-		}
-	}
-	else {
+	
 		// Send the text to the game if it is not being processed.
 		Broodwar->sendText("%s", text.c_str());
-	}
+	
 
 
 	// Make sure to use %s and pass the text as a parameter,
@@ -407,6 +406,28 @@ void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
 
 void ExampleAIModule::goScout(BWAPI::Unit scout){
 
+	//BWTA::BaseLocation enemyBase = BWTA::getBaseLocations
+	baseLocations = BWTA::getStartLocations();
+	
+	std::set<BWTA::BaseLocation*>::iterator it; 		// iteratation set
+	for (it = baseLocations.begin(); it != baseLocations.end(); ++it){
+		// remove the price if it is found in the vector
+		if (*it == BWTA::getStartLocation(Broodwar->self())){
+			baseLocations.erase(it);
+		}
+		else {
+			scout->move(BWTA::getNearestBaseLocation(scout->getPosition())->getPosition());
+			
+		}
+
+		
+
+		//if (*it == BWTA::getNearestBaseLocation(scout->getPosition())){}
+	}
+
+	
+
+	
 
 
 }

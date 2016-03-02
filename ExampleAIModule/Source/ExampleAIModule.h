@@ -21,7 +21,11 @@ public:
 	bool firstPylon;
 	BWAPI::Unit scout;
 
-	
+	std::set<TilePosition> startPositions;
+
+	std::set<BWTA::BaseLocation*>& baseLocations;
+
+
 
 	void releaseMinerals(BWAPI::Unit unit);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
@@ -29,8 +33,6 @@ public:
 	void goScout(BWAPI::Unit scout);
 
 	void drawTerrainData();
-
-	
 
 	std::vector<int> pendingBuildings;
 
