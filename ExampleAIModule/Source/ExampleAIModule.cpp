@@ -1,5 +1,6 @@
 #include "ExampleAIModule.h"
 #include <iostream>
+#include <vector>
 
 using namespace BWAPI;
 using namespace Filter;
@@ -7,7 +8,7 @@ using namespace Filter;
 void ExampleAIModule::onStart()
 {
 	// Hello World!
-	Broodwar->sendText("Hello me!");
+	Broodwar->sendText("Hello World!");
 
 	// Print the map name.
 	// BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
@@ -48,10 +49,14 @@ void ExampleAIModule::onStart()
 			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
 	}
 
+	// setting values
 	refinery = false;
 	refineryFinished = false;
-	workers = Broodwar->self()->supplyUsed() / 2;
+	workers = 0;
 	mineralsReserved = 0;
+	pendingBuildings;
+	scout = NULL;
+	firstPylon = true;
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -105,43 +110,15 @@ void ExampleAIModule::onFrame()
 
 		// If the unit is a worker unit
 		if (u->getType().isWorker()) {
-			static int lastChecked = 0;
-			UnitType supplyType = UnitTypes::Protoss_Pylon;
-			if (((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) / 2 < 6
-				|| Broodwar->self()->supplyUsed() < 17)
-				&& lastChecked + 400 < Broodwar->getFrameCount()
-				&& Broodwar->self()->minerals() >= supplyType.mineralPrice()
-				&& Broodwar->self()->incompleteUnitCount(supplyType) == 0) {
 
-				mineralsReserved += supplyType.mineralPrice();
-
-
-
-				lastChecked = Broodwar->getFrameCount();
-				TilePosition targetBuildLocation = Broodwar->getBuildLocation(supplyType, u->getTilePosition());
-				if (targetBuildLocation) {
-					// Register an event that draws the target build location
-					Broodwar->registerEvent([targetBuildLocation, supplyType](Game*) {
-						Broodwar->drawBoxMap(Position(targetBuildLocation),
-							Position(targetBuildLocation + supplyType.tileSize()),
-							Colors::Yellow);
-					},
-						nullptr,  // condition
-						supplyType.buildTime() + 100);  // frames to run
-
-					// Order the builder to construct the supply structure
-					u->build(supplyType, targetBuildLocation);
-					mineralsReserved -= supplyType.mineralPrice();
-
-				}
-
-			}
-
+			supplyCheckAndBuild(u);
 
 			// checks for a refinery
 			if (!refinery && Broodwar->self()->minerals() >= UnitTypes::Protoss_Assimilator.mineralPrice()
-				&& Broodwar->self()->supplyUsed() > 20){
-				buildRefinery(u);
+				&& (Broodwar->self()->supplyUsed() / 2) > 10){
+				UnitType refineryType = UnitTypes::Protoss_Assimilator;
+				constructBuilding(refineryType, u);
+				refinery = true;
 			}
 
 			// if our worker is idle
@@ -155,8 +132,7 @@ void ExampleAIModule::onFrame()
 				else if (!u->getPowerUp())  // The worker cannot harvest anything if it
 				{                             // is carrying a powerup such as a flag
 
-					if (refineryFinished && refineryWorkers < 4) {
-						Broodwar->sendText("workers to refinery");
+					if (refineryFinished && refineryWorkers < 3) {
 						if (!u->isGatheringMinerals()){
 							refineryWorkers++;
 							if (!u->gather(u->getClosestUnit(IsRefinery))){
@@ -176,77 +152,46 @@ void ExampleAIModule::onFrame()
 		} // closure: builder type
 
 
-		else if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
-		{
+		// A resource depot is a Command Center, Nexus, or Hatchery
+		else if (u->getType().isResourceDepot()) {
 
-			// Order the depot to construct more workers! But only when it is idle.
-			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice() ){
-				Broodwar->sendText("Tha shitteren");
-				workers++;
-				if (u->isIdle() && !u->train(u->getType().getRace().getWorker())) {
-					workers--;
+			// Order the depot to construct more workers! But only when it is idle and there is below 25 workers.
+			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice()
+				&& u->isIdle()
+				&& workers < 25
+				&& !u->train(u->getType().getRace().getWorker())){
 
-					// If that fails, draw the error at the location so that you can visibly see what went wrong!
-					// However, drawing the error once will only appear for a single frame
-					// so create an event that keeps it on the screen for some frames
-					Position pos = u->getPosition();
-					Error lastErr = Broodwar->getLastError();
-					Broodwar->registerEvent([pos, lastErr](Game*){ Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); },   // action
-						nullptr,    // condition
-						Broodwar->getLatencyFrames());  // frames to run
+				// If that fails, draw the error at the location so that you can visibly see what went wrong!
+				// However, drawing the error once will only appear for a single frame
+				// so create an event that keeps it on the screen for some frames
+				Position pos = u->getPosition();
+				Error lastErr = Broodwar->getLastError();
+				Broodwar->registerEvent([pos, lastErr](Game*){ Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); },   // action
+					nullptr,    // condition
+					Broodwar->getLatencyFrames());  // frames to run
 
-					// Retrieve the supply provider type in the case that we have run out of supplies
-					UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
-					static int lastChecked = 0;
+				// Retrieve the supply provider type in the case that we have run out of supplies
+				UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
+				static int lastChecked = 0;
 
-					// If we are supply blocked and haven't tried constructing more recently
-					if (lastErr == Errors::Insufficient_Supply &&
-						lastChecked + 400 < Broodwar->getFrameCount() &&
-						Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
-					{
-						lastChecked = Broodwar->getFrameCount();
+				// If we are supply blocked and haven't tried constructing more recently
+				if (lastErr == Errors::Insufficient_Supply &&
+					lastChecked + 400 < Broodwar->getFrameCount() &&
+					Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
+				{
+					lastChecked = Broodwar->getFrameCount();
 
-						// Retrieve a unit that is capable of constructing the supply needed
-						Unit supplyBuilder = u->getClosestUnit(GetType == supplyProviderType.whatBuilds().first &&
-							(IsIdle || IsGatheringMinerals) &&
-							IsOwned);
-						// If a unit was found
-						if (supplyBuilder)
-						{
-							if (supplyProviderType.isBuilding())
-							{
-								TilePosition targetBuildLocation = Broodwar->getBuildLocation(supplyProviderType, supplyBuilder->getTilePosition());
-								if (targetBuildLocation)
-								{
-									// Register an event that draws the target build location
-									Broodwar->registerEvent([targetBuildLocation, supplyProviderType](Game*)
-									{
-										Broodwar->drawBoxMap(Position(targetBuildLocation),
-											Position(targetBuildLocation + supplyProviderType.tileSize()),
-											Colors::Blue);
-									},
-										nullptr,  // condition
-										supplyProviderType.buildTime() + 100);  // frames to run
-
-									// Order the builder to construct the supply structure
-									supplyBuilder->build(supplyProviderType, targetBuildLocation);
-								}
-							}
-							else
-							{
-								// Train the supply provider (Overlord) if the provider is not a structure
-								supplyBuilder->train(supplyProviderType);
-							}
-						} // closure: supplyBuilder is valid
+					// Retrieve a unit that is capable of constructing the supply needed
+					Unit supplyBuilder = u->getClosestUnit(GetType == supplyProviderType.whatBuilds().first &&
+						(IsIdle || IsGatheringMinerals) && IsOwned);
+					// If a unit was found
+					if (supplyBuilder) {
+						constructBuilding(supplyProviderType, supplyBuilder);
 					} // closure: insufficient supply
 				} // closure: failed to train idle unit
 			}
+		} // closure: resoruceDepot
 
-
-		}
-		if (u->getType().isRefinery()){
-			refineryFinished = true;
-		}
 	} // closure: unit iterator
 }
 
@@ -293,8 +238,11 @@ void ExampleAIModule::onNukeDetect(BWAPI::Position target)
 	// You can also retrieve all the nuclear missile targets using Broodwar->getNukeDots()!
 }
 
-void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit)
-{
+void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
+
+	// scouting code
+
+
 }
 
 void ExampleAIModule::onUnitEvade(BWAPI::Unit unit)
@@ -309,8 +257,14 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 {
 }
 
-void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
-{
+void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
+
+	releaseMinerals(unit);
+
+	if (unit->getType().isWorker()) {
+		workers++;
+	}
+
 	if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
@@ -328,8 +282,10 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 {
 }
 
-void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)
-{
+void ExampleAIModule::onUnitMorph(BWAPI::Unit unit) {
+
+	releaseMinerals(unit);
+
 	if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
@@ -354,30 +310,71 @@ void ExampleAIModule::onSaveGame(std::string gameName)
 
 void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
 {
+
+	if (unit->getType().isRefinery()){
+		refineryFinished = true;
+	}
+
 }
 
-void ExampleAIModule::buildRefinery(BWAPI::Unit unit){
-	Broodwar->sendText("Building assimilator");
 
-	// Retrive the refinary type for the playing race
-	UnitType refineryType = UnitTypes::Protoss_Assimilator;
+void ExampleAIModule::releaseMinerals(BWAPI::Unit unit){
+	if (unit->getType().isBuilding()) {
+		int mineralPrice = unit->getType().mineralPrice();
+		std::vector<int>::iterator it; 		// iteratation vector
+		for (it = pendingBuildings.begin(); it != pendingBuildings.end(); it++){
+			// remove the price if it is found in the vector
+			if (*it == mineralPrice){
+				mineralsReserved -= mineralPrice;
+				pendingBuildings.erase(it);
+				// break the loop to make sure no dublicates are removed
+				break;
+			}
+		}
+	}
+}
 
-	TilePosition targetBuildLocation = Broodwar->getBuildLocation(refineryType,
-		unit->getTilePosition());
+void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker){
+	int buildingPrice = buildingType.mineralPrice();
+	TilePosition targetBuildLocation = Broodwar->getBuildLocation(buildingType,
+		worker->getTilePosition());
 	if (targetBuildLocation) {
 		// Register an event that draws the target build location
-		Broodwar->registerEvent([targetBuildLocation, refineryType](Game*) {
+		Broodwar->registerEvent([targetBuildLocation, buildingType](Game*) {
 			Broodwar->drawBoxMap(Position(targetBuildLocation),
-				Position(targetBuildLocation + refineryType.tileSize()),
+				Position(targetBuildLocation + buildingType.tileSize()),
 				Colors::Yellow);
 		},
 			nullptr,  // condition
-			refineryType.buildTime() + 100);  // frames to run
+			buildingType.buildTime() + 100);  // frames to run
 
-		// Order the builder to construct the supply structure
-		unit->build(refineryType, targetBuildLocation);
-		refinery = true;
+		// Order the worker to construct the structure
+		worker->build(buildingType, targetBuildLocation);
+		mineralsReserved += buildingPrice;
+		pendingBuildings.push_back(buildingPrice);
 	}
+}
+
+void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
+	static int lastChecked = 0;
+	UnitType supplyType = UnitTypes::Protoss_Pylon;
+	if (((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) / 2 < 4
+		|| Broodwar->self()->supplyUsed() < 17)
+		&& lastChecked + 400 < Broodwar->getFrameCount()
+		&& Broodwar->self()->minerals() >= supplyType.mineralPrice()
+		&& Broodwar->self()->incompleteUnitCount(supplyType) == 0) {
+
+		lastChecked = Broodwar->getFrameCount();
+		constructBuilding(supplyType, worker);
+
+		if (firstPylon){
+			scout = worker;
+			goScout(worker);
+		}
+	}
+}
+
+void ExampleAIModule::goScout(BWAPI::Unit scout){
 
 
 
