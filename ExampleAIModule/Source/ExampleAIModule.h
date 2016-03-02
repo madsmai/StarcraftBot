@@ -1,8 +1,12 @@
 #pragma once
 #include <BWAPI.h>
 #include <vector> // for std::vector
+#include <BWTA.h>
+#include <windows.h>
 
 // Remember not to use "Broodwar" in any global class constructor!
+
+DWORD WINAPI AnalyzeThread();
 
 class ExampleAIModule : public BWAPI::AIModule
 {
@@ -17,10 +21,16 @@ public:
 	bool firstPylon;
 	BWAPI::Unit scout;
 
+	
+
 	void releaseMinerals(BWAPI::Unit unit);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
 	void supplyCheckAndBuild(BWAPI::Unit worker);
 	void goScout(BWAPI::Unit scout);
+
+	void drawTerrainData();
+
+	
 
 	std::vector<int> pendingBuildings;
 
