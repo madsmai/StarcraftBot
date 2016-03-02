@@ -13,7 +13,7 @@ bool analysis_just_finished;
 void ExampleAIModule::onStart()
 {
 	// Hello World!
-	Broodwar->sendText("Hi World!");
+	Broodwar->sendText("Hey World!");
 
 	// Print the map name.
 	// BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
