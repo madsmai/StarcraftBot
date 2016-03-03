@@ -6,3 +6,7 @@ using namespace Filter;
 void ExampleAIModule::onStart(){
 	Broodwar->sendText("Hello me!");
 }
+
+void ExampleAIModule::onFrame(){
+
+}
