@@ -18,14 +18,14 @@ public:
 	int workers;
 	int mineralsReserved;
 
-	bool firstPylon;
+	bool scouting;
 	BWAPI::Unit scout;
 
-	std::set<TilePosition> startPositions;
-
-	std::set<BWTA::BaseLocation*>& baseLocations;
-
-
+	std::set<BWTA::BaseLocation*> baseLocations;
+	BWTA::BaseLocation* scoutedBase;
+	BWTA::BaseLocation* enemyBase;
+	BWTA::BaseLocation* expansion;
+	BWTA::BaseLocation* ourBase;
 
 	void releaseMinerals(BWAPI::Unit unit);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
@@ -35,7 +35,6 @@ public:
 	void drawTerrainData();
 
 	std::vector<int> pendingBuildings;
-
 
 	// Virtual functions for callbacks, leave these as they are.
 	virtual void onStart();

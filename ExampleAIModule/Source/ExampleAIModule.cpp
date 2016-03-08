@@ -10,6 +10,7 @@ using namespace Filter;
 bool analyzed;
 bool analysis_just_finished;
 
+
 void ExampleAIModule::onStart()
 {
 	// Hello World!
@@ -61,14 +62,14 @@ void ExampleAIModule::onStart()
 	mineralsReserved = 0;
 	pendingBuildings;
 	scout = NULL;
-	firstPylon = true;
-	startPositions;
+	scouting = true;
 
 	// BWTA2 MAP ANALYSIS YO
 	BWTA::readMap();
 	BWTA::analyze();
 	analyzed = false;
 	analysis_just_finished = false;
+	ourBase = BWTA::getStartLocation(Broodwar->self());
 
 
 	Broodwar << "Analyzing map... this may take a minute" << std::endl;;
@@ -226,10 +227,10 @@ void ExampleAIModule::onFrame()
 
 void ExampleAIModule::onSendText(std::string text) {
 
-	
-		// Send the text to the game if it is not being processed.
-		Broodwar->sendText("%s", text.c_str());
-	
+
+	// Send the text to the game if it is not being processed.
+	Broodwar->sendText("%s", text.c_str());
+
 
 
 	// Make sure to use %s and pass the text as a parameter,
@@ -271,8 +272,30 @@ void ExampleAIModule::onNukeDetect(BWAPI::Position target)
 void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 	// scouting code
+	Broodwar->sendText("onUnitDiscover");
+	if (scouting){
+		Broodwar->sendText("scouting");
+		if (unit->getType().isResourceDepot()) {
+			Broodwar->sendText("Unit discovered was a resource depot");
+			if (BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
+				Broodwar->sendText("Location is a start location");
+				if (unit->getPlayer()->getName() != Broodwar->self()->getName()) {
+					Broodwar->sendText("Owner of unit is an enemy player");
 
-
+					enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
+					scout->move(ourBase->getPosition());
+					scouting = false;
+					Broodwar->sendText("Done scouting, found mainbase");
+				}
+			}
+		}
+	}
+	else if (unit->getPlayer()->getName() != Broodwar->self()->getName() && UnitTypes::Buildings.isResourceDepot() && scouting) {
+		expansion = BWTA::getNearestBaseLocation(unit->getPosition());
+		scout->move(ourBase->getPosition());
+		scouting = false;
+		Broodwar->sendText("Done scouting, found expansion");
+	}
 }
 
 void ExampleAIModule::onUnitEvade(BWAPI::Unit unit)
@@ -293,6 +316,9 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 
 	if (unit->getType().isWorker()) {
 		workers++;
+	}
+	if (scouting && scout != NULL && unit->getType() == UnitTypes::Protoss_Pylon && Broodwar->self()->supplyTotal() < 19){
+		goScout(scout);
 	}
 
 	if (Broodwar->isReplay())
@@ -397,39 +423,32 @@ void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(supplyType, worker);
 
-		if (firstPylon){
+		if (Broodwar->self()->supplyTotal() < 19){
 			scout = worker;
-			goScout(worker);
 		}
 	}
 }
 
 void ExampleAIModule::goScout(BWAPI::Unit scout){
-
-	//BWTA::BaseLocation enemyBase = BWTA::getBaseLocations
 	baseLocations = BWTA::getStartLocations();
-	
+	double minDistance = 9999999;
+
 	std::set<BWTA::BaseLocation*>::iterator it; 		// iteratation set
 	for (it = baseLocations.begin(); it != baseLocations.end(); ++it){
-		// remove the price if it is found in the vector
-		if (*it == BWTA::getStartLocation(Broodwar->self())){
-			baseLocations.erase(it);
+		scoutedBase = *it;
+		// Remove our baselocation
+		if (scoutedBase->getPosition() == ourBase->getPosition()){
+			baseLocations.erase(*it);
+			Broodwar->sendText("Removed our base");
 		}
-		else {
-			scout->move(BWTA::getNearestBaseLocation(scout->getPosition())->getPosition());
-			
+		else if (ourBase->getGroundDistance(scoutedBase) < minDistance) {
+			minDistance = ourBase->getGroundDistance(scoutedBase);
+			Broodwar->sendText("Moving to enemybase");
+			scout->move(scoutedBase->getPosition());
+			Broodwar->sendText("Removing found base");
+			baseLocations.erase(*it);
 		}
-
-		
-
-		//if (*it == BWTA::getNearestBaseLocation(scout->getPosition())){}
 	}
-
-	
-
-	
-
-
 }
 
 
