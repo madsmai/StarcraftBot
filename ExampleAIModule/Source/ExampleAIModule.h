@@ -17,6 +17,7 @@ public:
 	int refineryWorkers;
 	int workers;
 	int mineralsReserved;
+	bool zealot_rush;
 
 	bool scouting;
 	BWAPI::Unit scout;
@@ -30,12 +31,15 @@ public:
 	void releaseMinerals(BWAPI::Unit unit);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
 	void supplyCheckAndBuild(BWAPI::Unit worker);
+	void gatewayCheckAndBuild(BWAPI::Unit worker);
 	void goScout(BWAPI::Unit scout);
 
 	void drawTerrainData();
 
 	std::vector<int> pendingBuildings;
 	std::vector<BWAPI::Unit> enemyUnits;
+	int our_gateways;
+	bool building_gateway;
 
 	// Virtual functions for callbacks, leave these as they are.
 	virtual void onStart();

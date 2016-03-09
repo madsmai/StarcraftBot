@@ -55,14 +55,22 @@ void ExampleAIModule::onStart()
 			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
 	}
 
+
+	// tactics
+	zealot_rush = true;
+	
+
+
 	// setting values
 	refinery = false;
 	refineryFinished = false;
 	workers = 0;
 	mineralsReserved = 0;
 	pendingBuildings;
+	enemyUnits;
 	scout = NULL;
 	scouting = true;
+	building_gateway = false;
 
 	// BWTA2 MAP ANALYSIS YO
 	BWTA::readMap();
@@ -138,11 +146,14 @@ void ExampleAIModule::onFrame()
 		// If the unit is a worker unit
 		if (u->getType().isWorker() && u != scout) {
 
+
+			gatewayCheckAndBuild(u);
 			supplyCheckAndBuild(u);
 
 			// checks for a refinery
 			if (!refinery && Broodwar->self()->minerals() >= UnitTypes::Protoss_Assimilator.mineralPrice()
-				&& (Broodwar->self()->supplyUsed() / 2) > 10){
+				&& (Broodwar->self()->supplyUsed() / 2) > 10
+				&& !zealot_rush){
 				UnitType refineryType = UnitTypes::Protoss_Assimilator;
 				constructBuilding(refineryType, u);
 				refinery = true;
@@ -186,7 +197,9 @@ void ExampleAIModule::onFrame()
 			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice()
 				&& u->isIdle()
 				&& workers < 25
-				&& !u->train(u->getType().getRace().getWorker())){
+				&& !u->train(u->getType().getRace().getWorker())
+				&& !(workers >= 10 && our_gateways == 0)
+				&& !(workers >= 12 && our_gateways == 1)){
 
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
@@ -313,6 +326,11 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 
 	releaseMinerals(unit);
 
+	if (unit->getType() == UnitTypes::Protoss_Gateway){
+		building_gateway = false;
+		our_gateways++;
+	}
+
 	if (unit->getType().isWorker()) {
 		workers++;
 	}
@@ -413,6 +431,23 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 		mineralsReserved += buildingPrice;
 		pendingBuildings.push_back(buildingPrice);
 	}
+}
+
+void ExampleAIModule::gatewayCheckAndBuild(BWAPI::Unit worker){
+
+	static int lastChecked = 0;
+	UnitType building = UnitTypes::Protoss_Gateway;
+	if (zealot_rush
+		&& (Broodwar->self()->supplyUsed() / 2 >= 10 && our_gateways == 0)
+		|| (Broodwar->self()->supplyUsed() / 2 >= 12 && our_gateways == 1)
+		&& Broodwar->self()->minerals() >= building.mineralPrice()
+		&& lastChecked + 800 < Broodwar->getFrameCount()){
+
+		lastChecked = Broodwar->getFrameCount();
+		constructBuilding(UnitTypes::Protoss_Gateway, worker);
+		building_gateway = true;
+	}
+
 }
 
 void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
