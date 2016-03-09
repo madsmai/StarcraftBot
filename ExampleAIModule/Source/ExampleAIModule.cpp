@@ -105,6 +105,7 @@ void ExampleAIModule::onFrame() {
 		for (BWAPI::Unit zealot : ourZealots){
 			zealot->attack(enemyBase->getPosition());
 		}
+		zealotMAX = zealotMAX * 2;
 
 	}
 
@@ -161,6 +162,23 @@ void ExampleAIModule::onFrame() {
 		if (u->getType() == UnitTypes::Protoss_Gateway
 			&& zealot_rush){
 			trainZealots(u);
+		}
+		if (u->getType() == UnitTypes::Protoss_Zealot && u->isIdle()) {
+
+			//TODO: Find en god radius til det her
+			BWAPI::Unitset closestUnits = u->getUnitsInRadius(50);
+			u->attack(closestUnits.getClosestUnit());
+		}
+
+		if (u->getType() == UnitTypes::Protoss_Zealot && u->isUnderAttack()) {
+			BWAPI::Unitset attackingUnits = u->getUnitsInRadius(4);
+			u->attack(attackingUnits.getClosestUnit());
+			Broodwar->sendText("Attacking closest unit");
+		}
+
+		if (u->getType().isWorker() && u == scout && u->isUnderAttack()) {
+			scout->move(ourBase->getPosition());
+			scout = NULL;
 		}
 
 		// If the unit is a worker unit
@@ -324,8 +342,6 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 		enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
 		scout->move(unit->getPosition());
 		scout->attack(unit);
-		scout->stop();
-		scout->move(ourBase->getPosition());
 		scouting = false;
 		Broodwar->sendText("Done scouting, found mainbase");
 
