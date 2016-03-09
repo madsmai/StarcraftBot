@@ -48,7 +48,7 @@ public:
 	int ourZealotsSize;
 	std::vector<BWAPI::Unit> ourZealots;
 
-	//zealot rush tactic
+	//zealot rush tactics
 	bool zealot_rush;
 	int zealotMAX;
 
