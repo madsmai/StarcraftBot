@@ -35,6 +35,7 @@ public:
 	void drawTerrainData();
 
 	std::vector<int> pendingBuildings;
+	std::vector<BWAPI::Unit> enemyUnits;
 
 	// Virtual functions for callbacks, leave these as they are.
 	virtual void onStart();

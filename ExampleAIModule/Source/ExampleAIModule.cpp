@@ -97,12 +97,10 @@ void ExampleAIModule::onFrame()
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
 		return;
 
-
 	//BWTA draw
 	if (analyzed) {
 		drawTerrainData();
 	}
-
 	if (analysis_just_finished) {
 		Broodwar << "Finished analyzing map." << std::endl;;
 		analysis_just_finished = false;
@@ -113,7 +111,6 @@ void ExampleAIModule::onFrame()
 	// Latency frames are the number of frames before commands are processed.
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
-
 
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits()) {
@@ -139,7 +136,7 @@ void ExampleAIModule::onFrame()
 		// -----------------------------!!----------------------------------
 
 		// If the unit is a worker unit
-		if (u->getType().isWorker()) {
+		if (u->getType().isWorker() && u != scout) {
 
 			supplyCheckAndBuild(u);
 
@@ -272,21 +269,30 @@ void ExampleAIModule::onNukeDetect(BWAPI::Position target)
 void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 	// scouting code
-	Broodwar->sendText("onUnitDiscover");
+
+	if (unit->getPlayer()->isEnemy(Broodwar->self())){
+		enemyUnits.push_back(unit);
+		Broodwar << "Unit found: " << unit->getType().getName() << "!" << std::endl;
+		
+	}
+
 	if (scouting
 		&& unit->getType().isResourceDepot()
 		&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
-		&& unit->getPlayer() != Broodwar->self()){
+		&& unit->getPlayer()->isEnemy(Broodwar->self())){	
+
 		enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
-		scout->move(ourBase->getPosition());
+		scout->move(unit->getPosition());
 		scouting = false;
 		Broodwar->sendText("Done scouting, found mainbase");
+
 	}
 	else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot() && scouting) {
+
 		expansion = BWTA::getNearestBaseLocation(unit->getPosition());
-		scout->move(ourBase->getPosition());
-		scouting = false;
-		Broodwar->sendText("Done scouting, found expansion");
+		scout->move(unit->getPosition());
+		Broodwar->sendText("Found expansion");
+		goScout(scout);
 	}
 
 }
@@ -310,7 +316,8 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 	if (unit->getType().isWorker()) {
 		workers++;
 	}
-	if (scouting && scout != NULL && unit->getType() == UnitTypes::Protoss_Pylon && Broodwar->self()->supplyTotal() < 19){
+	if (scouting && scout != NULL && unit->getType() == UnitTypes::Protoss_Pylon
+		&& Broodwar->self()->supplyTotal() < 19){
 		goScout(scout);
 	}
 
