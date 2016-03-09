@@ -23,6 +23,10 @@ public:
 	//Function for getting an instance
 	static ProbeManager& getInstance();
 
+	//Helper methods
+	bool becomeScout(BWAPI::Unit);
+	bool constructBuilding(BWAPI::Unit, BWAPI::UnitType);
+
 	//Getters and setters
 	std::vector<BWAPI::Unit> getProbes();
 	void setProbes(std::vector<BWAPI::Unit>);
