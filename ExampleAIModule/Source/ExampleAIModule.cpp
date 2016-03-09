@@ -58,7 +58,7 @@ void ExampleAIModule::onStart()
 
 	// tactics
 	zealot_rush = true;
-	
+	zealotMAX = 6;
 
 
 	// setting values
@@ -71,6 +71,10 @@ void ExampleAIModule::onStart()
 	scout = NULL;
 	scouting = true;
 	building_gateway = false;
+	our_gateways = 0;
+	zealotsInTraining = 0;
+	ourZealots;
+	ourZealotsSize = 0;
 
 	// BWTA2 MAP ANALYSIS YO
 	BWTA::readMap();
@@ -93,8 +97,18 @@ void ExampleAIModule::onEnd(bool isWinner)
 	}
 }
 
-void ExampleAIModule::onFrame()
-{
+void ExampleAIModule::onFrame() {
+
+
+	if (ourZealotsSize >= zealotMAX){
+
+		for (BWAPI::Unit zealot : ourZealots){
+			zealot->attack(enemyBase->getPosition());
+		}
+
+	}
+
+
 	// Called once every game frame
 
 	// Display the game frame rate as text in the upper left area of the screen
@@ -142,6 +156,12 @@ void ExampleAIModule::onFrame()
 
 		// Finally make the unit do some stuff!
 		// -----------------------------!!----------------------------------
+
+
+		if (u->getType() == UnitTypes::Protoss_Gateway
+			&& zealot_rush){
+			trainZealots(u);
+		}
 
 		// If the unit is a worker unit
 		if (u->getType().isWorker() && u != scout) {
@@ -197,9 +217,10 @@ void ExampleAIModule::onFrame()
 			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice()
 				&& u->isIdle()
 				&& workers < 25
+				&& (!(workers >= 10 && our_gateways == 0)
+				|| !(workers >= 12 && our_gateways == 1))
 				&& !u->train(u->getType().getRace().getWorker())
-				&& !(workers >= 10 && our_gateways == 0)
-				&& !(workers >= 12 && our_gateways == 1)){
+				){
 
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
@@ -241,6 +262,12 @@ void ExampleAIModule::onSendText(std::string text) {
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", text.c_str());
 
+	if (text == "zealotsInTraining"){
+		Broodwar << zealotsInTraining << std::endl;
+	}
+	else if (text == "ourZealotsSize"){
+		Broodwar << ourZealotsSize << std::endl;
+	}
 
 
 	// Make sure to use %s and pass the text as a parameter,
@@ -286,21 +313,25 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 	if (unit->getPlayer()->isEnemy(Broodwar->self())){
 		enemyUnits.push_back(unit);
 		Broodwar << "Unit found: " << unit->getType().getName() << "!" << std::endl;
-		
+
 	}
 
 	if (scouting
 		&& unit->getType().isResourceDepot()
 		&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
-		&& unit->getPlayer()->isEnemy(Broodwar->self())){	
+		&& unit->getPlayer()->isEnemy(Broodwar->self())){
 
 		enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
 		scout->move(unit->getPosition());
+		scout->attack(unit);
+		scout->stop();
+		scout->move(ourBase->getPosition());
 		scouting = false;
 		Broodwar->sendText("Done scouting, found mainbase");
 
 	}
-	else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot() && scouting) {
+	else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot() 
+		&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
 
 		expansion = BWTA::getNearestBaseLocation(unit->getPosition());
 		scout->move(unit->getPosition());
@@ -323,6 +354,14 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 }
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
+
+
+
+	if (unit->getType() == UnitTypes::Protoss_Zealot){
+		zealotsInTraining++;
+		Broodwar << "Zealots in training are: " << zealotsInTraining << std::endl;
+		Broodwar << "Zealots done are:  " << ourZealotsSize << std::endl;
+	}
 
 	releaseMinerals(unit);
 
@@ -353,8 +392,22 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
 
+	Broodwar << unit->getPlayer()->getName() << " Lost a unit" << std::endl;
+	Broodwar << unit->getType().getName() << " was destryoed!" << std::endl;
+
+	if (unit->getPlayer()->isEnemy(Broodwar->self())){
+		releaseFromList(unit, enemyUnits);
+	}
+
+	if (unit->getType() == BWAPI::UnitTypes::Protoss_Zealot
+		&& unit->getPlayer() == Broodwar->self()){
+		releaseFromList(unit, ourZealots);
+		ourZealotsSize--;
+	}
+
 	if (unit == scout){
 		scouting = false;
+		workers--;
 		//scout = NULL;
 	}
 
@@ -389,8 +442,51 @@ void ExampleAIModule::onSaveGame(std::string gameName)
 void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
 {
 
+	if (unit->getType() == UnitTypes::Protoss_Zealot
+		&& unit->getPlayer() == Broodwar->self()){
+		ourZealots.push_back(unit);
+		zealotsInTraining--;
+		ourZealotsSize++;
+	}
+
+	if (unit->getType() == UnitTypes::Protoss_Gateway){
+		unit->setRallyPoint(BWTA::getNearestChokepoint(ourBase->getPosition())->getCenter());
+	}
+
+
 	if (unit->getType().isRefinery()){
 		refineryFinished = true;
+	}
+
+}
+
+
+void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
+
+	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
+	int zealotPrice = zealot.mineralPrice();
+
+	if (gateway->isIdle()
+		&& Broodwar->self()->minerals() - mineralsReserved >= zealotPrice
+		&& (zealotsInTraining + ourZealotsSize) < zealotMAX
+		&& Broodwar->self()->supplyUsed() < Broodwar->self()->supplyTotal()){
+
+		gateway->train(zealot);
+	}
+
+
+}
+
+
+void ExampleAIModule::releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list){
+
+	std::vector<BWAPI::Unit>::iterator it; 		// iteratation vector
+	for (it = list.begin(); it != list.end(); it++){
+		// remove the price if it is found in the vector
+		if (*it == unit){
+			list.erase(it);
+			break;
+		}
 	}
 
 }
@@ -435,15 +531,16 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 
 void ExampleAIModule::gatewayCheckAndBuild(BWAPI::Unit worker){
 
-	static int lastChecked = 0;
+	static int lastChecked2 = 0;
 	UnitType building = UnitTypes::Protoss_Gateway;
 	if (zealot_rush
-		&& (Broodwar->self()->supplyUsed() / 2 >= 10 && our_gateways == 0)
-		|| (Broodwar->self()->supplyUsed() / 2 >= 12 && our_gateways == 1)
-		&& Broodwar->self()->minerals() >= building.mineralPrice()
-		&& lastChecked + 800 < Broodwar->getFrameCount()){
+		&& ((Broodwar->self()->supplyUsed() / 2 >= 10 && our_gateways == 0)
+		|| (Broodwar->self()->supplyUsed() / 2 >= 12 && our_gateways == 1))
+		&& Broodwar->self()->minerals() - mineralsReserved >= building.mineralPrice()
+		&& lastChecked2 + 400 < Broodwar->getFrameCount()
+		){
 
-		lastChecked = Broodwar->getFrameCount();
+		lastChecked2 = Broodwar->getFrameCount();
 		constructBuilding(UnitTypes::Protoss_Gateway, worker);
 		building_gateway = true;
 	}
@@ -456,7 +553,7 @@ void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
 	if (((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) / 2 < 4
 		|| Broodwar->self()->supplyUsed() < 17)
 		&& lastChecked + 400 < Broodwar->getFrameCount()
-		&& Broodwar->self()->minerals() >= supplyType.mineralPrice()
+		&& Broodwar->self()->minerals() - mineralsReserved >= supplyType.mineralPrice()
 		&& Broodwar->self()->incompleteUnitCount(supplyType) == 0) {
 
 		lastChecked = Broodwar->getFrameCount();

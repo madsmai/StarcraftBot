@@ -17,7 +17,8 @@ public:
 	int refineryWorkers;
 	int workers;
 	int mineralsReserved;
-	bool zealot_rush;
+	
+	int our_gateways;
 
 	bool scouting;
 	BWAPI::Unit scout;
@@ -29,17 +30,28 @@ public:
 	BWTA::BaseLocation* ourBase;
 
 	void releaseMinerals(BWAPI::Unit unit);
+	void releaseEnemyBuilding(BWAPI::Unit unit);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
 	void supplyCheckAndBuild(BWAPI::Unit worker);
 	void gatewayCheckAndBuild(BWAPI::Unit worker);
 	void goScout(BWAPI::Unit scout);
-
+	void trainZealots(BWAPI::Unit gateway);
 	void drawTerrainData();
+	void releaseZealot(BWAPI::Unit unit);
+	void releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list);
 
 	std::vector<int> pendingBuildings;
 	std::vector<BWAPI::Unit> enemyUnits;
-	int our_gateways;
+
 	bool building_gateway;
+	int zealotsInTraining;
+	int ourZealotsSize;
+	std::vector<BWAPI::Unit> ourZealots;
+
+	//zealot rush tactic
+	bool zealot_rush;
+	int zealotMAX;
+
 
 	// Virtual functions for callbacks, leave these as they are.
 	virtual void onStart();
