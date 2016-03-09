@@ -273,29 +273,22 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 	// scouting code
 	Broodwar->sendText("onUnitDiscover");
-	if (scouting){
-		Broodwar->sendText("scouting");
-		if (unit->getType().isResourceDepot()) {
-			Broodwar->sendText("Unit discovered was a resource depot");
-			if (BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
-				Broodwar->sendText("Location is a start location");
-				if (unit->getPlayer()->getName() != Broodwar->self()->getName()) {
-					Broodwar->sendText("Owner of unit is an enemy player");
-
-					enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
-					scout->move(ourBase->getPosition());
-					scouting = false;
-					Broodwar->sendText("Done scouting, found mainbase");
-				}
-			}
-		}
+	if (scouting
+		&& unit->getType().isResourceDepot()
+		&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
+		&& unit->getPlayer() != Broodwar->self()){
+		enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
+		scout->move(ourBase->getPosition());
+		scouting = false;
+		Broodwar->sendText("Done scouting, found mainbase");
 	}
-	else if (unit->getPlayer()->getName() != Broodwar->self()->getName() && UnitTypes::Buildings.isResourceDepot() && scouting) {
+	else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot() && scouting) {
 		expansion = BWTA::getNearestBaseLocation(unit->getPosition());
 		scout->move(ourBase->getPosition());
 		scouting = false;
 		Broodwar->sendText("Done scouting, found expansion");
 	}
+
 }
 
 void ExampleAIModule::onUnitEvade(BWAPI::Unit unit)
@@ -321,8 +314,7 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 		goScout(scout);
 	}
 
-	if (Broodwar->isReplay())
-	{
+	if (Broodwar->isReplay()) {
 		// if we are in a replay, then we will print out the build order of the structures
 		if (unit->getType().isBuilding() && !unit->getPlayer()->isNeutral())
 		{
@@ -334,8 +326,13 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 	}
 }
 
-void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
-{
+void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
+
+	if (unit == scout){
+		scouting = false;
+		//scout = NULL;
+	}
+
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit unit) {
