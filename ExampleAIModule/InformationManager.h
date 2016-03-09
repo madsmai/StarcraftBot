@@ -1,4 +1,7 @@
 #pragma once
+
+#include <BWAPI.h>
+
 class InformationManager
 {
 public:

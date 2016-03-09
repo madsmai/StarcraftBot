@@ -10,7 +10,8 @@ TODO:
 	- Sende idle probes til nærmeste mineral patch
 - metode onUnitDestroy:
 	- Fjerne destroyed object fra listen, hvis den er i listen
-
+- metode onUnitComplete:
+	- Sætter completed unit ind i liste, hvis den hører til
 */
 
 ProbeManager::ProbeManager()
@@ -26,7 +27,11 @@ void ProbeManager::onFrame(){
 
 }
 
-void ProbeManager::onUnitDestroy(){
+void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
+
+}
+
+void ProbeManager::onUnitComplete(BWAPI::Unit unit){
 
 }
 

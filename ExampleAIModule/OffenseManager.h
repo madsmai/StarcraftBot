@@ -1,9 +1,13 @@
 #pragma once
+
+#include <BWAPI.h>
+
 class OffenseManager
 {
 public:
 	OffenseManager();
 	~OffenseManager();
-	void onUnitDestroy();
+	void onUnitDestroy(BWAPI::Unit unit);
+	void onUnitComplete(BWAPI::Unit unit);
 };
 

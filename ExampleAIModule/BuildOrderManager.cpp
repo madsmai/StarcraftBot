@@ -18,3 +18,11 @@ BuildOrderManager::BuildOrderManager()
 BuildOrderManager::~BuildOrderManager()
 {
 }
+
+void BuildOrderManager::onFrame(){
+
+}
+
+void BuildOrderManager::onUnitDestroy(BWAPI::Unit unit){
+
+}

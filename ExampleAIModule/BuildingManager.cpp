@@ -10,6 +10,8 @@ TODO:
 			så det går hurtigere
 - metode onUnitDestroy:
 	- Fjerne destroyed object fra listen, hvis den er i listen
+- metode onUnitComplete:
+	- Sætter completed unit ind i liste, hvis den hører til
 */
 
 BuildingManager::BuildingManager()
@@ -25,6 +27,10 @@ void BuildingManager::onFrame(){
 
 }
 
-void BuildingManager::onUnitDestroy(){
+void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
+
+}
+
+void BuildingManager::onUnitComplete(BWAPI::Unit unit){
 
 }

@@ -7,7 +7,9 @@ TODO:
 	alt efter modstanderens forsvar
 - En måde at få zealots til at prioriterer hvad de angriber
 - metode onUnitDestroy:
-- Fjerne destroyed object fra listen, hvis den er i listen
+	- Fjerne destroyed object fra listen, hvis den er i listen
+- metode onUnitComplete:
+	- Sætter completed unit ind i liste, hvis den hører til
 */
 
 OffenseManager::OffenseManager()
@@ -18,6 +20,10 @@ OffenseManager::~OffenseManager()
 {
 }
 
-void OffenseManager::onUnitDestroy(){
+void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
+
+}
+
+void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 
 }
