@@ -14,3 +14,8 @@ InformationManager::InformationManager()
 InformationManager::~InformationManager()
 {
 }
+
+InformationManager& InformationManager::getInstance(){ //Return ref to InformationManager object
+	static InformationManager i; //Make static instance i
+	return i;
+}

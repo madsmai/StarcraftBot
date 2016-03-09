@@ -7,5 +7,7 @@ class ResourceManager
 public:
 	ResourceManager();
 	~ResourceManager();
+
+	ResourceManager& ResourceManager::getInstance();
 };
 

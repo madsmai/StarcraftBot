@@ -5,6 +5,7 @@ using namespace Filter;
 
 void ExampleAIModule::onStart(){
 	Broodwar->sendText("Hello me!");
+	ProbeManager::getInstance().onStart();
 }
 
 void ExampleAIModule::onFrame()

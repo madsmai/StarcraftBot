@@ -32,3 +32,8 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 
 }
+
+ScoutManager& ScoutManager::getInstance(){ //Return ref to ScoutManager object
+	static ScoutManager i; //Make static instance i
+	return i;
+}

@@ -27,3 +27,8 @@ void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 
 }
+
+OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager object
+	static OffenseManager i; //Make static instance i
+	return i;
+}

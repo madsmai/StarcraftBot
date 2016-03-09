@@ -16,3 +16,8 @@ ResourceManager::ResourceManager()
 ResourceManager::~ResourceManager()
 {
 }
+
+ResourceManager& ResourceManager::getInstance(){ //Return ref to ResourceManager object
+	static ResourceManager i; //Make static instance i
+	return i;
+}

@@ -7,5 +7,6 @@ class InformationManager
 public:
 	InformationManager();
 	~InformationManager();
+	InformationManager& InformationManager::getInstance();
 };
 

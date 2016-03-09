@@ -26,3 +26,8 @@ void BuildOrderManager::onFrame(){
 void BuildOrderManager::onUnitDestroy(BWAPI::Unit unit){
 
 }
+
+BuildOrderManager& BuildOrderManager::getInstance(){ //Return ref to BuildOrderManager object
+	static BuildOrderManager i; //Make static instance i
+	return i;
+}

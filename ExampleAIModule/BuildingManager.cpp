@@ -34,3 +34,8 @@ void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
 void BuildingManager::onUnitComplete(BWAPI::Unit unit){
 
 }
+
+BuildingManager& BuildingManager::getInstance(){ //Return ref to BuildingManager object
+	static BuildingManager i; //Make static instance i
+	return i;
+}
