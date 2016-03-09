@@ -96,9 +96,6 @@
   <ItemGroup>
     <ClInclude Include="Source\ExampleAIModule.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\..\Desktop\plan.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
