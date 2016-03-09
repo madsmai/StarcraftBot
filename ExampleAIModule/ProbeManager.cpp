@@ -4,9 +4,8 @@
 TODO:
 - Liste af probes
 - Liste af bygninger der skal bygges af probes
-- metode onFrame :
+- metode onFrame:
 	- Sende tætteste probe ud for at bygge næste bygning hvis der er nok materialer
-	- Sende en probe til ScoutManager og sletter probe fra egen liste, hvis bedt om det
 	- Sende idle probes til nærmeste mineral patch
 - metode onUnitDestroy:
 	- Fjerne destroyed object fra listen, hvis den er i listen
@@ -14,6 +13,8 @@ TODO:
 	- Sætter completed unit ind i liste, hvis den hører til
 - metode onStart:
 	- Sætter 4 første probes ind i liste af probes
+- metode makeScout:
+	- Sende en probe til ScoutManager og sletter probe fra egen liste, hvis bedt om det
 */
 
 void ProbeManager::onFrame(){
@@ -53,8 +54,8 @@ ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	return i;
 }
 
-//Getters and setters
 
+//Getters and setters
 std::vector<BWAPI::Unit> getProbes(){
 
 }
