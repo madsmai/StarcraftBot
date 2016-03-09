@@ -579,7 +579,7 @@ void ExampleAIModule::goScout(BWAPI::Unit scout){
 		}
 		else if (ourBase->getGroundDistance(scoutedBase) < minDistance) {
 			minDistance = ourBase->getGroundDistance(scoutedBase);
-			Broodwar->sendText("Moving to enemy base");
+			Broodwar->sendText("Moving to enemy basE");
 			scout->move(scoutedBase->getPosition());
 			Broodwar->sendText("Removing found base");
 			baseLocations.erase(*it);
