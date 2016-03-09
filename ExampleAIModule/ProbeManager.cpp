@@ -3,8 +3,6 @@
 
 /*
 TODO:
-- Liste af probes
-- Liste af bygninger der skal bygges af probes
 - metode onFrame:
 	- Sende tætteste probe ud for at bygge næste bygning hvis der er nok materialer
 	- Sende idle probes til nærmeste mineral patch
@@ -17,7 +15,7 @@ TODO:
 - metode makeScout:
 	- Sende en probe til ScoutManager og sletter probe fra egen liste, hvis bedt om det
 - metode constructBuilding:
-	- Forsøger at lave en bygning hvis der er nok mineraler, hvis det lykkedes så returnerer den sand
+	- Forsøger at lave en bygning hvis der er nok mineraler, hvis det lykkedes så returnerer den sandt
 */
 
 void ProbeManager::onFrame(){
@@ -38,10 +36,13 @@ void ProbeManager::onFrame(){
 
 void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 
+
 }
 
 void ProbeManager::onUnitComplete(BWAPI::Unit unit){
-
+	if (unit->getType().isWorker){
+		addProbe(unit);
+	}
 }
 
 void ProbeManager::onStart(){
