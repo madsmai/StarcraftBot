@@ -9,5 +9,6 @@ public:
 	~BuildOrderManager();
 	void onFrame();
 	void onUnitDestroy(BWAPI::Unit unit);
+	BuildOrderManager& BuildOrderManager::getInstance();
 };
 

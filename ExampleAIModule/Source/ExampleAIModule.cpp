@@ -1,38 +1,27 @@
 #include "ExampleAIModule.h"
 
-using namespace BWAPI;
-using namespace Filter;
-
 void ExampleAIModule::onStart(){
-	Broodwar->sendText("Hello me!");
+	BWAPI::Broodwar->sendText("Starting up");
+	ProbeManager::getInstance().onStart();
+	ResourceManager::getInstance().onStart();
 }
 
 void ExampleAIModule::onFrame()
 {
-	// Prevent spamming by only running our onFrame once every number of latency frames.
-	// Latency frames are the number of frames before commands are processed.
-	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
-		return;
+	if (BWAPI::Broodwar->getFrameCount() % BWAPI::Broodwar->getLatencyFrames() != 0) { return; }
+	
+	//Update ProbeManager
+	ProbeManager::getInstance().onFrame();
+}
 
-	// Iterate through all the units that we own
-	for (auto &u : Broodwar->self()->getUnits()) {
+void ExampleAIModule::onUnitComplete(BWAPI::Unit unit){
+	ProbeManager::getInstance().onUnitComplete(unit);
+	ResourceManager::getInstance().onUnitComplete(unit);
+}
 
-		// Ignore the unit if it no longer exists
-		// Make sure to include this block when handling any Unit pointer!
-		if (!u->exists())
-			continue;
+void ExampleAIModule::onSendText(std::string text){
+	BWAPI::Broodwar->sendText("%s", text.c_str());
 
-		// If the unit is a worker unit
-		if (u->getType().isWorker()) {
 
-			// if our worker is idle
-			if (u->isIdle()){
-				//Gather minerals
-				if (!u->gather(u->getClosestUnit(IsMineralField))) {
-					// If that fails, then print the last error message
-					Broodwar << Broodwar->getLastError() << std::endl;
-				}
-			} // closure: if idle
-		} // closure: builder type
-	} // closure: unit iterator
+
 }

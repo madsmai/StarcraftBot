@@ -114,3 +114,8 @@ void InformationManager::currentStatus(){
 						<< enemyTowers.size << "enemy tower(s) \n"
 						<< enemyPassiveBuildings.size << "passive enemy building(s) \n");
 }
+
+InformationManager& InformationManager::getInstance(){ //Return ref to InformationManager object
+	static InformationManager i; //Make static instance i
+	return i;
+}
