@@ -70,19 +70,13 @@ void ExampleAIModule::onStart()
 
 
 	// setting values
-	refinery = false;
-	refineryFinished = false;
-	workers = 0;
 	mineralsReserved = 0;
 	pendingBuildings;
 	enemyUnits;
 	scout = NULL;
 	scouting = true;
-	building_gateway = false;
-	our_gateways = 0;
-	zealotsInTraining = 0;
 	ourZealots;
-	ourZealotsSize = 0;
+	refineryWorkers = 0;
 
 	// BWTA2 MAP ANALYSIS YO
 	BWTA::readMap();
@@ -107,16 +101,9 @@ void ExampleAIModule::onEnd(bool isWinner)
 
 void ExampleAIModule::onFrame() {
 
-
-	if (ourZealotsSize >= zealotMAX){
+	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) >= zealotMAX){
 		for (BWAPI::Unit zealot : ourZealots){
-			if (zealot->getClosestUnit()->getPlayer() != Broodwar->self()
-				&& zealot->getClosestUnit()->canAttack()){
-				zealot->attack(zealot->getClosestUnit());
-			}
-			else {
-				zealot->attack(enemyBase->getPosition());
-			}
+			zealot->attack(enemyBase->getPosition());
 		}
 		zealotMAX = zealotMAX * 2;
 	}
@@ -181,6 +168,7 @@ void ExampleAIModule::onFrame() {
 		}
 
 
+
 		if (u->getType() == UnitTypes::Protoss_Gateway
 			&& zealot_rush){
 			trainZealots(u);
@@ -192,32 +180,25 @@ void ExampleAIModule::onFrame() {
 		}
 
 		if (u->getType() == UnitTypes::Protoss_Zealot && u->isUnderAttack()) {
-
 			u->attack(u->getClosestUnit((Filter::IsEnemy && Filter::CanAttack), 4));
-
 		}
 
 		if (u->getType().isWorker() && u == scout && u->isUnderAttack()) {
 			scout->move(ourBase->getPosition());
+			scouting = false;
 			scout = NULL;
 		}
 
 		// If the unit is a worker unit
-		if (u->getType().isWorker() && u != scout) {
+		if (u->getType().isWorker() 
+			&& u != scout
+			&& !isGasWorker(u)) {
 
 
 			gatewayCheckAndBuild(u);
 			supplyCheckAndBuild(u);
 			buildForge(u);
-
-			// checks for a refinery
-			if (!refinery && Broodwar->self()->minerals() >= UnitTypes::Protoss_Assimilator.mineralPrice()
-				&& (Broodwar->self()->supplyUsed() / 2) > 10
-				&& !zealot_rush){
-				UnitType refineryType = UnitTypes::Protoss_Assimilator;
-				constructBuilding(refineryType, u);
-				refinery = true;
-			}
+			buildRefinery(u);
 
 			// if our worker is idle
 			if (u->isIdle()){
@@ -230,7 +211,9 @@ void ExampleAIModule::onFrame() {
 				else if (!u->getPowerUp())  // The worker cannot harvest anything if it
 				{                             // is carrying a powerup such as a flag
 
-					if (refineryFinished && refineryWorkers < 3) {
+					if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) == 1
+						&& refineryWorkers < 2) {
+						Broodwar << "go gather gas!" << std::endl;
 						if (!u->isGatheringMinerals()){
 							refineryWorkers++;
 							if (!u->gather(u->getClosestUnit(IsRefinery))){
@@ -253,12 +236,14 @@ void ExampleAIModule::onFrame() {
 		// A resource depot is a Command Center, Nexus, or Hatchery
 		else if (u->getType().isResourceDepot()) {
 
+			int workerCount = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Probe);
+			int gatewayCount = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway);
+
 			// Order the depot to construct more workers! But only when it is idle and there is below 25 workers.
 			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice()
 				&& u->isIdle()
-				&& workers < 25
-				&& (!(workers >= 10 && our_gateways == 0)
-				|| !(workers >= 12 && our_gateways == 1))
+				&& workerCount < 25
+				&& (!(workerCount >= 10 && gatewayCount == 0) || !(workerCount >= 12 && gatewayCount == 1))
 				&& !u->train(u->getType().getRace().getWorker())
 				){
 
@@ -302,11 +287,20 @@ void ExampleAIModule::onSendText(std::string text) {
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", text.c_str());
 
-	if (text == "zealotsInTraining"){
-		Broodwar << zealotsInTraining << std::endl;
+	if (text == "incomplete zealots"){
+		Broodwar << Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
 	}
-	else if (text == "ourZealotsSize"){
-		Broodwar << ourZealotsSize << std::endl;
+	else if (text == "completed zealots"){
+		Broodwar << Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
+	}
+	else if (text == "assimilator"){
+		Broodwar << Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) << std::endl;
+	}
+	else if (text == "scout"){
+		if (scout != NULL){
+			Broodwar << scout->exists() << std::endl;
+		}
+		
 	}
 
 
@@ -351,7 +345,7 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 	// scouting code
 
 	if (unit->getPlayer()->isEnemy(Broodwar->self())){
-		enemyUnits.push_back(unit);
+		//enemyUnits.push_back(unit);
 		Broodwar << "Unit found: " << unit->getType().getName() << "!" << std::endl;
 
 	}
@@ -368,14 +362,16 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 		Broodwar->sendText("Done scouting, found mainbase");
 
 	}
-	else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot()
+
+	// TODO:
+	/*else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot()
 		&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
 
 		expansion = BWTA::getNearestBaseLocation(unit->getPosition());
 		scout->move(unit->getPosition());
 		Broodwar->sendText("Found expansion");
 		goScout(scout);
-	}
+	}*/
 
 }
 
@@ -393,24 +389,13 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 
-
-
 	if (unit->getType() == UnitTypes::Protoss_Zealot){
-		zealotsInTraining++;
-		Broodwar << "Zealots in training are: " << zealotsInTraining << std::endl;
-		Broodwar << "Zealots done are:  " << ourZealotsSize << std::endl;
+		Broodwar << "Zealots in training are: " << Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
+		Broodwar << "Zealots done are:  " << Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
 	}
 
 	releaseMinerals(unit);
 
-	if (unit->getType() == UnitTypes::Protoss_Gateway){
-		building_gateway = false;
-		our_gateways++;
-	}
-
-	if (unit->getType().isWorker()) {
-		workers++;
-	}
 	if (scouting && scout != NULL && unit->getType() == UnitTypes::Protoss_Pylon
 		&& Broodwar->self()->supplyTotal() < 19){
 		goScout(scout);
@@ -434,19 +419,18 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
 	Broodwar << unit->getType().getName() << " was destryoed!" << std::endl;
 
 	if (unit->getPlayer()->isEnemy(Broodwar->self())){
-		releaseFromList(unit, enemyUnits);
+		//releaseFromList(unit, enemyUnits);
 	}
 
 	if (unit->getType() == BWAPI::UnitTypes::Protoss_Zealot
 		&& unit->getPlayer() == Broodwar->self()){
 		releaseFromList(unit, ourZealots);
-		ourZealotsSize--;
 	}
 
 	if (unit == scout){
 		scouting = false;
-		workers--;
-		//scout = NULL;
+		
+		scout = NULL;
 	}
 
 }
@@ -483,8 +467,6 @@ void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
 	if (unit->getType() == UnitTypes::Protoss_Zealot
 		&& unit->getPlayer() == Broodwar->self()){
 		ourZealots.push_back(unit);
-		zealotsInTraining--;
-		ourZealotsSize++;
 	}
 
 	if (unit->getType() == UnitTypes::Protoss_Gateway){
@@ -492,13 +474,10 @@ void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
 	}
 
 
-	if (unit->getType().isRefinery()){
-		refineryFinished = true;
-	}
-
 }
 
 
+// Kasper
 void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
 
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
@@ -506,7 +485,7 @@ void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
 
 	if (gateway->isIdle()
 		&& Broodwar->self()->minerals() - mineralsReserved >= zealotPrice
-		&& (zealotsInTraining + ourZealotsSize) < zealotMAX
+		&& (Broodwar->self()->incompleteUnitCount(zealot) + Broodwar->self()->completedUnitCount(zealot)) < zealotMAX
 		&& Broodwar->self()->supplyUsed() < Broodwar->self()->supplyTotal()){
 
 		gateway->train(zealot);
@@ -516,6 +495,7 @@ void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
 }
 
 
+// Kasper
 void ExampleAIModule::releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list){
 
 	std::vector<BWAPI::Unit>::iterator it; 		// iteratation vector
@@ -530,6 +510,7 @@ void ExampleAIModule::releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit>
 }
 
 
+// Kasper
 void ExampleAIModule::releaseMinerals(BWAPI::Unit unit){
 	if (unit->getType().isBuilding()) {
 		int mineralPrice = unit->getType().mineralPrice();
@@ -546,10 +527,14 @@ void ExampleAIModule::releaseMinerals(BWAPI::Unit unit){
 	}
 }
 
+// Kasper
 void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker){
 	int buildingPrice = buildingType.mineralPrice();
 	TilePosition targetBuildLocation = Broodwar->getBuildLocation(buildingType,
 		worker->getTilePosition());
+	if (!targetBuildLocation.isValid()){
+		targetBuildLocation = Broodwar->getBuildLocation(buildingType, ourBase->getTilePosition());
+	}
 	if (targetBuildLocation) {
 		// Register an event that draws the target build location
 		Broodwar->registerEvent([targetBuildLocation, buildingType](Game*) {
@@ -567,28 +552,30 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 	}
 }
 
+// Kasper
 void ExampleAIModule::gatewayCheckAndBuild(BWAPI::Unit worker){
 
 	static int lastChecked = 0;
-	UnitType building = UnitTypes::Protoss_Gateway;
+	UnitType gateway = UnitTypes::Protoss_Gateway;
 	if (zealot_rush
-		&& ((Broodwar->self()->supplyUsed() / 2 >= 10 && our_gateways == 0)
-		|| (Broodwar->self()->supplyUsed() / 2 >= 12 && our_gateways == 1))
-		&& Broodwar->self()->minerals() - mineralsReserved >= building.mineralPrice()
+		&& ((Broodwar->self()->supplyUsed() / 2 >= 10 && Broodwar->self()->allUnitCount(gateway) == 0)
+		|| (Broodwar->self()->supplyUsed() / 2 >= 12 && Broodwar->self()->allUnitCount(gateway) == 1))
+		&& Broodwar->self()->minerals() - mineralsReserved >= gateway.mineralPrice()
 		&& lastChecked + 400 < Broodwar->getFrameCount()
 		){
 
 		lastChecked = Broodwar->getFrameCount();
-		constructBuilding(UnitTypes::Protoss_Gateway, worker);
-		building_gateway = true;
+		constructBuilding(gateway, worker);
 	}
 
 }
 
+
+// Kasper
 void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
 	static int lastChecked = 0;
 	UnitType supplyType = UnitTypes::Protoss_Pylon;
-	if (((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) / 2 < 4
+	if (((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) / 2 < 5
 		|| Broodwar->self()->supplyUsed() < 17)
 		&& lastChecked + 400 < Broodwar->getFrameCount()
 		&& Broodwar->self()->minerals() - mineralsReserved >= supplyType.mineralPrice()
@@ -604,41 +591,74 @@ void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
 }
 
 
+// Kasper
+void ExampleAIModule::buildRefinery(BWAPI::Unit worker){
+
+	static int lastChecked = 0;
+	UnitType refineryType = UnitTypes::Protoss_Assimilator;
+	if (Broodwar->self()->allUnitCount(refineryType) == 0
+		&& Broodwar->self()->minerals() >= refineryType.mineralPrice()
+		&& (Broodwar->self()->supplyUsed() / 2) > 12
+		&& lastChecked + 400 < Broodwar->getFrameCount()
+		){
+
+		lastChecked = Broodwar->getFrameCount();
+		constructBuilding(refineryType, worker);
+
+	}
+
+}
+
+//Kasper
+bool ExampleAIModule::isGasWorker(BWAPI::Unit worker){
+
+	if (worker->isCarryingGas()
+		|| worker->isGatheringGas()
+		|| worker->getOrderTargetPosition() == ourBase->getGeysers().getPosition()){
+		return true;
+	}
+	else {
+		return false;
+	}
+
+}
+
+
+// Kasper
 void ExampleAIModule::buildForge(BWAPI::Unit worker){
 
 	BWAPI::UnitType forge = UnitTypes::Protoss_Forge;
 	static int lastChecked = 0;
 
-	if (our_gateways >= 2
+	if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
 		&& Broodwar->self()->minerals() >= forge.mineralPrice() + 100
 		&& lastChecked + 400 < Broodwar->getFrameCount()
-		&& Broodwar->self()->incompleteUnitCount(forge) == 0
-		&& Broodwar->self()->completedUnitCount(forge) == 0){
+		&& Broodwar->self()->allUnitCount(forge) == 0){
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(forge, worker);
 
 	}
 
-
-
-
 }
 
 
-// Kasper
+//Kasper
 void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 
 	if (forge->isIdle()){
 
 		// Ground weapons
 		BWAPI::UpgradeType ground_weapons = BWAPI::UpgradeTypes::Protoss_Ground_Weapons;
-		int ground_weapons_price = ground_weapons.mineralPrice() 
+		int ground_weapons_mineral_price = ground_weapons.mineralPrice()
 			+ (ground_weapons.mineralPriceFactor() * ground_weapons_count);
+		int ground_weapons_gas_price = ground_weapons.gasPrice()
+			+ (ground_weapons.gasPriceFactor() * ground_weapons_count);
 
 		if (ground_weapons_count == 0
-			&& our_gateways >= 2
-			&& Broodwar->self()->minerals() >= ground_weapons_price + 100){
+			&& Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
+			&& Broodwar->self()->minerals() >= ground_weapons_mineral_price + 100
+			&& Broodwar->self()->gas() >= ground_weapons_gas_price){
 
 			forge->upgrade(ground_weapons);
 			ground_weapons_count++;
@@ -647,8 +667,10 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 
 		// Ground armor
 		BWAPI::UpgradeType ground_armor = BWAPI::UpgradeTypes::Protoss_Ground_Armor;
-		int ground_armor_price = ground_armor.mineralPrice()
+		int ground_armor_mineral_price = ground_armor.mineralPrice()
 			+ (ground_armor.mineralPriceFactor() * ground_armor_count);
+		int ground_armor_gas_price = ground_armor.gasPrice()
+			+ (ground_armor.gasPriceFactor() * ground_armor_count);
 
 		if (FALSE){
 			forge->upgrade(ground_armor);
@@ -657,8 +679,10 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 
 		// Air weapons
 		BWAPI::UpgradeType air_weapons = BWAPI::UpgradeTypes::Protoss_Air_Weapons;
-		int air_weapons_price = air_weapons.mineralPrice()
+		int air_weapons_mineral_price = air_weapons.mineralPrice()
 			+ (air_weapons.mineralPriceFactor() * air_weapons_count);
+		int air_weapons_gas_price = air_weapons.gasPrice()
+			+ (air_weapons.gasPriceFactor() * air_weapons_count);
 
 		if (FALSE){
 			forge->upgrade(air_weapons);
@@ -667,8 +691,10 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 
 		// Air armor
 		BWAPI::UpgradeType air_armor = BWAPI::UpgradeTypes::Protoss_Air_Armor;
-		int air_armor_price = air_armor.mineralPrice()
+		int air_armor_mineral_price = air_armor.mineralPrice()
 			+ (air_armor.mineralPriceFactor() * air_armor_count);
+		int air_armor_gas_price = air_armor.gasPrice()
+			+ (air_armor.gasPriceFactor() * air_armor_count);
 
 		if (FALSE){
 			forge->upgrade(air_armor);
@@ -677,8 +703,10 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 
 		// Plasma shields
 		BWAPI::UpgradeType plasma_shields = BWAPI::UpgradeTypes::Protoss_Plasma_Shields;
-		int plasma_shields_price = plasma_shields.mineralPrice()
+		int plasma_shields_mineral_price = plasma_shields.mineralPrice()
 			+ (plasma_shields.mineralPriceFactor() * plasma_shields_count);
+		int plasma_shields_gas_price = plasma_shields.gasPrice()
+			+ (plasma_shields.gasPriceFactor() * plasma_shields_count);
 
 		if (FALSE){
 			forge->upgrade(plasma_shields);
@@ -688,6 +716,7 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 	}
 
 }
+
 
 void ExampleAIModule::goScout(BWAPI::Unit scout){
 	baseLocations = BWTA::getStartLocations();

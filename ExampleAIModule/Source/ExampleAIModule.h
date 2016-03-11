@@ -12,15 +12,12 @@ class ExampleAIModule : public BWAPI::AIModule
 {
 public:
 
-	bool refinery;
-	bool refineryFinished;
-	int refineryWorkers;
-	int workers;
-	int mineralsReserved;
-	
-	int our_gateways;
 
+	int refineryWorkers;
+	int mineralsReserved;
 	bool scouting;
+
+
 	BWAPI::Unit scout;
 
 	std::set<BWTA::BaseLocation*> baseLocations;
@@ -29,6 +26,7 @@ public:
 	BWTA::BaseLocation* expansion;
 	BWTA::BaseLocation* ourBase;
 
+	void buildRefinery(BWAPI::Unit worker);
 	void releaseMinerals(BWAPI::Unit unit);
 	void releaseEnemyBuilding(BWAPI::Unit unit);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
@@ -41,14 +39,12 @@ public:
 	void releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list);
 
 	void buildForge(BWAPI::Unit worker);
+
+	bool isGasWorker(BWAPI::Unit worker);
 	
 
 	std::vector<int> pendingBuildings;
 	std::vector<BWAPI::Unit> enemyUnits;
-
-	bool building_gateway;
-	int zealotsInTraining;
-	int ourZealotsSize;
 	std::vector<BWAPI::Unit> ourZealots;
 
 
