@@ -19,12 +19,15 @@ public:
 	static ProbeManager& getInstance();
 
 	//Helper methods
-	bool becomeScout(BWAPI::Unit);
+	bool becomeScout();
+
+	//Add building to list
+	void addBuilding(BWAPI::UnitType);
 
 private:
 	//The lists
 	std::vector<BWAPI::Unit> probes;
-	std::queue<BWAPI::Unit> pendingBuildings;
+	std::queue<BWAPI::UnitType> pendingBuildings;
 
 	//Con- and destructor aren't needed since class is used as static
 	ProbeManager(){};

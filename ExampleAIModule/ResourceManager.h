@@ -6,8 +6,8 @@ class ResourceManager
 public:
 
 	//onStart and onUnitComplete
-	void onStart(){ reservedMinerals = 0; };
-	void onUnitComplete(BWAPI::Unit);
+	void onStart(){ reservedMinerals = 400; }; //Has to start on 400 because the Nexus's minerals are released
+	void onUnitCreated(BWAPI::Unit);
 
 	//Function for getting an instance
 	static ResourceManager& getInstance();
@@ -21,9 +21,6 @@ public:
 private:
 	//Minerals
 	int reservedMinerals;
-
-	//Release
-	void releaseMinerals(BWAPI::UnitType);
 
 	ResourceManager() {};
 	~ResourceManager() {};
