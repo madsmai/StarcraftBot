@@ -11,6 +11,43 @@ TODO:
 
 using namespace BWAPI;
 
+//Discover and destroy methods
+void InformationManager::onUnitDiscover(BWAPI::Unit unit){
+	if (unit->getPlayer()->isEnemy(Broodwar->self())){
+		
+		if (unit->getType().isWorker()){
+			addEnemyWorkers(unit);
+		}
+
+		if (unit->getType().canAttack() && unit->getType().canMove() && unit->getType().isWorker()){
+			addEnemyAttackers(unit);
+		}
+
+		if (unit->getType() == UnitTypes::Protoss_Gateway || 
+			unit->getType() == UnitTypes::Zerg_Spawning_Pool || 
+			unit->getType() == UnitTypes::Terran_Barracks){
+
+			addEnemyBarracks(unit);
+		}
+
+		if (unit->getType().isBuilding() && unit->getType().canAttack()){
+			addEnemyTowers(unit);
+		}
+
+		if (unit->getType().isBuilding() && !unit->getType().canAttack()){
+			addEnemyPassiveBuildings(unit);
+		}
+
+
+	}
+
+}
+
+void InformationManager::onUnitDestroy(BWAPI::Unit unit){
+
+}
+
+
 //Adding enemy units to vectors
 void InformationManager::addEnemyBarracks(BWAPI::Unit barracks){
 

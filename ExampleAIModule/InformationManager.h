@@ -10,6 +10,9 @@ public:
 	InformationManager(){};
 	~InformationManager(){};
 
+	void onUnitDiscover(BWAPI::Unit);
+	void onUnitDestroy(BWAPI::Unit);
+
 	void currentStatus();
 
 	void addEnemyBarracks(BWAPI::Unit);
