@@ -40,6 +40,9 @@ public:
 	void releaseZealot(BWAPI::Unit unit);
 	void releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list);
 
+	void buildForge(BWAPI::Unit worker);
+	
+
 	std::vector<int> pendingBuildings;
 	std::vector<BWAPI::Unit> enemyUnits;
 
@@ -47,6 +50,16 @@ public:
 	int zealotsInTraining;
 	int ourZealotsSize;
 	std::vector<BWAPI::Unit> ourZealots;
+
+
+	// Forge upgrade
+	void forgeUpgrades(BWAPI::Unit forge);
+	int ground_weapons_count;
+	int ground_armor_count;
+	int air_weapons_count;
+	int air_armor_count;
+	int plasma_shields_count;
+
 
 	//zealot rush tactics
 	bool zealot_rush;
