@@ -1,6 +1,5 @@
 #include "InformationManager.h"
 #include <vector>
-#include <BWTA.h>
 
 // Author: Sami Ghali s144443
 
