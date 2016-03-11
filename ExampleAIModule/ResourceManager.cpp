@@ -2,22 +2,29 @@
 
 /*
 TODO:
-- Variabel der indeholder antal mineraler
-- Variabel der indeholder antal reserverede mineraler
-- metode der sørger for at andre klasser kan reservere mineraler
-- metoder der fortæller om der er nok ikke-reserverede mineraler til at bygge noget
+	
 */
 
-ResourceManager::ResourceManager()
-{
+//Currently only possible to reserve/release minerals for buildings
+//Reserve
+void ResourceManager::reserveMinerals(BWAPI::UnitType type){
+	if (type.isBuilding()){
+		reservedMinerals = reservedMinerals + type.mineralPrice();
+	}
 }
 
-
-ResourceManager::~ResourceManager()
-{
+//Release
+void ResourceManager::releaseMinerals(BWAPI::UnitType type){
+	if (type.isBuilding()){
+		reservedMinerals = reservedMinerals - type.mineralPrice();
+	}
 }
 
 ResourceManager& ResourceManager::getInstance(){ //Return ref to ResourceManager object
 	static ResourceManager i; //Make static instance i
 	return i;
+}
+
+void ResourceManager::onUnitComplete(BWAPI::Unit unit){
+	releaseMinerals(unit->getType());
 }

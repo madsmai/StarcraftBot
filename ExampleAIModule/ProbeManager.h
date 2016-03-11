@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BWAPI.h>
+#include "ResourceManager.h"
 #include <vector>
 #include <queue>
 
@@ -19,7 +20,6 @@ public:
 
 	//Helper methods
 	bool becomeScout(BWAPI::Unit);
-	bool constructBuilding(BWAPI::Unit, BWAPI::UnitType);
 
 private:
 	//The lists
