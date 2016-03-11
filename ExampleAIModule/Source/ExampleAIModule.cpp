@@ -11,10 +11,7 @@ bool analyzed;
 bool analysis_just_finished;
 
 
-void ExampleAIModule::onStart()
-{
-	// Hello World!
-	Broodwar->sendText("Hey World!");
+void ExampleAIModule::onStart() {
 
 	// Print the map name.
 	// BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
@@ -31,8 +28,7 @@ void ExampleAIModule::onStart()
 	Broodwar->setCommandOptimizationLevel(2);
 
 	// Check if this is a replay
-	if (Broodwar->isReplay())
-	{
+	if (Broodwar->isReplay()) {
 
 		// Announce the players in the replay
 		Broodwar << "The following players are in this replay:" << std::endl;
@@ -45,7 +41,6 @@ void ExampleAIModule::onStart()
 			if (!p->isObserver())
 				Broodwar << p->getName() << ", playing as " << p->getRace() << std::endl;
 		}
-
 	}
 	else // if this is not a replay
 	{
@@ -55,38 +50,41 @@ void ExampleAIModule::onStart()
 			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
 	}
 
+	// Initializing variables
 
-	// tactics
+	//Basic game variables
+	mineralsReserved = 0;
+	refineryWorkers = 0;
+	scout = NULL;
+	scouting = true;
+	pendingBuildings;
+	enemyUnits;
+	ourZealots;
+
+
+	// tactic variables
 	zealot_rush = true;
-	zealotMAX = 6;
 
+	// zealot rush variables
+	if (zealot_rush){
+		zealotMAX = 6;
 
-	// Forge upgrade levels
+	}
+
+	// Upgrade level variables
 	ground_weapons_count = 0;
 	ground_armor_count = 0;
 	air_weapons_count = 0;
 	air_armor_count = 0;
 	plasma_shields_count = 0;
+	singularity_Charge_Researched = false;
 
-
-	// setting values
-	mineralsReserved = 0;
-	pendingBuildings;
-	enemyUnits;
-	scout = NULL;
-	scouting = true;
-	ourZealots;
-	refineryWorkers = 0;
-
-	// BWTA2 MAP ANALYSIS YO
+	// BWTA
 	BWTA::readMap();
 	BWTA::analyze();
 	analyzed = false;
 	analysis_just_finished = false;
 	ourBase = BWTA::getStartLocation(Broodwar->self());
-
-
-	Broodwar << "Analyzing map... this may take a minute" << std::endl;;
 	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
 }
 
@@ -107,9 +105,6 @@ void ExampleAIModule::onFrame() {
 		}
 		zealotMAX = zealotMAX * 2;
 	}
-
-
-
 
 	// Called once every game frame
 
@@ -163,7 +158,13 @@ void ExampleAIModule::onFrame() {
 		if (u->getType() == UnitTypes::Protoss_Forge
 			&& u->isCompleted()){
 
-			forgeUpgrades(u);
+			researchForge(u);
+
+		}
+		else if (u->getType() == UnitTypes::Protoss_Cybernetics_Core
+			&& u->isCompleted()){
+
+			researchCybernetics_Core(u);
 
 		}
 
@@ -190,15 +191,14 @@ void ExampleAIModule::onFrame() {
 		}
 
 		// If the unit is a worker unit
-		if (u->getType().isWorker() 
+		if (u->getType().isWorker()
 			&& u != scout
 			&& !isGasWorker(u)) {
 
 
-			gatewayCheckAndBuild(u);
-			supplyCheckAndBuild(u);
-			buildForge(u);
-			buildRefinery(u);
+			// Method that checks for builds
+			callBuildFunctions(u);
+
 
 			// if our worker is idle
 			if (u->isIdle()){
@@ -300,7 +300,9 @@ void ExampleAIModule::onSendText(std::string text) {
 		if (scout != NULL){
 			Broodwar << scout->exists() << std::endl;
 		}
-		
+	}
+	else if (text == "reserved"){
+		Broodwar << mineralsReserved << std::endl;
 	}
 
 
@@ -371,7 +373,7 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 		scout->move(unit->getPosition());
 		Broodwar->sendText("Found expansion");
 		goScout(scout);
-	}*/
+		}*/
 
 }
 
@@ -429,7 +431,7 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
 
 	if (unit == scout){
 		scouting = false;
-		
+
 		scout = NULL;
 	}
 
@@ -552,8 +554,20 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 	}
 }
 
+//Kasper
+void ExampleAIModule::callBuildFunctions(BWAPI::Unit worker){
+	buildGateway(worker);
+	buildSupply(worker);
+	buildForge(worker);
+	buildRefinery(worker);
+	buildCitadel_Of_Adun(worker);
+	buildCybernetics_Core(worker);
+	buildPhoton_Cannon(worker);
+}
+
+
 // Kasper
-void ExampleAIModule::gatewayCheckAndBuild(BWAPI::Unit worker){
+void ExampleAIModule::buildGateway(BWAPI::Unit worker){
 
 	static int lastChecked = 0;
 	UnitType gateway = UnitTypes::Protoss_Gateway;
@@ -572,7 +586,7 @@ void ExampleAIModule::gatewayCheckAndBuild(BWAPI::Unit worker){
 
 
 // Kasper
-void ExampleAIModule::supplyCheckAndBuild(BWAPI::Unit worker){
+void ExampleAIModule::buildSupply(BWAPI::Unit worker){
 	static int lastChecked = 0;
 	UnitType supplyType = UnitTypes::Protoss_Pylon;
 	if (((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) / 2 < 5
@@ -609,20 +623,70 @@ void ExampleAIModule::buildRefinery(BWAPI::Unit worker){
 
 }
 
-//Kasper
-bool ExampleAIModule::isGasWorker(BWAPI::Unit worker){
+// Kasper
+void ExampleAIModule::buildCybernetics_Core(BWAPI::Unit worker){
 
-	if (worker->isCarryingGas()
-		|| worker->isGatheringGas()
-		|| worker->getOrderTargetPosition() == ourBase->getGeysers().getPosition()){
-		return true;
+	static int lastChecked = 0;
+	BWAPI::UnitType cybernetics_Core = UnitTypes::Protoss_Cybernetics_Core;
+
+	// Amount of gateways (including ones in construction)
+	int gatewayCount = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway)
+		+ Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway);
+
+
+	if (lastChecked + 600 < Broodwar->getFrameCount()
+		&& Broodwar->self()->allUnitCount(cybernetics_Core) == 0
+		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) >= 1
+		&& Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
+		&& Broodwar->self()->minerals() >= cybernetics_Core.mineralPrice()
+		&& Broodwar->self()->supplyUsed() / 2 >= 15
+		//TODO: Tactic
+		) {
+
+		lastChecked = Broodwar->getFrameCount();
+		constructBuilding(cybernetics_Core, worker);
+
 	}
-	else {
-		return false;
+}
+
+// Kasper
+void ExampleAIModule::buildPhoton_Cannon(BWAPI::Unit worker){
+
+	static int lastChecked = 0;
+	BWAPI::UnitType photon_cannon = UnitTypes::Protoss_Photon_Cannon;
+
+	if (lastChecked + 600 < Broodwar->getFrameCount()
+		&& Broodwar->self()->allUnitCount(photon_cannon) <= 5
+		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge) >= 1
+		&& Broodwar->self()->minerals() >= photon_cannon.mineralPrice() + 400
+		//TODO: Tactic
+		){
+
+		lastChecked = Broodwar->getFrameCount();
+		constructBuilding(photon_cannon, worker);
+
 	}
 
 }
 
+// Kasper
+void ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
+
+	static int lastChecked = 0;
+	BWAPI::UnitType citadel_Of_Adun = UnitTypes::Protoss_Citadel_of_Adun;
+
+	if (lastChecked + 600 < Broodwar->getFrameCount()
+		&& Broodwar->self()->allUnitCount(citadel_Of_Adun) == 0
+		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core)
+		&& Broodwar->self()->minerals() >= citadel_Of_Adun.mineralPrice()
+		//TODO: Tactic
+		){
+
+		lastChecked = Broodwar->getFrameCount();
+		constructBuilding(citadel_Of_Adun, worker);
+
+	}
+}
 
 // Kasper
 void ExampleAIModule::buildForge(BWAPI::Unit worker){
@@ -633,7 +697,9 @@ void ExampleAIModule::buildForge(BWAPI::Unit worker){
 	if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
 		&& Broodwar->self()->minerals() >= forge.mineralPrice() + 100
 		&& lastChecked + 400 < Broodwar->getFrameCount()
-		&& Broodwar->self()->allUnitCount(forge) == 0){
+		&& Broodwar->self()->allUnitCount(forge) == 0
+		//TODO: Tactic
+		){
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(forge, worker);
@@ -644,7 +710,7 @@ void ExampleAIModule::buildForge(BWAPI::Unit worker){
 
 
 //Kasper
-void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
+void ExampleAIModule::researchForge(BWAPI::Unit forge){
 
 	if (forge->isIdle()){
 
@@ -658,12 +724,14 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 		if (ground_weapons_count == 0
 			&& Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
 			&& Broodwar->self()->minerals() >= ground_weapons_mineral_price + 100
-			&& Broodwar->self()->gas() >= ground_weapons_gas_price){
+			&& Broodwar->self()->gas() >= ground_weapons_gas_price
+			//TODO: Tactic
+			){
 
 			forge->upgrade(ground_weapons);
 			ground_weapons_count++;
-		}
 
+		}
 
 		// Ground armor
 		BWAPI::UpgradeType ground_armor = BWAPI::UpgradeTypes::Protoss_Ground_Armor;
@@ -672,33 +740,15 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 		int ground_armor_gas_price = ground_armor.gasPrice()
 			+ (ground_armor.gasPriceFactor() * ground_armor_count);
 
-		if (FALSE){
+		if (ground_weapons_count >= 1
+			&& Broodwar->self()->minerals() >= ground_armor_mineral_price + 100
+			&& Broodwar->self()->gas() >= ground_armor_gas_price
+			//TODO: Tactic
+			){
+
 			forge->upgrade(ground_armor);
 			ground_armor_count++;
-		}
 
-		// Air weapons
-		BWAPI::UpgradeType air_weapons = BWAPI::UpgradeTypes::Protoss_Air_Weapons;
-		int air_weapons_mineral_price = air_weapons.mineralPrice()
-			+ (air_weapons.mineralPriceFactor() * air_weapons_count);
-		int air_weapons_gas_price = air_weapons.gasPrice()
-			+ (air_weapons.gasPriceFactor() * air_weapons_count);
-
-		if (FALSE){
-			forge->upgrade(air_weapons);
-			air_weapons_count++;
-		}
-
-		// Air armor
-		BWAPI::UpgradeType air_armor = BWAPI::UpgradeTypes::Protoss_Air_Armor;
-		int air_armor_mineral_price = air_armor.mineralPrice()
-			+ (air_armor.mineralPriceFactor() * air_armor_count);
-		int air_armor_gas_price = air_armor.gasPrice()
-			+ (air_armor.gasPriceFactor() * air_armor_count);
-
-		if (FALSE){
-			forge->upgrade(air_armor);
-			air_armor_count++;
 		}
 
 		// Plasma shields
@@ -708,11 +758,86 @@ void ExampleAIModule::forgeUpgrades(BWAPI::Unit forge){
 		int plasma_shields_gas_price = plasma_shields.gasPrice()
 			+ (plasma_shields.gasPriceFactor() * plasma_shields_count);
 
-		if (FALSE){
+		if (ground_armor_count >= 1
+			&& Broodwar->self()->minerals() >= plasma_shields_mineral_price + 100
+			&& Broodwar->self()->gas() >= plasma_shields_gas_price
+			//TODO: Tactic
+			){
+
 			forge->upgrade(plasma_shields);
 			plasma_shields_count++;
+
 		}
 
+	}
+
+}
+
+// Kasper
+void ExampleAIModule::researchCybernetics_Core(BWAPI::Unit cybernetics_Core){
+
+	if (cybernetics_Core->isIdle()){
+
+		// Air weapons
+		BWAPI::UpgradeType air_weapons = BWAPI::UpgradeTypes::Protoss_Air_Weapons;
+		int air_weapons_mineral_price = air_weapons.mineralPrice()
+			+ (air_weapons.mineralPriceFactor() * air_weapons_count);
+		int air_weapons_gas_price = air_weapons.gasPrice()
+			+ (air_weapons.gasPriceFactor() * air_weapons_count);
+
+		if (FALSE
+			//TODO: Tactic
+			){
+
+			cybernetics_Core->upgrade(air_weapons);
+			air_weapons_count++;
+
+		}
+
+		// Air armor
+		BWAPI::UpgradeType air_armor = BWAPI::UpgradeTypes::Protoss_Air_Armor;
+		int air_armor_mineral_price = air_armor.mineralPrice()
+			+ (air_armor.mineralPriceFactor() * air_armor_count);
+		int air_armor_gas_price = air_armor.gasPrice()
+			+ (air_armor.gasPriceFactor() * air_armor_count);
+
+		if (FALSE
+			//TODO: Tactic
+			){
+
+			cybernetics_Core->upgrade(air_armor);
+			air_armor_count++;
+
+		}
+
+		// Singularity_Charge
+		BWAPI::UpgradeType singularity_charge = BWAPI::UpgradeTypes::Singularity_Charge;
+
+		if (!singularity_Charge_Researched
+			&& Broodwar->self()->minerals() >= singularity_charge.mineralPrice() + 400
+			&& Broodwar->self()->gas() >= singularity_charge.gasPrice() + 200
+			//TODO: Tactic
+			){
+
+			cybernetics_Core->upgrade(singularity_charge);
+			singularity_charge = true;
+
+		}
+	}
+
+
+}
+
+//Kasper
+bool ExampleAIModule::isGasWorker(BWAPI::Unit worker){
+
+	if (worker->isCarryingGas()
+		|| worker->isGatheringGas()
+		|| worker->getOrderTargetPosition() == ourBase->getGeysers().getPosition()){
+		return true;
+	}
+	else {
+		return false;
 	}
 
 }
