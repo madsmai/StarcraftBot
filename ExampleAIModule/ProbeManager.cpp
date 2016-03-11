@@ -1,5 +1,6 @@
 #include "ProbeManager.h"
 #include "BWAPI.h"
+#include <string>
 
 /*
 TODO:
@@ -20,83 +21,75 @@ TODO:
 
 void ProbeManager::onFrame(){
 
-	if (!pendingBuildings.empty()){
-		//BWAPI::Unit u = getProbes().front();
+	//Construct the next building in the queue
+	/*if (!pendingBuildings.empty()){
+		BWAPI::Unit u = getProbes().front();
 
 		getProbes().front()->build(BWAPI::UnitTypes::Protoss_Pylon, 
 			BWAPI::Broodwar->getBuildLocation(BWAPI::UnitTypes::Protoss_Pylon, getProbes().front()->getTilePosition()));
-	}
+	}*/
 
-	for (BWAPI::Unit unit : getProbes()){
-		if (unit->exists()	&&	unit->getType().isWorker()	&&	unit->isIdle()){
+	//Make idle workers do stuff
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = probes.begin(); it != probes.end(); it++){
+		BWAPI::Broodwar->sendText("Inside for-loop");
+		BWAPI::Unit unit = *it;
+		if (unit->exists() && unit->isIdle()){
 			unit->gather(unit->getClosestUnit(BWAPI::Filter::IsMineralField));
+			BWAPI::Broodwar->sendText("Idle worker has been set to work");
 		}
 	}
 }
 
+//Remove destroyed worker
 void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
-
-
-}
-
-void ProbeManager::onUnitComplete(BWAPI::Unit unit){
-	if (unit->getType().isWorker){
-		addProbe(unit);
-	}
-}
-
-void ProbeManager::onStart(){
-	for (auto &unit : BWAPI::Broodwar->self()->getUnits()) {
-		if (unit->exists		&&	  unit->getType().isWorker){
-			addProbe(unit);
+	if (unit->getType().isWorker()){
+		std::vector<BWAPI::Unit>::iterator it;
+		for (it = probes.begin(); it != probes.end(); it++){
+			if (*it == unit){
+				probes.erase(it);
+				break;
+			}
 		}
 	}
 }
 
+//Add newly made worker to list
+void ProbeManager::onUnitComplete(BWAPI::Unit unit){
+	if (unit->getType().isWorker()){
+		probes.push_back(unit);
+	}
+}
+
+//Add the first 4 probes to list
+void ProbeManager::onStart(){
+	BWAPI::Broodwar->sendText("onStart is being run..");
+	for (auto &unit : BWAPI::Broodwar->self()->getUnits()) {
+		if (unit->exists()		&&	  unit->getType().isWorker()){
+			probes.push_back(unit);
+			BWAPI::Broodwar->sendText("Probe was added to list..");
+			int i = probes.size();
+			std::string s = std::to_string(i);
+			char const *pchar = s.c_str();
+			BWAPI::Broodwar->sendText(pchar);
+		}
+	}
+}
+
+//Remove worker from list and put into ScoutManager list
 bool ProbeManager::becomeScout(BWAPI::Unit){
 
+	return true;
 }
 
+//Construct a building with a specific worker
 bool ProbeManager::constructBuilding(BWAPI::Unit, BWAPI::UnitType){
 
+	return true;
 }
 
-void ProbeManager::addProbe(BWAPI::Unit unit){
-
-
-}
-
-void ProbeManager::removeProbe(BWAPI::Unit unit){
-
-}
-
-void ProbeManager::addPendingBuilding(BWAPI::Unit unit){
-
-}
-
-void ProbeManager::removePendingBuilding(BWAPI::Unit unit){
-
-}
-
+//Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
-}
-
-
-//Getters and setters
-std::vector<BWAPI::Unit> ProbeManager::getProbes(){
-
-}
-
-void ProbeManager::setProbes(std::vector<BWAPI::Unit> units){
-
-}
-
-std::queue<BWAPI::Unit> ProbeManager::getPendingBuildings(){
-
-}
-
-void ProbeManager::setPendingBuildings(std::queue<BWAPI::Unit> units){
-
 }

@@ -14,24 +14,12 @@ public:
 	void onUnitComplete(BWAPI::Unit unit);
 	void onStart();
 
-	//Managing the lists
-	void addProbe(BWAPI::Unit);
-	void removeProbe(BWAPI::Unit);
-	void addPendingBuilding(BWAPI::Unit);
-	void removePendingBuilding(BWAPI::Unit);
-
 	//Function for getting an instance
 	static ProbeManager& getInstance();
 
 	//Helper methods
 	bool becomeScout(BWAPI::Unit);
 	bool constructBuilding(BWAPI::Unit, BWAPI::UnitType);
-
-	//Getters and setters
-	std::vector<BWAPI::Unit> getProbes();
-	void setProbes(std::vector<BWAPI::Unit>);
-	std::queue<BWAPI::Unit> getPendingBuildings();
-	void setPendingBuildings(std::queue<BWAPI::Unit>);
 
 private:
 	//The lists
