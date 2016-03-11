@@ -352,28 +352,31 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 	}
 
-	if (scouting
-		&& unit->getType().isResourceDepot()
-		&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
-		&& unit->getPlayer()->isEnemy(Broodwar->self())){
+	if (scout != NULL){
+		if (scouting
+			&& unit->getType().isResourceDepot()
+			&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
+			&& unit->getPlayer()->isEnemy(Broodwar->self())){
 
-		enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
-		scout->move(unit->getPosition());
-		scout->attack(unit);
-		scouting = false;
-		Broodwar->sendText("Done scouting, found mainbase");
+			enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
+			scout->move(unit->getPosition());
+			scout->attack(unit);
+			scouting = false;
+			Broodwar->sendText("Done scouting, found mainbase");
 
+		}
+
+		else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot()
+			&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
+
+			expansion = BWTA::getNearestBaseLocation(unit->getPosition());
+			scout->move(unit->getPosition());
+			Broodwar->sendText("Found expansion");
+			goScout(scout);
+		}
 	}
 
-	// TODO:
-	/*else if (unit->getPlayer() != Broodwar->self() && unit->getType().isResourceDepot()
-		&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
 
-		expansion = BWTA::getNearestBaseLocation(unit->getPosition());
-		scout->move(unit->getPosition());
-		Broodwar->sendText("Found expansion");
-		goScout(scout);
-		}*/
 
 }
 
@@ -656,7 +659,7 @@ void ExampleAIModule::buildPhoton_Cannon(BWAPI::Unit worker){
 	BWAPI::UnitType photon_cannon = UnitTypes::Protoss_Photon_Cannon;
 
 	if (lastChecked + 600 < Broodwar->getFrameCount()
-		&& Broodwar->self()->allUnitCount(photon_cannon) <= 5
+		&& Broodwar->self()->allUnitCount(photon_cannon) < 5
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge) >= 1
 		&& Broodwar->self()->minerals() >= photon_cannon.mineralPrice() + 400
 		//TODO: Tactic
