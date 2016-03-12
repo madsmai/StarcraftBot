@@ -4,10 +4,9 @@
 class ResourceManager
 {
 public:
-
-	//onStart and onUnitComplete
+	//onStart and onUnitCreated
 	void onStart(){ reservedMinerals = 400; }; //Has to start on 400 because the Nexus's minerals are released
-	void onUnitCreated(BWAPI::Unit);
+	void onUnitCreate(BWAPI::Unit);
 
 	//Function for getting an instance
 	static ResourceManager& getInstance();
