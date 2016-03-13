@@ -10,8 +10,11 @@ void ExampleAIModule::onStart(){
 
 	//Random message
 	BWAPI::Broodwar->sendText("Starting...");
+	/*
+	For printing out amount of reservedMinerals:
 	int  min = ResourceManager::getInstance().getReservedMinerals();
 	BWAPI::Broodwar->sendText(std::to_string(min).c_str());
+	*/
 }
 
 void ExampleAIModule::onFrame(){
@@ -31,13 +34,9 @@ void ExampleAIModule::onUnitComplete(BWAPI::Unit unit){
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit){
 	//Call onUnitCreates
 	ResourceManager::getInstance().onUnitCreate(unit);
-	int  min = ResourceManager::getInstance().getReservedMinerals();
-	BWAPI::Broodwar->sendText(std::to_string(min).c_str());
 }
 
 void ExampleAIModule::onSendText(std::string text){
 	//Print out message
 	BWAPI::Broodwar->sendText(text.c_str());
-
-	//Testing
 }
