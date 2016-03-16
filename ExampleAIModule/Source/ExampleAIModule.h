@@ -20,6 +20,7 @@ public:
 	std::vector<int> pendingBuildings;
 	std::vector<BWAPI::Unit> enemyUnits;
 	std::vector<BWAPI::Unit> ourZealots;
+	std::vector<BWAPI::TilePosition> pendingTilePositions;
 
 	// BWTA variables
 	BWTA::BaseLocation* scoutedBase;

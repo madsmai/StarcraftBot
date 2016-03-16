@@ -58,7 +58,6 @@ void ExampleAIModule::onStart() {
 	scout = NULL;
 	scouting = true;
 	pendingBuildings;
-	pendingTilePositions;
 	enemyUnits;
 	ourZealots;
 
@@ -87,15 +86,6 @@ void ExampleAIModule::onStart() {
 	analysis_just_finished = false;
 	ourBase = BWTA::getStartLocation(Broodwar->self());
 	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
-}
-
-void ExampleAIModule::onEnd(bool isWinner)
-{
-	// Called when the game ends
-	if (isWinner)
-	{
-		// Log your win here!
-	}
 }
 
 void ExampleAIModule::onFrame() {
@@ -199,38 +189,6 @@ void ExampleAIModule::onFrame() {
 
 			// Method that checks for builds
 			callBuildFunctions(u);
-
-
-			// if our worker is idle
-			if (u->isIdle()){
-
-				// Order workers carrying a resource to return them to the center,
-				// otherwise find a mineral patch to harvest.
-				if (u->isCarryingGas() || u->isCarryingMinerals()) {
-					u->returnCargo();
-				}
-				else if (!u->getPowerUp())  // The worker cannot harvest anything if it
-				{                             // is carrying a powerup such as a flag
-
-					if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) == 1
-						&& refineryWorkers < 2) {
-						Broodwar << "go gather gas!" << std::endl;
-						if (!u->isGatheringMinerals()){
-							refineryWorkers++;
-							if (!u->gather(u->getClosestUnit(IsRefinery))){
-								Broodwar << Broodwar->getLastError() << std::endl;
-							}
-						}
-					}
-					// Harvest from the nearest mineral patch
-					else {
-						if (!u->gather(u->getClosestUnit(IsMineralField))) {
-							// If the call fails, then print the last error message
-							Broodwar << Broodwar->getLastError() << std::endl;
-						}
-					}
-				} // closure: has no powerup
-			} // closure: if idle
 		} // closure: builder type
 
 
@@ -282,67 +240,6 @@ void ExampleAIModule::onFrame() {
 	} // closure: unit iterator
 }
 
-void ExampleAIModule::onSendText(std::string text) {
-
-
-	// Send the text to the game if it is not being processed.
-	Broodwar->sendText("%s", text.c_str());
-
-	if (text == "incomplete zealots"){
-		Broodwar << Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
-	}
-	else if (text == "completed zealots"){
-		Broodwar << Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
-	}
-	else if (text == "assimilator"){
-		Broodwar << Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) << std::endl;
-	}
-	else if (text == "scout"){
-		if (scout != NULL){
-			Broodwar << scout->exists() << std::endl;
-		}
-	}
-	else if (text == "reserved"){
-		Broodwar << mineralsReserved << std::endl;
-	}
-
-
-	// Make sure to use %s and pass the text as a parameter,
-	// otherwise you may run into problems when you use the %(percent) character!
-
-}
-
-void ExampleAIModule::onReceiveText(BWAPI::Player player, std::string text)
-{
-	// Parse the received text
-	Broodwar << player->getName() << " said \"" << text << "\"" << std::endl;
-}
-
-void ExampleAIModule::onPlayerLeft(BWAPI::Player player)
-{
-	// Interact verbally with the other players in the game by
-	// announcing that the other player has left.
-	Broodwar->sendText("Goodbye %s!", player->getName().c_str());
-}
-
-void ExampleAIModule::onNukeDetect(BWAPI::Position target)
-{
-
-	// Check if the target is a valid position
-	if (target)
-	{
-		// if so, print the location of the nuclear strike target
-		Broodwar << "Nuclear Launch Detected at " << target << std::endl;
-	}
-	else
-	{
-		// Otherwise, ask other players where the nuke is!
-		Broodwar->sendText("Where's the nuke?");
-	}
-
-	// You can also retrieve all the nuclear missile targets using Broodwar->getNukeDots()!
-}
-
 void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 	// scouting code
@@ -381,18 +278,6 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 }
 
-void ExampleAIModule::onUnitEvade(BWAPI::Unit unit)
-{
-}
-
-void ExampleAIModule::onUnitShow(BWAPI::Unit unit)
-{
-}
-
-void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
-{
-}
-
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 
 	if (unit->getType() == UnitTypes::Protoss_Zealot){
@@ -405,17 +290,6 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 	if (scouting && scout != NULL && unit->getType() == UnitTypes::Protoss_Pylon
 		&& Broodwar->self()->supplyTotal() < 19){
 		goScout(scout);
-	}
-
-	if (Broodwar->isReplay()) {
-		// if we are in a replay, then we will print out the build order of the structures
-		if (unit->getType().isBuilding() && !unit->getPlayer()->isNeutral())
-		{
-			int seconds = Broodwar->getFrameCount() / 24;
-			int minutes = seconds / 60;
-			seconds %= 60;
-			Broodwar->sendText("%.2d:%.2d: %s creates a %s", minutes, seconds, unit->getPlayer()->getName().c_str(), unit->getType().c_str());
-		}
 	}
 }
 
@@ -456,15 +330,6 @@ void ExampleAIModule::onUnitMorph(BWAPI::Unit unit) {
 			Broodwar->sendText("%.2d:%.2d: %s morphs a %s", minutes, seconds, unit->getPlayer()->getName().c_str(), unit->getType().c_str());
 		}
 	}
-}
-
-void ExampleAIModule::onUnitRenegade(BWAPI::Unit unit)
-{
-}
-
-void ExampleAIModule::onSaveGame(std::string gameName)
-{
-	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
 }
 
 void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
@@ -538,6 +403,9 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 	int buildingPrice = buildingType.mineralPrice();
 	TilePosition targetBuildLocation = Broodwar->getBuildLocation(buildingType,
 		worker->getTilePosition());
+	if (!targetBuildLocation.isValid()){
+		targetBuildLocation = Broodwar->getBuildLocation(buildingType, ourBase->getTilePosition());
+	}
 	if (targetBuildLocation) {
 		// Register an event that draws the target build location
 		Broodwar->registerEvent([targetBuildLocation, buildingType](Game*) {
@@ -549,36 +417,9 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 			buildingType.buildTime() + 100);  // frames to run
 
 		// Order the worker to construct the structure
-		if (std::find(pendingTilePositions.begin(), pendingTilePositions.end(),
-			targetBuildLocation) != pendingTilePositions.end()) {
-
-			//Targetbuildlocation is a pendingTilePosition
-			targetBuildLocation = Broodwar->getBuildLocation(buildingType,
-				ourBase->getTilePosition());
-
-
-			Broodwar->registerEvent([targetBuildLocation, buildingType](Game*) {
-				Broodwar->drawBoxMap(Position(targetBuildLocation),
-					Position(targetBuildLocation + buildingType.tileSize()),
-					Colors::Blue);
-			},
-				nullptr,  // condition
-				buildingType.buildTime());  // frames to run
-
-
-
-			Broodwar->sendText("Targetbuildlocation var en pending location");
-		}
-		else {
-			//TargetbuildLocation is not a pendingTilePosition
-			pendingTilePositions.push_back(targetBuildLocation);
-			Broodwar->sendText("Push back");
-			//TODO Implement at den releaser den fra listen igen.
-			worker->build(buildingType, targetBuildLocation);
-			mineralsReserved += buildingPrice;
-			pendingBuildings.push_back(buildingPrice);
-		}
-		
+		worker->build(buildingType, targetBuildLocation);
+		mineralsReserved += buildingPrice;
+		pendingBuildings.push_back(buildingPrice);
 	}
 }
 
@@ -707,7 +548,6 @@ void ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
 		&& Broodwar->self()->allUnitCount(citadel_Of_Adun) == 0
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core)
 		&& Broodwar->self()->minerals() >= citadel_Of_Adun.mineralPrice()
-		&& Broodwar->self()->gas() >= citadel_Of_Adun.gasPrice()
 		//TODO: Tactic
 		){
 
@@ -720,10 +560,8 @@ void ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
 // Kasper
 void ExampleAIModule::buildForge(BWAPI::Unit worker){
 
-
 	BWAPI::UnitType forge = UnitTypes::Protoss_Forge;
 	static int lastChecked = 0;
-
 
 	if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
 		&& Broodwar->self()->minerals() >= forge.mineralPrice() + 100
@@ -738,6 +576,7 @@ void ExampleAIModule::buildForge(BWAPI::Unit worker){
 	}
 
 }
+
 
 //Kasper
 void ExampleAIModule::researchForge(BWAPI::Unit forge){
