@@ -682,6 +682,7 @@ void ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
 		&& Broodwar->self()->allUnitCount(citadel_Of_Adun) == 0
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core)
 		&& Broodwar->self()->minerals() >= citadel_Of_Adun.mineralPrice()
+		&& Broodwar->self()->gas() >= citadel_Of_Adun.gasPrice()
 		//TODO: Tactic
 		){
 
@@ -694,8 +695,10 @@ void ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
 // Kasper
 void ExampleAIModule::buildForge(BWAPI::Unit worker){
 
+
 	BWAPI::UnitType forge = UnitTypes::Protoss_Forge;
 	static int lastChecked = 0;
+
 
 	if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
 		&& Broodwar->self()->minerals() >= forge.mineralPrice() + 100
@@ -710,7 +713,6 @@ void ExampleAIModule::buildForge(BWAPI::Unit worker){
 	}
 
 }
-
 
 //Kasper
 void ExampleAIModule::researchForge(BWAPI::Unit forge){
