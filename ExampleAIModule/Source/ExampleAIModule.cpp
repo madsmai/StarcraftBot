@@ -166,14 +166,12 @@ void ExampleAIModule::onFrame() {
 		if (u->getType() == UnitTypes::Protoss_Zealot && u->isIdle()) {
 
 			//TODO: Find en god radius til det her
-			BWAPI::Unitset closestUnits = u->getUnitsInRadius(50);
-			u->attack(closestUnits.getClosestUnit());
+			u->attack(u->getClosestUnit((Filter::IsEnemy), 50));
 		}
 
 		if (u->getType() == UnitTypes::Protoss_Zealot && u->isUnderAttack()) {
-			BWAPI::Unitset attackingUnits = u->getUnitsInRadius(4);
-			u->attack(attackingUnits.getClosestUnit());
 			Broodwar->sendText("Attacking closest unit");
+			u->attack(u->getClosestUnit((Filter::IsEnemy && Filter::CanAttack), 4));
 		}
 
 		if (u->getType().isWorker() && u == scout && u->isUnderAttack()) {
@@ -476,7 +474,6 @@ void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
 
 }
 
-
 void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
 
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
@@ -493,7 +490,6 @@ void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
 
 }
 
-
 void ExampleAIModule::releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list){
 
 	std::vector<BWAPI::Unit>::iterator it; 		// iteratation vector
@@ -506,7 +502,6 @@ void ExampleAIModule::releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit>
 	}
 
 }
-
 
 void ExampleAIModule::releaseMinerals(BWAPI::Unit unit){
 	if (unit->getType().isBuilding()) {
@@ -602,7 +597,6 @@ void ExampleAIModule::goScout(BWAPI::Unit scout){
 		}
 	}
 }
-
 
 DWORD WINAPI AnalyzeThread() {
 	//BWTA::analyze();
