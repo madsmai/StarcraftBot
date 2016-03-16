@@ -58,6 +58,7 @@ void ExampleAIModule::onStart() {
 	scout = NULL;
 	scouting = true;
 	pendingBuildings;
+	pendingTilePositions;
 	enemyUnits;
 	ourZealots;
 
@@ -537,9 +538,6 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 	int buildingPrice = buildingType.mineralPrice();
 	TilePosition targetBuildLocation = Broodwar->getBuildLocation(buildingType,
 		worker->getTilePosition());
-	if (!targetBuildLocation.isValid()){
-		targetBuildLocation = Broodwar->getBuildLocation(buildingType, ourBase->getTilePosition());
-	}
 	if (targetBuildLocation) {
 		// Register an event that draws the target build location
 		Broodwar->registerEvent([targetBuildLocation, buildingType](Game*) {
@@ -551,9 +549,36 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 			buildingType.buildTime() + 100);  // frames to run
 
 		// Order the worker to construct the structure
-		worker->build(buildingType, targetBuildLocation);
-		mineralsReserved += buildingPrice;
-		pendingBuildings.push_back(buildingPrice);
+		if (std::find(pendingTilePositions.begin(), pendingTilePositions.end(),
+			targetBuildLocation) != pendingTilePositions.end()) {
+
+			//Targetbuildlocation is a pendingTilePosition
+			targetBuildLocation = Broodwar->getBuildLocation(buildingType,
+				ourBase->getTilePosition());
+
+
+			Broodwar->registerEvent([targetBuildLocation, buildingType](Game*) {
+				Broodwar->drawBoxMap(Position(targetBuildLocation),
+					Position(targetBuildLocation + buildingType.tileSize()),
+					Colors::Blue);
+			},
+				nullptr,  // condition
+				buildingType.buildTime());  // frames to run
+
+
+
+			Broodwar->sendText("Targetbuildlocation var en pending location");
+		}
+		else {
+			//TargetbuildLocation is not a pendingTilePosition
+			pendingTilePositions.push_back(targetBuildLocation);
+			Broodwar->sendText("Push back");
+			//TODO Implement at den releaser den fra listen igen.
+			worker->build(buildingType, targetBuildLocation);
+			mineralsReserved += buildingPrice;
+			pendingBuildings.push_back(buildingPrice);
+		}
+		
 	}
 }
 
