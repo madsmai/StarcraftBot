@@ -12,45 +12,70 @@ class ExampleAIModule : public BWAPI::AIModule
 {
 public:
 
-	bool refinery;
-	bool refineryFinished;
+	// Basic game variables
 	int refineryWorkers;
-	int workers;
 	int mineralsReserved;
-	
-	int our_gateways;
-
 	bool scouting;
 	BWAPI::Unit scout;
+	std::vector<int> pendingBuildings;
+	std::vector<BWAPI::Unit> enemyUnits;
+	std::vector<BWAPI::Unit> ourZealots;
 
-	std::set<BWTA::BaseLocation*> baseLocations;
+	// BWTA variables
 	BWTA::BaseLocation* scoutedBase;
 	BWTA::BaseLocation* enemyBase;
 	BWTA::BaseLocation* expansion;
 	BWTA::BaseLocation* ourBase;
+	std::set<BWTA::BaseLocation*> baseLocations;
 
-	void releaseMinerals(BWAPI::Unit unit);
-	void releaseEnemyBuilding(BWAPI::Unit unit);
+	// Upgrades variables
+	int ground_weapons_count;
+	int ground_armor_count;
+	int air_weapons_count;
+	int air_armor_count;
+	int plasma_shields_count;
+	bool singularity_Charge_Researched;
+
+	// tactic variables
+	bool zealot_rush;
+
+
+	//zealot_rush variables
+	int zealotMAX;
+
+
+	// Build functions
+	void callBuildFunctions(BWAPI::Unit worker);
+	void buildSupply(BWAPI::Unit worker);
+	void buildRefinery(BWAPI::Unit worker);
+	void buildForge(BWAPI::Unit worker);
+	void buildGateway(BWAPI::Unit worker);
+	void buildCybernetics_Core(BWAPI::Unit worker);
+	void buildCitadel_Of_Adun(BWAPI::Unit worker);
+	void buildPhoton_Cannon(BWAPI::Unit worker);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
-	void supplyCheckAndBuild(BWAPI::Unit worker);
-	void gatewayCheckAndBuild(BWAPI::Unit worker);
+
+
+	// Auxiliary functions
+	void releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list);
+	void releaseMinerals(BWAPI::Unit unit); // removes minerals from the reserved list
+
+
+	// Basic functions
 	void goScout(BWAPI::Unit scout);
 	void trainZealots(BWAPI::Unit gateway);
+	bool isGasWorker(BWAPI::Unit worker);
+	void researchForge(BWAPI::Unit forge);
+	void researchCybernetics_Core(BWAPI::Unit forge);
+
+
+	// BWTA functions
 	void drawTerrainData();
-	void releaseZealot(BWAPI::Unit unit);
-	void releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list);
 
-	std::vector<int> pendingBuildings;
-	std::vector<BWAPI::Unit> enemyUnits;
 
-	bool building_gateway;
-	int zealotsInTraining;
-	int ourZealotsSize;
-	std::vector<BWAPI::Unit> ourZealots;
 
-	//zealot rush tactic
-	bool zealot_rush;
-	int zealotMAX;
+
+
 
 
 	// Virtual functions for callbacks, leave these as they are.
