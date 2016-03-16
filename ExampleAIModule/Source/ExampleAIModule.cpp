@@ -56,9 +56,10 @@ void ExampleAIModule::onStart() {
 	mineralsReserved = 0;
 	refineryWorkers = 0;
 	scout = NULL;
+	builder = NULL;
 	scouting = true;
+	building = false;
 	pendingBuildings;
-	pendingTilePositions;
 	enemyUnits;
 	ourZealots;
 
@@ -99,6 +100,9 @@ void ExampleAIModule::onEnd(bool isWinner)
 }
 
 void ExampleAIModule::onFrame() {
+
+
+
 
 	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) >= zealotMAX){
 		for (BWAPI::Unit zealot : ourZealots){
@@ -196,9 +200,16 @@ void ExampleAIModule::onFrame() {
 			&& u != scout
 			&& !isGasWorker(u)) {
 
+			if (builder == NULL){
+				builder = u;
+			}
 
 			// Method that checks for builds
-			callBuildFunctions(u);
+			
+			if (!building){
+				callBuildFunctions(builder);
+			}
+			
 
 
 			// if our worker is idle
@@ -347,12 +358,6 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 	// scouting code
 
-	if (unit->getPlayer()->isEnemy(Broodwar->self())){
-		//enemyUnits.push_back(unit);
-		Broodwar << "Unit found: " << unit->getType().getName() << "!" << std::endl;
-
-	}
-
 	if (scout != NULL){
 		if (scouting
 			&& unit->getType().isResourceDepot()
@@ -394,6 +399,11 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 }
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
+
+
+	if (unit->getType().isBuilding()){
+		building = false;
+	}
 
 	if (unit->getType() == UnitTypes::Protoss_Zealot){
 		Broodwar << "Zealots in training are: " << Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
@@ -548,37 +558,23 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 			nullptr,  // condition
 			buildingType.buildTime() + 100);  // frames to run
 
-		// Order the worker to construct the structure
-		if (std::find(pendingTilePositions.begin(), pendingTilePositions.end(),
-			targetBuildLocation) != pendingTilePositions.end()) {
-
-			//Targetbuildlocation is a pendingTilePosition
-			targetBuildLocation = Broodwar->getBuildLocation(buildingType,
-				ourBase->getTilePosition());
-
-
-			Broodwar->registerEvent([targetBuildLocation, buildingType](Game*) {
-				Broodwar->drawBoxMap(Position(targetBuildLocation),
-					Position(targetBuildLocation + buildingType.tileSize()),
-					Colors::Blue);
-			},
-				nullptr,  // condition
-				buildingType.buildTime());  // frames to run
 
 
 
-			Broodwar->sendText("Targetbuildlocation var en pending location");
-		}
-		else {
-			//TargetbuildLocation is not a pendingTilePosition
-			pendingTilePositions.push_back(targetBuildLocation);
-			Broodwar->sendText("Push back");
-			//TODO Implement at den releaser den fra listen igen.
-			worker->build(buildingType, targetBuildLocation);
-			mineralsReserved += buildingPrice;
-			pendingBuildings.push_back(buildingPrice);
-		}
-		
+		//TODO Implement at den releaser den fra listen igen.
+		worker->build(buildingType, targetBuildLocation);
+		building = true;
+		mineralsReserved += buildingPrice;
+		pendingBuildings.push_back(buildingPrice);
+
+
+
+
+
+
+
+
+
 	}
 }
 
@@ -628,6 +624,17 @@ void ExampleAIModule::buildSupply(BWAPI::Unit worker){
 
 		if (Broodwar->self()->supplyTotal() < 19){
 			scout = worker;
+			for (auto &u : Broodwar->self()->getUnits()) {
+				if (u->getType().isWorker()
+					&& u != scout){
+					builder = u;
+				}
+			}
+
+
+
+
+
 		}
 	}
 }
@@ -639,7 +646,7 @@ void ExampleAIModule::buildRefinery(BWAPI::Unit worker){
 	static int lastChecked = 0;
 	UnitType refineryType = UnitTypes::Protoss_Assimilator;
 	if (Broodwar->self()->allUnitCount(refineryType) == 0
-		&& Broodwar->self()->minerals() >= refineryType.mineralPrice()
+		&& Broodwar->self()->minerals() >= refineryType.mineralPrice() + mineralsReserved
 		&& (Broodwar->self()->supplyUsed() / 2) > 12
 		&& lastChecked + 400 < Broodwar->getFrameCount()
 		){
