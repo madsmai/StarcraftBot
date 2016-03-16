@@ -11,7 +11,8 @@ TODO:
 
 using namespace BWAPI;
 
-//Discover and destroy methods
+//Discover and destroy methods  
+
 void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 	if (unit->getPlayer()->isEnemy(Broodwar->self())){
 		
@@ -44,38 +45,119 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 }
 
 void InformationManager::onUnitDestroy(BWAPI::Unit unit){
+	if (unit->getPlayer()->isEnemy(Broodwar->self())){
 
+		if (unit->getType().isWorker()){
+			removeEnemyWorkers(unit);
+		}
+
+		if (unit->getType().canAttack() && unit->getType().canMove() && unit->getType().isWorker()){
+			removeEnemyAttackers(unit);
+		}
+
+		if (unit->getType() == UnitTypes::Protoss_Gateway ||
+			unit->getType() == UnitTypes::Zerg_Spawning_Pool ||
+			unit->getType() == UnitTypes::Terran_Barracks){
+
+			removeEnemyBarracks(unit);
+		}
+
+		if (unit->getType().isBuilding() && unit->getType().canAttack()){
+			removeEnemyTowers(unit);
+		}
+
+		if (unit->getType().isBuilding() && !unit->getType().canAttack()){
+			removeEnemyPassiveBuildings(unit);
+		}
+
+
+	}
 }
 
 
 //Adding enemy units to vectors
 void InformationManager::addEnemyBarracks(BWAPI::Unit barracks){
 
-	enemyBarracks.push_back(barracks);
-
+	bool exists = false;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = enemyBarracks.begin(); it != enemyBarracks.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == barracks->getID()){
+			exists = true;
+			break;
+		}
+	}
+	if (!exists) {
+		enemyBarracks.push_back(barracks);
+	}
+		
 }
 
 void InformationManager::addEnemyAttackers(BWAPI::Unit attacker){
 
-	enemyAttackers.push_back(attacker);
+	bool exists = false;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == attacker->getID()){
+			exists = true;
+			break;
+		}
+	}
+	if (!exists) {
+		enemyAttackers.push_back(attacker);
+	}
 
 }
 
 void InformationManager::addEnemyWorkers(BWAPI::Unit worker){
 
-	enemyWorkers.push_back(worker);
+	bool exists = false;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = enemyWorkers.begin(); it != enemyWorkers.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == worker->getID()){
+			exists = true;
+			break;
+		}
+	}
+	if (!exists) {
+		enemyWorkers.push_back(worker);
+	}
 
 }
 
 void InformationManager::addEnemyTowers(BWAPI::Unit tower){
 
-	enemyTowers.push_back(tower);
+	bool exists = false;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = enemyTowers.begin(); it != enemyTowers.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == tower->getID()){
+			exists = true;
+			break;
+		}
+	}
+	if (!exists) {
+		enemyTowers.push_back(tower);
+	}
 
 }
 
 void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
-	enemyPassiveBuildings.push_back(passiveBuilding);
+	bool exists = false;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = enemyPassiveBuildings.begin(); it != enemyPassiveBuildings.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == passiveBuilding->getID()){
+			exists = true;
+			break;
+		}
+	}
+	if (!exists) {
+		enemyPassiveBuildings.push_back(passiveBuilding);
+	}
 
 }
 
