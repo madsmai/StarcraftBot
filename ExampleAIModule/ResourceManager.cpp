@@ -1,22 +1,12 @@
 #include "ResourceManager.h"
 
-/*
-TODO:
-	
-*/
-
 //Currently only possible to reserve/release minerals for buildings
 //Reserve
 void ResourceManager::reserveMinerals(BWAPI::UnitType type){
 	if (type.isBuilding()){
 		reservedMinerals = reservedMinerals + type.mineralPrice();
-	}
-}
-
-//Release
-void ResourceManager::releaseMinerals(BWAPI::UnitType type){
-	if (type.isBuilding()){
-		reservedMinerals = reservedMinerals - type.mineralPrice();
+		int  min = getReservedMinerals();
+		BWAPI::Broodwar->sendText(std::to_string(min).c_str());
 	}
 }
 
@@ -25,6 +15,8 @@ ResourceManager& ResourceManager::getInstance(){ //Return ref to ResourceManager
 	return i;
 }
 
-void ResourceManager::onUnitComplete(BWAPI::Unit unit){
-	releaseMinerals(unit->getType());
+void ResourceManager::onUnitCreate(BWAPI::Unit unit){
+	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
+		reservedMinerals = reservedMinerals - unit->getType().mineralPrice();
+	}
 }

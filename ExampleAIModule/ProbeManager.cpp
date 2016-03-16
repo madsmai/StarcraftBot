@@ -10,13 +10,13 @@ void ProbeManager::onFrame(){
 	//Construct the next building in the queue
 	if (!pendingBuildings.empty()){
 		BWAPI::Unit unit = probes.front(); //Get a probe
-		BWAPI::UnitType type = pendingBuildings.front()->getType(); //Find building type
+		BWAPI::UnitType type = pendingBuildings.front(); //Find building type
 		int price = type.mineralPrice(); //Price of building
 		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, unit->getTilePosition()); //Buildposition
 
 		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > price){
 			unit->build(type, position);
-			ResourceManager::getInstance().reserveMinerals(type);
+			ResourceManager::getInstance().reserveMinerals(pendingBuildings.front());
 			pendingBuildings.pop(); //Remove building from queue
 		}
 		else { //IF we don't have enough minerals
@@ -64,7 +64,7 @@ void ProbeManager::onStart(){
 }
 
 //Remove worker from list and put into ScoutManager list
-bool ProbeManager::becomeScout(BWAPI::Unit unit){
+bool ProbeManager::becomeScout(){
 
 	return true;
 }
@@ -73,4 +73,11 @@ bool ProbeManager::becomeScout(BWAPI::Unit unit){
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
+}
+
+//Add building to queue
+void ProbeManager::addBuilding(BWAPI::UnitType type){
+	if (type.isBuilding()){
+		pendingBuildings.push(type);
+	}
 }
