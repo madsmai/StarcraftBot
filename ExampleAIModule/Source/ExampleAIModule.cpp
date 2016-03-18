@@ -195,6 +195,7 @@ void ExampleAIModule::onFrame() {
 			scout = NULL;
 		}
 
+
 		// If the unit is a worker unit
 		if (u->getType().isWorker()
 			&& u != scout
@@ -888,17 +889,14 @@ void ExampleAIModule::goScout(BWAPI::Unit scout){
 	for (it = baseLocations.begin(); it != baseLocations.end(); ++it){
 		scoutedBase = *it;
 		// Remove our baselocation
-		if (scoutedBase->getPosition() == ourBase->getPosition()){
+		if (scoutedBase->getPosition() == ourBase->getPosition() || scout->getPosition() == scoutedBase->getPosition()){
 			baseLocations.erase(*it);
-			Broodwar->sendText("Removed our base");
 		}
-		else if (ourBase->getGroundDistance(scoutedBase) < minDistance) {
-			minDistance = ourBase->getGroundDistance(scoutedBase);
-			Broodwar->sendText("Moving to enemy base");
+		else if (scout->getDistance(scoutedBase->getPosition()) < minDistance) {
+			minDistance = scout->getDistance(scoutedBase->getPosition());
 			scout->move(scoutedBase->getPosition());
-			Broodwar->sendText("Removing found base");
-			baseLocations.erase(*it);
 		}
+		
 	}
 }
 
