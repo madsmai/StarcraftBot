@@ -549,7 +549,7 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 			buildingType.buildTime() + 100);  // frames to run
 
 		// Order the worker to construct the structure
-		if (std::find(pendingTilePositions.begin(), pendingTilePositions.end(),
+		while (std::find(pendingTilePositions.begin(), pendingTilePositions.end(),
 			targetBuildLocation) != pendingTilePositions.end()) {
 
 			//Targetbuildlocation is a pendingTilePosition
@@ -569,15 +569,14 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 
 			Broodwar->sendText("Targetbuildlocation var en pending location");
 		}
-		else {
+		
 			//TargetbuildLocation is not a pendingTilePosition
 			pendingTilePositions.push_back(targetBuildLocation);
 			Broodwar->sendText("Push back");
 			//TODO Implement at den releaser den fra listen igen.
 			worker->build(buildingType, targetBuildLocation);
 			mineralsReserved += buildingPrice;
-			pendingBuildings.push_back(buildingPrice);
-		}
+			pendingBuildings.push_back(buildingPrice)
 		
 	}
 }
