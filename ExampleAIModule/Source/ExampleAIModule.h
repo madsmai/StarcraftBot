@@ -47,14 +47,14 @@ public:
 
 
 	// Build functions
-	void callBuildFunctions(BWAPI::Unit worker);
-	void buildSupply(BWAPI::Unit worker);
-	void buildRefinery(BWAPI::Unit worker);
-	void buildForge(BWAPI::Unit worker);
-	void buildGateway(BWAPI::Unit worker);
-	void buildCybernetics_Core(BWAPI::Unit worker);
-	void buildCitadel_Of_Adun(BWAPI::Unit worker);
-	void buildPhoton_Cannon(BWAPI::Unit worker);
+	bool callBuildFunctions(BWAPI::Unit worker);
+	bool buildSupply(BWAPI::Unit worker);
+	bool buildRefinery(BWAPI::Unit worker);
+	bool buildForge(BWAPI::Unit worker);
+	bool buildGateway(BWAPI::Unit worker);
+	bool buildCybernetics_Core(BWAPI::Unit worker);
+	bool buildCitadel_Of_Adun(BWAPI::Unit worker);
+	bool buildPhoton_Cannon(BWAPI::Unit worker);
 	void constructBuilding(BWAPI::UnitType buildingType, BWAPI::Unit worker);
 
 

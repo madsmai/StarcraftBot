@@ -103,7 +103,6 @@ void ExampleAIModule::onFrame() {
 
 
 
-
 	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) >= zealotMAX){
 		for (BWAPI::Unit zealot : ourZealots){
 			zealot->attack(enemyBase->getPosition());
@@ -184,11 +183,16 @@ void ExampleAIModule::onFrame() {
 			//TODO: Find en god radius til det her
 			u->attack(u->getClosestUnit((Filter::IsEnemy && Filter::CanAttack), 50));
 		}
+		else if (u->getType() == UnitTypes::Protoss_Zealot && u->isIdle()){
+			u->attack(u->getClosestUnit((Filter::IsEnemy), 200));
+		}
 
 		if (u->getType() == UnitTypes::Protoss_Zealot && u->isUnderAttack()) {
 			u->attack(u->getClosestUnit((Filter::IsEnemy && Filter::CanAttack), 4));
 		}
 
+
+		// Cheese tactic
 		if (u->getType().isWorker() && u == scout && u->isUnderAttack()) {
 			scout->move(ourBase->getPosition());
 			scouting = false;
@@ -196,21 +200,26 @@ void ExampleAIModule::onFrame() {
 		}
 
 
+
 		// If the unit is a worker unit
 		if (u->getType().isWorker()
 			&& u != scout
 			&& !isGasWorker(u)) {
 
+			// assign u as builder if no builder is assigned
 			if (builder == NULL){
 				builder = u;
 			}
+			// checks if the builder is currently moving to construct
+			else if (!builder->isConstructing()){
+				building = false;
+			}
+
 
 			// Method that checks for builds
-			
 			if (!building){
 				callBuildFunctions(builder);
 			}
-			
 
 
 			// if our worker is idle
@@ -225,8 +234,8 @@ void ExampleAIModule::onFrame() {
 				{                             // is carrying a powerup such as a flag
 
 					if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) == 1
-						&& refineryWorkers < 2) {
-						Broodwar << "go gather gas!" << std::endl;
+						&& refineryWorkers < 2
+						&& !(u == scout || u == builder)) {
 						if (!u->isGatheringMinerals()){
 							refineryWorkers++;
 							if (!u->gather(u->getClosestUnit(IsRefinery))){
@@ -252,10 +261,11 @@ void ExampleAIModule::onFrame() {
 			int workerCount = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Probe);
 			int gatewayCount = Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway);
 
-			// Order the depot to construct more workers! But only when it is idle and there is below 25 workers.
+			// Order the depot to construct more workers! But only when it is idle and there is less than 25 workers
 			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice()
 				&& u->isIdle()
 				&& workerCount < 25
+				// TODO: Tactic
 				&& (!(workerCount >= 10 && gatewayCount == 0) || !(workerCount >= 12 && gatewayCount == 1))
 				&& !u->train(u->getType().getRace().getWorker())
 				){
@@ -296,7 +306,6 @@ void ExampleAIModule::onFrame() {
 
 void ExampleAIModule::onSendText(std::string text) {
 
-
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", text.c_str());
 
@@ -316,6 +325,9 @@ void ExampleAIModule::onSendText(std::string text) {
 	}
 	else if (text == "reserved"){
 		Broodwar << mineralsReserved << std::endl;
+	}
+	else if (text == "building"){
+		Broodwar << building << std::endl;
 	}
 
 
@@ -358,7 +370,6 @@ void ExampleAIModule::onNukeDetect(BWAPI::Position target)
 void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 
 	// scouting code
-
 	if (scout != NULL){
 		if (scouting
 			&& unit->getType().isResourceDepot()
@@ -401,11 +412,6 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit) {
 
-
-	if (unit->getType().isBuilding()){
-		building = false;
-	}
-
 	if (unit->getType() == UnitTypes::Protoss_Zealot){
 		Broodwar << "Zealots in training are: " << Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
 		Broodwar << "Zealots done are:  " << Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) << std::endl;
@@ -446,8 +452,11 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
 
 	if (unit == scout){
 		scouting = false;
-
 		scout = NULL;
+	}
+	else if (unit == builder){
+		builder = NULL;
+		building = false;
 	}
 
 }
@@ -478,8 +487,7 @@ void ExampleAIModule::onSaveGame(std::string gameName)
 	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
 }
 
-void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
-{
+void ExampleAIModule::onUnitComplete(BWAPI::Unit unit) {
 
 	if (unit->getType() == UnitTypes::Protoss_Zealot
 		&& unit->getPlayer() == Broodwar->self()){
@@ -560,39 +568,35 @@ void ExampleAIModule::constructBuilding(BWAPI::UnitType buildingType, BWAPI::Uni
 			buildingType.buildTime() + 100);  // frames to run
 
 
-
-
-		//TODO Implement at den releaser den fra listen igen.
 		worker->build(buildingType, targetBuildLocation);
 		building = true;
 		mineralsReserved += buildingPrice;
 		pendingBuildings.push_back(buildingPrice);
 
-
-
-
-
-
-
-
-
 	}
 }
 
 //Kasper
-void ExampleAIModule::callBuildFunctions(BWAPI::Unit worker){
-	buildGateway(worker);
-	buildSupply(worker);
-	buildForge(worker);
-	buildRefinery(worker);
-	buildCitadel_Of_Adun(worker);
-	buildCybernetics_Core(worker);
-	buildPhoton_Cannon(worker);
+bool ExampleAIModule::callBuildFunctions(BWAPI::Unit worker){
+	if (buildGateway(worker)
+		|| buildSupply(worker)
+		|| buildForge(worker)
+		|| buildRefinery(worker)
+		|| buildCitadel_Of_Adun(worker)
+		|| buildCybernetics_Core(worker)
+		|| buildPhoton_Cannon(worker)){
+
+		return true;
+	}
+
+	return false;
+
+
 }
 
 
 // Kasper
-void ExampleAIModule::buildGateway(BWAPI::Unit worker){
+bool ExampleAIModule::buildGateway(BWAPI::Unit worker){
 
 	static int lastChecked = 0;
 	UnitType gateway = UnitTypes::Protoss_Gateway;
@@ -605,13 +609,15 @@ void ExampleAIModule::buildGateway(BWAPI::Unit worker){
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(gateway, worker);
+		return true;
 	}
+	return false;
 
 }
 
 
 // Kasper
-void ExampleAIModule::buildSupply(BWAPI::Unit worker){
+bool ExampleAIModule::buildSupply(BWAPI::Unit worker){
 	static int lastChecked = 0;
 	UnitType supplyType = UnitTypes::Protoss_Pylon;
 	if (((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) / 2 < 5
@@ -623,6 +629,7 @@ void ExampleAIModule::buildSupply(BWAPI::Unit worker){
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(supplyType, worker);
 
+
 		if (Broodwar->self()->supplyTotal() < 19){
 			scout = worker;
 			for (auto &u : Broodwar->self()->getUnits()) {
@@ -632,35 +639,36 @@ void ExampleAIModule::buildSupply(BWAPI::Unit worker){
 				}
 			}
 
-
-
-
+			return true;
 
 		}
 	}
+	return false;
 }
 
 
 // Kasper
-void ExampleAIModule::buildRefinery(BWAPI::Unit worker){
+bool ExampleAIModule::buildRefinery(BWAPI::Unit worker){
 
 	static int lastChecked = 0;
 	UnitType refineryType = UnitTypes::Protoss_Assimilator;
 	if (Broodwar->self()->allUnitCount(refineryType) == 0
-		&& Broodwar->self()->minerals() >= refineryType.mineralPrice() + mineralsReserved
+		&& Broodwar->self()->minerals() - mineralsReserved >= refineryType.mineralPrice()
 		&& (Broodwar->self()->supplyUsed() / 2) > 12
 		&& lastChecked + 400 < Broodwar->getFrameCount()
 		){
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(refineryType, worker);
+		return true;
 
 	}
+	return false;
 
 }
 
 // Kasper
-void ExampleAIModule::buildCybernetics_Core(BWAPI::Unit worker){
+bool ExampleAIModule::buildCybernetics_Core(BWAPI::Unit worker){
 
 	static int lastChecked = 0;
 	BWAPI::UnitType cybernetics_Core = UnitTypes::Protoss_Cybernetics_Core;
@@ -674,19 +682,20 @@ void ExampleAIModule::buildCybernetics_Core(BWAPI::Unit worker){
 		&& Broodwar->self()->allUnitCount(cybernetics_Core) == 0
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) >= 1
 		&& Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
-		&& Broodwar->self()->minerals() >= cybernetics_Core.mineralPrice()
+		&& Broodwar->self()->minerals() - mineralsReserved >= cybernetics_Core.mineralPrice()
 		&& Broodwar->self()->supplyUsed() / 2 >= 15
 		//TODO: Tactic
 		) {
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(cybernetics_Core, worker);
-
+		return true;
 	}
+	return false;
 }
 
 // Kasper
-void ExampleAIModule::buildPhoton_Cannon(BWAPI::Unit worker){
+bool ExampleAIModule::buildPhoton_Cannon(BWAPI::Unit worker){
 
 	static int lastChecked = 0;
 	BWAPI::UnitType photon_cannon = UnitTypes::Protoss_Photon_Cannon;
@@ -694,19 +703,20 @@ void ExampleAIModule::buildPhoton_Cannon(BWAPI::Unit worker){
 	if (lastChecked + 600 < Broodwar->getFrameCount()
 		&& Broodwar->self()->allUnitCount(photon_cannon) < 5
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge) >= 1
-		&& Broodwar->self()->minerals() >= photon_cannon.mineralPrice() + 400
+		&& Broodwar->self()->minerals() - mineralsReserved >= photon_cannon.mineralPrice() + 400
 		//TODO: Tactic
 		){
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(photon_cannon, worker);
-
+		return true;
 	}
+	return false;
 
 }
 
 // Kasper
-void ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
+bool ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
 
 	static int lastChecked = 0;
 	BWAPI::UnitType citadel_Of_Adun = UnitTypes::Protoss_Citadel_of_Adun;
@@ -714,19 +724,20 @@ void ExampleAIModule::buildCitadel_Of_Adun(BWAPI::Unit worker){
 	if (lastChecked + 600 < Broodwar->getFrameCount()
 		&& Broodwar->self()->allUnitCount(citadel_Of_Adun) == 0
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core)
-		&& Broodwar->self()->minerals() >= citadel_Of_Adun.mineralPrice()
+		&& Broodwar->self()->minerals() - mineralsReserved >= citadel_Of_Adun.mineralPrice()
 		&& Broodwar->self()->gas() >= citadel_Of_Adun.gasPrice()
 		//TODO: Tactic
 		){
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(citadel_Of_Adun, worker);
-
+		return true;
 	}
+	return false;
 }
 
 // Kasper
-void ExampleAIModule::buildForge(BWAPI::Unit worker){
+bool ExampleAIModule::buildForge(BWAPI::Unit worker){
 
 
 	BWAPI::UnitType forge = UnitTypes::Protoss_Forge;
@@ -734,7 +745,7 @@ void ExampleAIModule::buildForge(BWAPI::Unit worker){
 
 
 	if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
-		&& Broodwar->self()->minerals() >= forge.mineralPrice() + 100
+		&& Broodwar->self()->minerals() - mineralsReserved >= forge.mineralPrice() + 100
 		&& lastChecked + 400 < Broodwar->getFrameCount()
 		&& Broodwar->self()->allUnitCount(forge) == 0
 		//TODO: Tactic
@@ -742,8 +753,10 @@ void ExampleAIModule::buildForge(BWAPI::Unit worker){
 
 		lastChecked = Broodwar->getFrameCount();
 		constructBuilding(forge, worker);
+		return true;
 
 	}
+	return false;
 
 }
 
@@ -889,14 +902,17 @@ void ExampleAIModule::goScout(BWAPI::Unit scout){
 	for (it = baseLocations.begin(); it != baseLocations.end(); ++it){
 		scoutedBase = *it;
 		// Remove our baselocation
-		if (scoutedBase->getPosition() == ourBase->getPosition() || scout->getPosition() == scoutedBase->getPosition()){
+		if (scoutedBase->getPosition() == ourBase->getPosition()){
+			baseLocations.erase(*it);
+			Broodwar->sendText("Removed our base");
+		}
+		else if (ourBase->getGroundDistance(scoutedBase) < minDistance) {
+			minDistance = ourBase->getGroundDistance(scoutedBase);
+			Broodwar->sendText("Moving to enemy base");
+			scout->move(scoutedBase->getPosition());
+			Broodwar->sendText("Removing found base");
 			baseLocations.erase(*it);
 		}
-		else if (scout->getDistance(scoutedBase->getPosition()) < minDistance) {
-			minDistance = scout->getDistance(scoutedBase->getPosition());
-			scout->move(scoutedBase->getPosition());
-		}
-		
 	}
 }
 
