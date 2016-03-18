@@ -16,11 +16,12 @@ public:
 	int refineryWorkers;
 	int mineralsReserved;
 	bool scouting;
+	bool building;
 	BWAPI::Unit scout;
+	BWAPI::Unit builder;
 	std::vector<int> pendingBuildings;
 	std::vector<BWAPI::Unit> enemyUnits;
 	std::vector<BWAPI::Unit> ourZealots;
-	std::vector<BWAPI::TilePosition> pendingTilePositions;
 
 	// BWTA variables
 	BWTA::BaseLocation* scoutedBase;
