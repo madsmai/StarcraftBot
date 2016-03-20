@@ -166,117 +166,109 @@ void ExampleAIModule::onFrame() {
 		if (u->getType() == UnitTypes::Protoss_Zealot && u->isIdle()) {
 
 			//TODO: Find en god radius til det her
-			//BWAPI::Unitset closestUnits = u->getUnitsInRadius(50);
-			//u->attack(closestUnits.getClosestUnit());
+			u->attack(u->getClosestUnit(Filter::IsEnemy, 50));
 		}
 
 		if (u->getType() == UnitTypes::Protoss_Zealot && u->isUnderAttack()) {
-			BWAPI::Unitset attackingUnits = u->getUnitsInRadius(4);
-			for (Unit unit : attackingUnits){
-				if (unit->getPlayer() == Broodwar->self()){
-					attackingUnits.erase(unit);
-				}
-			}
-		u->attack(attackingUnits.getClosestUnit());
-		Broodwar->sendText("Attacking closest unit");
-	}
-
-	if (u->getType().isWorker() && u == scout && u->isUnderAttack()) {
-		scout->move(ourBase->getPosition());
-		//scout = NULL;
-	}
-
-	// If the unit is a worker unit
-	if (u->getType().isWorker() && u != scout) {
-
-
-		gatewayCheckAndBuild(u);
-		supplyCheckAndBuild(u);
-
-		// checks for a refinery
-		if (!refinery && Broodwar->self()->minerals() >= UnitTypes::Protoss_Assimilator.mineralPrice()
-			&& (Broodwar->self()->supplyUsed() / 2) > 10
-			&& !zealot_rush){
-			UnitType refineryType = UnitTypes::Protoss_Assimilator;
-			constructBuilding(refineryType, u);
-			refinery = true;
+			u->attack(u->getClosestUnit(Filter::IsEnemy, 4));
 		}
 
-		// if our worker is idle
-		if (u->isIdle()){
+		if (u->getType().isWorker() && u == scout && u->isUnderAttack()) {
+			scout->move(ourBase->getPosition());
+			//scout = NULL;
+		}
 
-			// Order workers carrying a resource to return them to the center,
-			// otherwise find a mineral patch to harvest.
-			if (u->isCarryingGas() || u->isCarryingMinerals()) {
-				u->returnCargo();
+		// If the unit is a worker unit
+		if (u->getType().isWorker() && u != scout) {
+
+
+			gatewayCheckAndBuild(u);
+			supplyCheckAndBuild(u);
+
+			// checks for a refinery
+			if (!refinery && Broodwar->self()->minerals() >= UnitTypes::Protoss_Assimilator.mineralPrice()
+				&& (Broodwar->self()->supplyUsed() / 2) > 10
+				&& !zealot_rush){
+				UnitType refineryType = UnitTypes::Protoss_Assimilator;
+				constructBuilding(refineryType, u);
+				refinery = true;
 			}
-			else if (!u->getPowerUp())  // The worker cannot harvest anything if it
-			{                             // is carrying a powerup such as a flag
 
-				if (refineryFinished && refineryWorkers < 3) {
-					if (!u->isGatheringMinerals()){
-						refineryWorkers++;
-						if (!u->gather(u->getClosestUnit(IsRefinery))){
+			// if our worker is idle
+			if (u->isIdle()){
+
+				// Order workers carrying a resource to return them to the center,
+				// otherwise find a mineral patch to harvest.
+				if (u->isCarryingGas() || u->isCarryingMinerals()) {
+					u->returnCargo();
+				}
+				else if (!u->getPowerUp())  // The worker cannot harvest anything if it
+				{                             // is carrying a powerup such as a flag
+
+					if (refineryFinished && refineryWorkers < 3) {
+						if (!u->isGatheringMinerals()){
+							refineryWorkers++;
+							if (!u->gather(u->getClosestUnit(IsRefinery))){
+								Broodwar << Broodwar->getLastError() << std::endl;
+							}
+						}
+					}
+					// Harvest from the nearest mineral patch
+					else {
+						if (!u->gather(u->getClosestUnit(IsMineralField))) {
+							// If the call fails, then print the last error message
 							Broodwar << Broodwar->getLastError() << std::endl;
 						}
 					}
-				}
-				// Harvest from the nearest mineral patch
-				else {
-					if (!u->gather(u->getClosestUnit(IsMineralField))) {
-						// If the call fails, then print the last error message
-						Broodwar << Broodwar->getLastError() << std::endl;
-					}
-				}
-			} // closure: has no powerup
-		} // closure: if idle
-	} // closure: builder type
+				} // closure: has no powerup
+			} // closure: if idle
+		} // closure: builder type
 
 
-	// A resource depot is a Command Center, Nexus, or Hatchery
-	else if (u->getType().isResourceDepot()) {
+		// A resource depot is a Command Center, Nexus, or Hatchery
+		else if (u->getType().isResourceDepot()) {
 
-		// Order the depot to construct more workers! But only when it is idle and there is below 25 workers.
-		if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice()
-			&& u->isIdle()
-			&& workers < 25
-			&& (!(workers >= 10 && our_gateways == 0)
-			|| !(workers >= 12 && our_gateways == 1))
-			&& !u->train(u->getType().getRace().getWorker())
-			){
+			// Order the depot to construct more workers! But only when it is idle and there is below 25 workers.
+			if (Broodwar->self()->minerals() - mineralsReserved >= UnitTypes::Protoss_Probe.mineralPrice()
+				&& u->isIdle()
+				&& workers < 25
+				&& (!(workers >= 10 && our_gateways == 0)
+				|| !(workers >= 12 && our_gateways == 1))
+				&& !u->train(u->getType().getRace().getWorker())
+				){
 
-			// If that fails, draw the error at the location so that you can visibly see what went wrong!
-			// However, drawing the error once will only appear for a single frame
-			// so create an event that keeps it on the screen for some frames
-			Position pos = u->getPosition();
-			Error lastErr = Broodwar->getLastError();
-			Broodwar->registerEvent([pos, lastErr](Game*){ Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); },   // action
-				nullptr,    // condition
-				Broodwar->getLatencyFrames());  // frames to run
+				// If that fails, draw the error at the location so that you can visibly see what went wrong!
+				// However, drawing the error once will only appear for a single frame
+				// so create an event that keeps it on the screen for some frames
+				Position pos = u->getPosition();
+				Error lastErr = Broodwar->getLastError();
+				Broodwar->registerEvent([pos, lastErr](Game*){ Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); },   // action
+					nullptr,    // condition
+					Broodwar->getLatencyFrames());  // frames to run
 
-			// Retrieve the supply provider type in the case that we have run out of supplies
-			UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
-			static int lastChecked = 0;
+				// Retrieve the supply provider type in the case that we have run out of supplies
+				UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
+				static int lastChecked = 0;
 
-			// If we are supply blocked and haven't tried constructing more recently
-			if (lastErr == Errors::Insufficient_Supply &&
-				lastChecked + 400 < Broodwar->getFrameCount() &&
-				Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
-			{
-				lastChecked = Broodwar->getFrameCount();
+				// If we are supply blocked and haven't tried constructing more recently
+				if (lastErr == Errors::Insufficient_Supply &&
+					lastChecked + 400 < Broodwar->getFrameCount() &&
+					Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
+				{
+					lastChecked = Broodwar->getFrameCount();
 
-				// Retrieve a unit that is capable of constructing the supply needed
-				Unit supplyBuilder = u->getClosestUnit(GetType == supplyProviderType.whatBuilds().first &&
-					(IsIdle || IsGatheringMinerals) && IsOwned);
-				// If a unit was found
-				if (supplyBuilder) {
-					constructBuilding(supplyProviderType, supplyBuilder);
-				} // closure: insufficient supply
-			} // closure: failed to train idle unit
-		}
-	} // closure: resoruceDepot
+					// Retrieve a unit that is capable of constructing the supply needed
+					Unit supplyBuilder = u->getClosestUnit(GetType == supplyProviderType.whatBuilds().first &&
+						(IsIdle || IsGatheringMinerals) && IsOwned);
+					// If a unit was found
+					if (supplyBuilder) {
+						constructBuilding(supplyProviderType, supplyBuilder);
+					} // closure: insufficient supply
+				} // closure: failed to train idle unit
+			}
+		} // closure: resoruceDepot
 
-} // closure: unit iterator
+	} // closure: unit iterator
 }
 
 void ExampleAIModule::onSendText(std::string text) {
@@ -481,7 +473,6 @@ void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
 
 }
 
-
 void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
 
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
@@ -498,7 +489,6 @@ void ExampleAIModule::trainZealots(BWAPI::Unit gateway){
 
 }
 
-
 void ExampleAIModule::releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit> list){
 
 	std::vector<BWAPI::Unit>::iterator it; 		// iteratation vector
@@ -511,7 +501,6 @@ void ExampleAIModule::releaseFromList(BWAPI::Unit unit, std::vector<BWAPI::Unit>
 	}
 
 }
-
 
 void ExampleAIModule::releaseMinerals(BWAPI::Unit unit){
 	if (unit->getType().isBuilding()) {
@@ -607,7 +596,6 @@ void ExampleAIModule::goScout(BWAPI::Unit scout){
 		}
 	}
 }
-
 
 DWORD WINAPI AnalyzeThread() {
 	//BWTA::analyze();
