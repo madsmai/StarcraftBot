@@ -2,37 +2,86 @@
 
 /*
 TODO:
-- Liste af alle byginger
-- Liste af units der skal bygges af bygninger
-- metode onFrame:
-	- Sætte bygninger til at producere units fra listen hvis der er mineraler nok
-		- Det er vigtigt at produktionen så vidt muligt bliver spredt ud over flere bygnigner 
-			så det går hurtigere
-- metode onUnitDestroy:
-	- Fjerne destroyed object fra listen, hvis den er i listen
-- metode onUnitComplete:
-	- Sætter completed unit ind i liste, hvis den hører til
+- Hvis en bygning ikke eksisterer så units/upgrade ikke kan laves, bliver køen stoppet til
 */
 
-BuildingManager::BuildingManager()
-{
-}
-
-
-BuildingManager::~BuildingManager()
-{
-}
-
 void BuildingManager::onFrame(){
+	//Construct the next unit in the queue
+	if (!pendingUnits.empty()){
 
+		BWAPI::UnitType type = pendingUnits.front();
+		int minPrice = type.mineralPrice(); //Price of unit
+		int gasPrice = type.gasPrice(); //Price of unit
+
+		std::vector<BWAPI::Unit>::iterator it;
+		for (it = buildings.begin(); it != buildings.end(); it++){
+			BWAPI::Unit unit = *it;
+			if (unit->canTrain(type) && 
+				unit->isIdle() && 
+				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > minPrice &&
+				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() > gasPrice){
+
+				unit->train(type);
+				pendingUnits.pop();
+			}
+			else {
+				BWAPI::Broodwar->sendText("Minerals/Non-idle/Non-existant-building error");
+			}
+		}
+	}
+
+	//Reasearch to the next upgrade in the queue
+	if (!pendingUpgrades.empty()){
+		BWAPI::UpgradeType type = pendingUpgrades.front();
+		int minPrice = type.mineralPrice(); //Price of unit
+		int gasPrice = type.gasPrice(); //Price of unit
+
+		std::vector<BWAPI::Unit>::iterator it;
+		for (it = buildings.begin(); it != buildings.end(); it++){
+			BWAPI::Unit unit = *it;
+			if (unit->canUpgrade(type) &&
+				unit->isIdle() &&
+				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > minPrice &&
+				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() > gasPrice){
+				
+				unit->upgrade(type);
+				pendingUpgrades.pop();
+			}
+			else {
+				BWAPI::Broodwar->sendText("Minerals/Non-idle/Non-existant-building error");
+			}
+		}
+	}
 }
 
 void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
+	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
+		std::vector<BWAPI::Unit>::iterator it;
 
+		//Loop through buildings
+		for (it = buildings.begin(); it != buildings.end(); it++){
+			if (*it == unit){
+				buildings.erase(it);
+				break;
+			}
+		}
+	}
 }
 
 void BuildingManager::onUnitComplete(BWAPI::Unit unit){
+	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
+		buildings.push_back(unit);
+	}
+}
 
+void BuildingManager::addUnit(BWAPI::UnitType type){
+	if (!type.isBuilding()){
+		pendingUnits.push(type);
+	}
+}
+
+void BuildingManager::addUpgrade(BWAPI::UpgradeType type){
+	pendingUpgrades.push(type);
 }
 
 BuildingManager& BuildingManager::getInstance(){ //Return ref to BuildingManager object

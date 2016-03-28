@@ -4,22 +4,24 @@
 class ResourceManager
 {
 public:
-	//onStart and onUnitCreated
-	void onStart(){ reservedMinerals = 400; }; //Has to start on 400 because the Nexus's minerals are released
+	//onUnitCreated
 	void onUnitCreate(BWAPI::Unit);
 
 	//Function for getting an instance
 	static ResourceManager& getInstance();
 
-	//Reserve Minerals
+	//Reserve Minerals and gas
 	void reserveMinerals(BWAPI::UnitType);
+	void reserveGas(BWAPI::UnitType);
 
 	//Getter
-	int getReservedMinerals() { return reservedMinerals; }
+	int const &getReservedMinerals() { return reservedMinerals; } //pure read-only access
+	int const &getReservedGas() { return reservedGas; }
 
 private:
 	//Minerals
-	int reservedMinerals;
+	int reservedMinerals = 400; //Has to start on 400 because the Nexus's minerals are released
+	int reservedGas = 0;
 
 	ResourceManager() {};
 	~ResourceManager() {};

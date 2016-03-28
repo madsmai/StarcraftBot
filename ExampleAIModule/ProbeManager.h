@@ -2,6 +2,7 @@
 
 #include <BWAPI.h>
 #include "ResourceManager.h"
+#include "ScoutManager.h"
 #include <vector>
 #include <queue>
 
@@ -18,16 +19,20 @@ public:
 	//Function for getting an instance
 	static ProbeManager& getInstance();
 
-	//Helper methods
-	bool becomeScout();
+	//Add scoutRequest
+	void addScoutRequest();
 
 	//Add building to list
 	void addBuilding(BWAPI::UnitType);
 
 private:
 	//The lists
-	std::vector<BWAPI::Unit> probes;
+	std::vector<BWAPI::Unit> mineralProbes;
+	std::vector<BWAPI::Unit> gasProbes;
 	std::queue<BWAPI::UnitType> pendingBuildings;
+
+	//Amount of scoutRequests
+	int scoutRequests;
 
 	//Con- and destructor aren't needed since class is used as static
 	ProbeManager(){};

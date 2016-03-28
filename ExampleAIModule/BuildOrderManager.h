@@ -1,14 +1,33 @@
 #pragma once
 
 #include <BWAPI.h>
+#include "ProbeManager.h"
+#include "BuildingManager.h"
+#include "OffenseManager.h"
 
 class BuildOrderManager
 {
 public:
-	BuildOrderManager();
-	~BuildOrderManager();
 	void onFrame();
-	void onUnitDestroy(BWAPI::Unit unit);
-	BuildOrderManager& BuildOrderManager::getInstance();
+
+	BuildOrderManager& getInstance();
+
+private:
+	BuildOrderManager() {};
+	~BuildOrderManager() {};
+
+	//Building functions
+	void buildGateway();
+	void buildSupply();
+	void buildForge();
+	void buildRefinery();
+	void buildCitadelOfAdun();
+	void buildCyberneticsCore();
+	void buildPhotonCannon();
+	void researchForge();
+	void researchCyberneticsCore();
+	void trainZealot();
+	void trainProbe();
+	void makeScout();
 };
 

@@ -2,34 +2,69 @@
 
 /*
 TODO:
-- metode makeScout:
-	- Sende en probe til ScoutManager og sletter probe fra egen liste, hvis bedt om det
+- Have a way of actually making probes mine gas
+- FIX: building two things in a row produces an error where the buildings want to be placed on same spot
 */
 
 void ProbeManager::onFrame(){
 	//Construct the next building in the queue
 	if (!pendingBuildings.empty()){
-		BWAPI::Unit unit = probes.front(); //Get a probe
+		BWAPI::Unit unit = mineralProbes.front(); //Get a probe
 		BWAPI::UnitType type = pendingBuildings.front(); //Find building type
-		int price = type.mineralPrice(); //Price of building
+		int minPrice = type.mineralPrice(); //Price of building
+		int gasPrice = type.gasPrice(); //Price of building
 		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, unit->getTilePosition()); //Buildposition
 
-		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > price){
+		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > minPrice
+			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() > gasPrice){
 			unit->build(type, position);
 			ResourceManager::getInstance().reserveMinerals(pendingBuildings.front());
 			pendingBuildings.pop(); //Remove building from queue
 		}
-		else { //IF we don't have enough minerals
-			BWAPI::Broodwar->sendText("Not enough minerals");
+		else { //If we don't have enough minerals or gas
+			BWAPI::Broodwar->sendText("Not enough minerals/gas");
 		}
 	}
 
-	//Make idle workers do stuff
+	//Make a scout
+	if (!scoutRequests == 0){
+		std::vector<BWAPI::Unit>::iterator it;
+		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
+			BWAPI::Unit unit = *it;
+			if (unit->isGatheringMinerals()){
+				mineralProbes.erase(it); //Remove probe from list
+				scoutRequests--; //Remove a scoutRequest
+				ScoutManager::getInstance().makeScout(unit); //Add a scout
+				break;
+			}
+		}
+	}
+
+	//Make idle mineralWorkers do stuff
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = probes.begin(); it != probes.end(); it++){
+	for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
 		BWAPI::Unit unit = *it;
 		if (unit->exists() && unit->isIdle() && unit->getPlayer() == BWAPI::Broodwar->self()){
-			unit->gather(unit->getClosestUnit(BWAPI::Filter::IsMineralField));
+			if (unit->isCarryingGas() || unit->isCarryingMinerals()) {
+				unit->returnCargo();
+			}
+			if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsMineralField))) {
+				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
+			}
+		}
+	}
+
+	//Make idle gasWorkers do stuff
+	for (it = gasProbes.begin(); it != gasProbes.end(); it++){
+		BWAPI::Unit u = *it;
+		if (u->exists() && u->isIdle() && u->getPlayer() == BWAPI::Broodwar->self()){
+			if (u->isCarryingGas() || u->isCarryingMinerals()) {
+				u->returnCargo();
+			}
+			if (!u->gather(u->getClosestUnit(BWAPI::Filter::IsRefinery))){
+				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
+			}
+
 		}
 	}
 }
@@ -38,9 +73,19 @@ void ProbeManager::onFrame(){
 void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self()){
 		std::vector<BWAPI::Unit>::iterator it;
-		for (it = probes.begin(); it != probes.end(); it++){
+
+		//Loop through mineralsProbes
+		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
 			if (*it == unit){
-				probes.erase(it);
+				mineralProbes.erase(it);
+				break;
+			}
+		}
+
+		//Loop through gasProbes
+		for (it = gasProbes.begin(); it != gasProbes.end(); it++){
+			if (*it == unit){
+				gasProbes.erase(it);
 				break;
 			}
 		}
@@ -50,29 +95,29 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 //Add newly made worker to list
 void ProbeManager::onUnitComplete(BWAPI::Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self()){
-		probes.push_back(unit);
+		mineralProbes.push_back(unit);
 	}
 }
 
-//Add the first 4 probes to list
+//Add the first 4 probes to list and set scoutRequests to 0
 void ProbeManager::onStart(){
 	for (auto &unit : BWAPI::Broodwar->self()->getUnits()) {
 		if (unit->exists()		&&	  unit->getType().isWorker()){
-			probes.push_back(unit);
+			mineralProbes.push_back(unit);
 		}
 	}
-}
-
-//Remove worker from list and put into ScoutManager list
-bool ProbeManager::becomeScout(){
-
-	return true;
+	scoutRequests = 0;
 }
 
 //Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
+}
+
+//Add scoutRequest
+void ProbeManager::addScoutRequest(){
+	scoutRequests++;
 }
 
 //Add building to queue

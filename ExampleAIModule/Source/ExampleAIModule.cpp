@@ -18,8 +18,15 @@ void ExampleAIModule::onStart(){
 }
 
 void ExampleAIModule::onFrame(){
+	//Return if paused
+	if (BWAPI::Broodwar->isReplay() || BWAPI::Broodwar->isPaused() || !BWAPI::Broodwar->self()) { return; }
+
 	//Prevent useless calls to onFrame
 	if (BWAPI::Broodwar->getFrameCount() % BWAPI::Broodwar->getLatencyFrames() != 0) { return; }
+
+	//Display FPS
+	BWAPI::Broodwar->drawTextScreen(200, 0, "FPS: %d", BWAPI::Broodwar->getFPS());
+	BWAPI::Broodwar->drawTextScreen(200, 20, "Average FPS: %f", BWAPI::Broodwar->getAverageFPS());
 	
 	//Call onFrames
 	ProbeManager::getInstance().onFrame();
@@ -39,4 +46,7 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit){
 void ExampleAIModule::onSendText(std::string text){
 	//Print out message
 	BWAPI::Broodwar->sendText(text.c_str());
+
+
+
 }

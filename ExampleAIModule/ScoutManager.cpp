@@ -12,15 +12,6 @@ TODO:
 	- Sætter completed unit ind i liste, hvis den hører til
 */
 
-ScoutManager::ScoutManager()
-{
-}
-
-
-ScoutManager::~ScoutManager()
-{
-}
-
 void ScoutManager::onFrame(){
 
 }
