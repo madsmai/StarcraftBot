@@ -14,16 +14,6 @@ TODO:
 
 using namespace BWAPI;
 
-
-ScoutManager::ScoutManager()
-{
-}
-
-
-ScoutManager::~ScoutManager()
-{
-}
-
 void ScoutManager::onFrame(){
 
 }

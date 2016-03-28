@@ -6,7 +6,6 @@ void ExampleAIModule::onStart(){
 
 	//Call onStarts
 	ProbeManager::getInstance().onStart();
-	ResourceManager::getInstance().onStart();
 
 	//Random message
 	BWAPI::Broodwar->sendText("Starting...");

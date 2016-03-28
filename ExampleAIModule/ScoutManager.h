@@ -7,13 +7,7 @@
 class ScoutManager
 {
 public:
-
 	BWAPI::Unit scout;
-
-
-
-	ScoutManager();
-	~ScoutManager();
 
 	void onFrame();
 	void onUnitDestroy(BWAPI::Unit unit);
@@ -28,5 +22,9 @@ public:
 	std::set<BWTA::BaseLocation*> baseLocations;
 
 	ScoutManager& ScoutManager::getInstance();
+
+private:
+	ScoutManager() {};
+	~ScoutManager() {};
 };
 
