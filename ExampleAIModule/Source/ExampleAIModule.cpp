@@ -10,9 +10,6 @@ void ExampleAIModule::onStart(){
 	//Enable user input
 	BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
 
-	//Call onStarts
-	ProbeManager::getInstance().onStart();
-
 	//Random message
 	BWAPI::Broodwar->sendText("Starting...");
 	/*
@@ -27,6 +24,10 @@ void ExampleAIModule::onStart(){
 	analysis_just_finished = false;
 	ourBase = BWTA::getStartLocation(Broodwar->self());
 	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
+
+	//Call on starts
+	BuildOrderManager::getInstance().onStart();
+	BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().size() << std::endl;
 }
 
 void ExampleAIModule::onFrame(){
@@ -48,7 +49,6 @@ void ExampleAIModule::onFrame(){
 	//Prevent useless calls to onFrame
 	if (BWAPI::Broodwar->getFrameCount() % BWAPI::Broodwar->getLatencyFrames() != 0) { return; }
 
-	
 	//Call onFrames
 	ProbeManager::getInstance().onFrame();
 	BuildingManager::getInstance().onFrame();
@@ -74,6 +74,12 @@ void ExampleAIModule::onSendText(std::string text){
 	BWAPI::Broodwar->sendText(text.c_str());
 	if (text == "Current Status") {
 		InformationManager::getInstance().currentStatus();
+	}
+	else if (text == "size"){
+		BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().size() << std::endl;
+	}
+	else if (text == "front"){
+		BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().front().getName() << std::endl;
 	}
 }
 
