@@ -225,7 +225,7 @@ void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding
 //Prints the current count of enemy units
 void InformationManager::currentStatus(){
 
-	Broodwar->sendText("Current Status: \n"
+	Broodwar << ("Current Status: \n"
 						<< enemyAttackers.size() << "enemy attacker(s) \n"
 						<< enemyBarracks.size() << "enemy barrack(s) \n"
 						<< enemyWorkers.size() << "enemy worker(s) \n"

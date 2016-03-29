@@ -24,7 +24,7 @@ void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 }
 
 void OffenseManager::onUnitComplete(BWAPI::Unit unit){
-	if (unit->getType == BWAPI::UnitTypes::Protoss_Zealot && unit->getPlayer() == BWAPI::Broodwar->self()){
+	if (unit->getType() == BWAPI::UnitTypes::Protoss_Zealot && unit->getPlayer() == BWAPI::Broodwar->self()){
 		zealots.push_back(unit);
 	}
 }
