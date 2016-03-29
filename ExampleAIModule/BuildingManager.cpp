@@ -8,7 +8,7 @@ TODO:
 void BuildingManager::onFrame(){
 	//Construct the next unit in the queue
 	if (!pendingUnits.empty()){
-
+		
 		BWAPI::UnitType type = pendingUnits.front();
 		int minPrice = type.mineralPrice(); //Price of unit
 		int gasPrice = type.gasPrice(); //Price of unit
@@ -16,6 +16,7 @@ void BuildingManager::onFrame(){
 		std::vector<BWAPI::Unit>::iterator it;
 		for (it = buildings.begin(); it != buildings.end(); it++){
 			BWAPI::Unit unit = *it;
+			BWAPI::Broodwar << "Can train" << unit->canTrain(type) << "\n Is idle" << unit->isIdle() << "\n Reserved Minerals " << ResourceManager::getInstance().getReservedMinerals() << std::endl;
 			if (unit->canTrain(type) && 
 				unit->isIdle() && 
 				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > minPrice &&
@@ -23,9 +24,6 @@ void BuildingManager::onFrame(){
 
 				unit->train(type);
 				pendingUnits.pop();
-			}
-			else {
-				BWAPI::Broodwar->sendText("Minerals/Non-idle/Non-existant-building error");
 			}
 		}
 	}
@@ -46,9 +44,6 @@ void BuildingManager::onFrame(){
 				
 				unit->upgrade(type);
 				pendingUpgrades.pop();
-			}
-			else {
-				BWAPI::Broodwar->sendText("Minerals/Non-idle/Non-existant-building error");
 			}
 		}
 	}

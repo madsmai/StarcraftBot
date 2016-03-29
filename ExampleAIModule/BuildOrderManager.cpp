@@ -18,6 +18,7 @@ void BuildOrderManager::onFrame(){
 	researchCyberneticsCore();
 	trainZealot();
 	trainProbe();
+	
 	makeScout();
 }
 
@@ -183,9 +184,7 @@ void BuildOrderManager::trainProbe(){
 	BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
 	int workerCount = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Probe);
 	int gatewayCount = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway);
-
 	if (workerCount < 25 && (!(workerCount >= 10 && gatewayCount == 0) || !(workerCount >= 12 && gatewayCount == 1))){
-
 		BuildingManager::getInstance().addUnit(probe);
 	}
 }

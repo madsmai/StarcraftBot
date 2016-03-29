@@ -10,6 +10,8 @@
 #include <BWTA.h>
 #include <Windows.h>
 
+DWORD WINAPI AnalyzeThread();
+
 class ExampleAIModule : public BWAPI::AIModule
 {
 public:
@@ -31,4 +33,12 @@ public:
 	//virtual void onUnitMorph(BWAPI::Unit unit);
 	//virtual void onUnitRenegade(BWAPI::Unit unit);
 	//virtual void onSaveGame(std::string gameName);
+
+	BWTA::BaseLocation* scoutedBase;
+	BWTA::BaseLocation* enemyBase;
+	BWTA::BaseLocation* expansion;
+	BWTA::BaseLocation* ourBase;
+	std::set<BWTA::BaseLocation*> baseLocations;
+
+	void drawTerrainData();
 };

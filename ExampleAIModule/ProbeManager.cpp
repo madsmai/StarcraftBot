@@ -21,9 +21,6 @@ void ProbeManager::onFrame(){
 			ResourceManager::getInstance().reserveMinerals(pendingBuildings.front());
 			pendingBuildings.pop(); //Remove building from queue
 		}
-		else { //If we don't have enough minerals or gas
-			BWAPI::Broodwar->sendText("Not enough minerals/gas");
-		}
 	}
 
 	//Make a scout
