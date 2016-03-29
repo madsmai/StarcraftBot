@@ -34,7 +34,8 @@ void ProbeManager::onFrame(){
 			if (unit->isGatheringMinerals()){
 				mineralProbes.erase(it); //Remove probe from list
 				scoutRequests--; //Remove a scoutRequest
-				ScoutManager::getInstance().makeScout(unit); //Add a scout
+				//TODO: When scoutmanager is finished enable method
+				//ScoutManager::getInstance().makeScout(unit); //Add a scout
 				break;
 			}
 		}
