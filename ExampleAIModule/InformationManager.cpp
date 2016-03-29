@@ -226,11 +226,11 @@ void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding
 void InformationManager::currentStatus(){
 
 	Broodwar->sendText("Current Status: \n"
-						<< enemyAttackers.size << "enemy attacker(s) \n"
-						<< enemyBarracks.size << "enemy barrack(s) \n"
-						<< enemyWorkers.size << "enemy worker(s) \n"
-						<< enemyTowers.size << "enemy tower(s) \n"
-						<< enemyPassiveBuildings.size << "passive enemy building(s) \n");
+						<< enemyAttackers.size() << "enemy attacker(s) \n"
+						<< enemyBarracks.size() << "enemy barrack(s) \n"
+						<< enemyWorkers.size() << "enemy worker(s) \n"
+						<< enemyTowers.size() << "enemy tower(s) \n"
+						<< enemyPassiveBuildings.size() << "passive enemy building(s) \n");
 }
 
 InformationManager& InformationManager::getInstance(){ //Return ref to InformationManager object
