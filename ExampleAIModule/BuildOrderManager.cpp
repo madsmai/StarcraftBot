@@ -174,7 +174,8 @@ void BuildOrderManager::trainZealot(){
 
 	if ((BWAPI::Broodwar->self()->incompleteUnitCount(zealot) + 
 		BWAPI::Broodwar->self()->completedUnitCount(zealot)) < OffenseManager::getInstance().getZealotMax()
-		&& BWAPI::Broodwar->self()->supplyUsed() < BWAPI::Broodwar->self()->supplyTotal()){
+		&& BWAPI::Broodwar->self()->supplyUsed() < BWAPI::Broodwar->self()->supplyTotal() 
+		&& BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >=1){
 
 		BuildingManager::getInstance().addUnit(zealot);
 	}

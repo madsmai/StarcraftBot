@@ -16,11 +16,10 @@ void BuildingManager::onFrame(){
 		std::vector<BWAPI::Unit>::iterator it;
 		for (it = buildings.begin(); it != buildings.end(); it++){
 			BWAPI::Unit unit = *it;
-			BWAPI::Broodwar << "Can train" << unit->canTrain(type) << "\n Is idle" << unit->isIdle() << "\n Reserved Minerals " << ResourceManager::getInstance().getReservedMinerals() << std::endl;
 			if (unit->canTrain(type) && 
-				unit->isIdle() && 
-				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > minPrice &&
-				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() > gasPrice){
+				unit->isIdle() &&
+				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
+				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) {
 
 				unit->train(type);
 				pendingUnits.pop();
@@ -39,8 +38,8 @@ void BuildingManager::onFrame(){
 			BWAPI::Unit unit = *it;
 			if (unit->canUpgrade(type) &&
 				unit->isIdle() &&
-				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > minPrice &&
-				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() > gasPrice){
+				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
+				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
 				
 				unit->upgrade(type);
 				pendingUpgrades.pop();

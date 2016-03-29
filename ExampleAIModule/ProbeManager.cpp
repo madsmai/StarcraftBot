@@ -13,10 +13,11 @@ void ProbeManager::onFrame(){
 		BWAPI::UnitType type = pendingBuildings.front(); //Find building type
 		int minPrice = type.mineralPrice(); //Price of building
 		int gasPrice = type.gasPrice(); //Price of building
+
 		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, unit->getTilePosition()); //Buildposition
 
-		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() > minPrice
-			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() > gasPrice){
+		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
+			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
 			unit->build(type, position);
 			ResourceManager::getInstance().reserveMinerals(pendingBuildings.front());
 			pendingBuildings.pop(); //Remove building from queue
