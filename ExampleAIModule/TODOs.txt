@@ -5,3 +5,4 @@
 - Få probes der har bygget noget til at mine igen
 - Sørge for at få ScoutManager, OffenseManager og InformationManager færdige, så de arbejder sammen
 - In probeManager: Put probes into scoutManager!
+- Fix at der bliver reserveret mineraler der ikke bliver afreserveret igen
