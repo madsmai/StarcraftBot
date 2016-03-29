@@ -31,6 +31,8 @@ private:
 	std::vector<BWAPI::Unit> gasProbes;
 	std::queue<BWAPI::UnitType> pendingBuildings;
 
+	BWAPI::Unit builder;
+
 	//Amount of scoutRequests
 	int scoutRequests;
 

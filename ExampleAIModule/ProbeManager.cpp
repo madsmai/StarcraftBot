@@ -8,21 +8,44 @@ TODO:
 
 void ProbeManager::onFrame(){
 	//Construct the next building in the queue
-	if (!pendingBuildings.empty()){
-		BWAPI::Unit unit = mineralProbes.front(); //Get a probe
+
+	//Old implementation before using 1 builder
+
+	//if (!pendingBuildings.empty()){
+	//	BWAPI::Unit unit = mineralProbes.front(); //Get a probe
+	//	BWAPI::UnitType type = pendingBuildings.front(); //Find building type
+	//	int minPrice = type.mineralPrice(); //Price of building
+	//	int gasPrice = type.gasPrice(); //Price of building
+
+	//	BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, unit->getTilePosition()); //Buildposition
+
+	//	if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
+	//		&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
+	//		unit->build(type, position);
+	//		ResourceManager::getInstance().reserveMinerals(pendingBuildings.front());
+	//		pendingBuildings.pop(); //Remove building from queue
+	//	}
+	//}
+
+	if (!pendingBuildings.empty()) {
+		if (builder == NULL || !builder->exists()) {
+			builder = mineralProbes.front(); //Make a builder
+		}
 		BWAPI::UnitType type = pendingBuildings.front(); //Find building type
 		int minPrice = type.mineralPrice(); //Price of building
 		int gasPrice = type.gasPrice(); //Price of building
 
-		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, unit->getTilePosition()); //Buildposition
+		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
 
 		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
 			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
-			unit->build(type, position);
+			builder->build(type, position);
 			ResourceManager::getInstance().reserveMinerals(pendingBuildings.front());
 			pendingBuildings.pop(); //Remove building from queue
 		}
 	}
+
+
 
 	//Make a scout
 	if (!scoutRequests == 0){
