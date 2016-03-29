@@ -7,9 +7,10 @@ TODO:
 
 void BuildingManager::onFrame(){
 	//Construct the next unit in the queue
-	if (!pendingUnits.empty()){
+	std::queue<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
+	if (!queue.empty() && !queue.front().isBuilding()){
 		
-		BWAPI::UnitType type = pendingUnits.front();
+		BWAPI::UnitType type = queue.front(); //Type of unit
 		int minPrice = type.mineralPrice(); //Price of unit
 		int gasPrice = type.gasPrice(); //Price of unit
 
@@ -22,7 +23,7 @@ void BuildingManager::onFrame(){
 				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) {
 
 				unit->train(type);
-				pendingUnits.pop();
+				queue.pop();
 			}
 		}
 	}
@@ -68,11 +69,11 @@ void BuildingManager::onUnitComplete(BWAPI::Unit unit){
 	}
 }
 
-void BuildingManager::addUnit(BWAPI::UnitType type){
-	if (!type.isBuilding()){
-		pendingUnits.push(type);
-	}
-}
+//void BuildingManager::addUnit(BWAPI::UnitType type){
+//	if (!type.isBuilding()){
+//		pendingUnits.push(type);
+//	}
+//}
 
 void BuildingManager::addUpgrade(BWAPI::UpgradeType type){
 	pendingUpgrades.push(type);
