@@ -9,16 +9,18 @@ void ProbeManager::onFrame(){
 	//Construct the next building in the queue
 	std::queue<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
 	if (!queue.empty() && queue.front().isBuilding()){
-		BWAPI::Unit unit = mineralProbes.front(); //Get a probe
+		if (builder == NULL || !builder->exists()) {
+			builder = mineralProbes.front(); //Assign a probe as designated builder
+		}
 		BWAPI::UnitType type = queue.front(); //Find building type
 		int minPrice = type.mineralPrice(); //Price of building
 		int gasPrice = type.gasPrice(); //Price of building
 
-		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, unit->getTilePosition()); //Buildposition
+		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
 
 		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
 			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
-			unit->build(type, position);
+			builder->build(type, position);
 			ResourceManager::getInstance().reserveMinerals(queue.front());
 			queue.pop(); //Remove building from queue
 		}
@@ -64,6 +66,11 @@ void ProbeManager::onFrame(){
 			else if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsMineralField))) {
 				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 			}
+		}
+	}
+	if (builder != NULL && builder->isIdle()) {
+		if (!builder->gather(builder->getClosestUnit(BWAPI::Filter::IsMineralField))) {
+			BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 		}
 	}
 

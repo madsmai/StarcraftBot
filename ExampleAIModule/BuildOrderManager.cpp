@@ -19,6 +19,7 @@ void BuildOrderManager::onStart(){
 	fixedOrderQueue.push(pylon);
 	fixedOrderQueue.push(gateway);
 	fixedOrderQueue.push(zealot);
+	fixedOrderQueue.push(gateway);
 	fixedOrderQueue.push(zealot);
 	fixedOrderQueue.push(zealot);
 
