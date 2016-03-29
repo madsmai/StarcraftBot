@@ -6,7 +6,7 @@
 class InformationManager
 {
 public:
-	InformationManager& InformationManager::getInstance();
+	static InformationManager& getInstance();
 	InformationManager(){};
 	~InformationManager(){};
 
