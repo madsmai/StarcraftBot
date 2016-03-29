@@ -7,22 +7,12 @@ TODO:
 */
 
 void BuildOrderManager::onFrame(){
-	buildGateway();
-	buildSupply();
-	buildForge();
-	buildRefinery();
-	buildCitadelOfAdun();
-	buildCyberneticsCore();
-	buildPhotonCannon();
-	researchForge();
-	researchCyberneticsCore();
-	trainZealot();
-	trainProbe();
-	
-	makeScout();
+	if (buildGateway() ||		buildSupply() ||		buildForge() ||		buildRefinery() ||		buildCitadelOfAdun() ||		buildCyberneticsCore() ||		buildPhotonCannon() ||
+		researchForge() ||		researchCyberneticsCore() ||		trainZealot() ||		trainProbe() ||		makeScout()) {
+	}
 }
 
-void BuildOrderManager::buildGateway(){
+bool BuildOrderManager::buildGateway(){
 	static int lastChecked = 0;
 	BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
 	if (((BWAPI::Broodwar->self()->supplyUsed() / 2 >= 10 && BWAPI::Broodwar->self()->allUnitCount(gateway) == 0) || 
@@ -31,10 +21,12 @@ void BuildOrderManager::buildGateway(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		ProbeManager::getInstance().addBuilding(gateway);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::buildSupply(){
+bool BuildOrderManager::buildSupply(){
 	static int lastChecked = 0;
 	BWAPI::UnitType supplyType = BWAPI::UnitTypes::Protoss_Pylon;
 	if (((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) / 2 < 5|| 
@@ -43,10 +35,12 @@ void BuildOrderManager::buildSupply(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		ProbeManager::getInstance().addBuilding(supplyType);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::buildForge(){
+bool BuildOrderManager::buildForge(){
 	BWAPI::UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
 	static int lastChecked = 0;
 
@@ -56,10 +50,12 @@ void BuildOrderManager::buildForge(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		ProbeManager::getInstance().addBuilding(forge);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::buildRefinery(){
+bool BuildOrderManager::buildRefinery(){
 	static int lastChecked = 0;
 	BWAPI::UnitType refineryType = BWAPI::UnitTypes::Protoss_Assimilator;
 	if (BWAPI::Broodwar->self()->allUnitCount(refineryType) == 0
@@ -68,10 +64,12 @@ void BuildOrderManager::buildRefinery(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		ProbeManager::getInstance().addBuilding(refineryType);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::buildCitadelOfAdun(){
+bool BuildOrderManager::buildCitadelOfAdun(){
 	static int lastChecked = 0;
 	BWAPI::UnitType citadel_Of_Adun = BWAPI::UnitTypes::Protoss_Citadel_of_Adun;
 
@@ -81,10 +79,12 @@ void BuildOrderManager::buildCitadelOfAdun(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		ProbeManager::getInstance().addBuilding(citadel_Of_Adun);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::buildCyberneticsCore(){
+bool BuildOrderManager::buildCyberneticsCore(){
 	static int lastChecked = 0;
 	BWAPI::UnitType cybernetics_Core = BWAPI::UnitTypes::Protoss_Cybernetics_Core;
 
@@ -100,10 +100,12 @@ void BuildOrderManager::buildCyberneticsCore(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		ProbeManager::getInstance().addBuilding(cybernetics_Core);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::buildPhotonCannon(){
+bool BuildOrderManager::buildPhotonCannon(){
 	static int lastChecked = 0;
 	BWAPI::UnitType photon_cannon = BWAPI::UnitTypes::Protoss_Photon_Cannon;
 
@@ -113,10 +115,12 @@ void BuildOrderManager::buildPhotonCannon(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		ProbeManager::getInstance().addBuilding(photon_cannon);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::researchForge(){
+bool BuildOrderManager::researchForge(){
 
 	//Upgrade types
 	BWAPI::UpgradeType ground_weapons = BWAPI::UpgradeTypes::Protoss_Ground_Weapons;
@@ -128,22 +132,26 @@ void BuildOrderManager::researchForge(){
 	if (OffenseManager::getInstance().getGroundWeapons() == 0 && BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >= 2){
 		BuildingManager::getInstance().addUpgrade(ground_weapons);
 		OffenseManager::getInstance().getGroundWeapons()++;
+		return true;
 	}
 
 	// Ground armor
 	else if (OffenseManager::getInstance().getGroundWeapons() >= 1){
 		BuildingManager::getInstance().addUpgrade(ground_armor);
 		OffenseManager::getInstance().getGroundArmor()++;
+		return true;
 	}
 
 	// Plasma shields
 	else if (OffenseManager::getInstance().getGroundArmor() >= 1){
 		BuildingManager::getInstance().addUpgrade(plasma_shields);
 		OffenseManager::getInstance().getPlasmaShields()++;
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::researchCyberneticsCore(){
+bool BuildOrderManager::researchCyberneticsCore(){
 
 	//Upgrade types
 	BWAPI::UpgradeType air_weapons = BWAPI::UpgradeTypes::Protoss_Air_Weapons;
@@ -154,22 +162,26 @@ void BuildOrderManager::researchCyberneticsCore(){
 	if (FALSE){
 		BuildingManager::getInstance().addUpgrade(air_weapons);
 		OffenseManager::getInstance().getAirWeapons()++;
+		return true;
 	}
 
 	// Air armor
 	if (FALSE){
 		BuildingManager::getInstance().addUpgrade(air_armor);
 		OffenseManager::getInstance().getAirArmor()++;
+		return true;
 	}
 
 	// Singularity_Charge
 	if (FALSE){
 		BuildingManager::getInstance().addUpgrade(singularity_charge);
 		OffenseManager::getInstance().getSingularityCharge() = true;
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::trainZealot(){
+bool BuildOrderManager::trainZealot(){
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
 
 	if ((BWAPI::Broodwar->self()->incompleteUnitCount(zealot) + 
@@ -178,22 +190,28 @@ void BuildOrderManager::trainZealot(){
 		&& BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >=1){
 
 		BuildingManager::getInstance().addUnit(zealot);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::trainProbe(){
+bool BuildOrderManager::trainProbe(){
 	BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
 	int workerCount = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Probe);
 	int gatewayCount = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway);
 	if (workerCount < 25 && (!(workerCount >= 10 && gatewayCount == 0) || !(workerCount >= 12 && gatewayCount == 1))){
 		BuildingManager::getInstance().addUnit(probe);
+		return true;
 	}
+	return false;
 }
 
-void BuildOrderManager::makeScout(){
+bool BuildOrderManager::makeScout(){
 	if (BWAPI::Broodwar->self()->supplyTotal() < 19){
 		ProbeManager::getInstance().addScoutRequest();
+		return true;
 	}
+	return false;
 }
 
 BuildOrderManager& BuildOrderManager::getInstance(){ //Return ref to BuildOrderManager object

@@ -17,17 +17,17 @@ private:
 	~BuildOrderManager() {};
 
 	//Building functions
-	void buildGateway();
-	void buildSupply();
-	void buildForge();
-	void buildRefinery();
-	void buildCitadelOfAdun();
-	void buildCyberneticsCore();
-	void buildPhotonCannon();
-	void researchForge();
-	void researchCyberneticsCore();
-	void trainZealot();
-	void trainProbe();
-	void makeScout();
+	bool buildGateway();
+	bool buildSupply();
+	bool buildForge();
+	bool buildRefinery();
+	bool buildCitadelOfAdun();
+	bool buildCyberneticsCore();
+	bool buildPhotonCannon();
+	bool researchForge();
+	bool researchCyberneticsCore();
+	bool trainZealot();
+	bool trainProbe();
+	bool makeScout();
 };
 
