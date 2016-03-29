@@ -1,22 +1,24 @@
 #pragma once
-#include <BWAPI.h>
 #include "../ProbeManager.h"
 #include "../ResourceManager.h"
+#include "../BuildingManager.h"
+#include "../BuildOrderManager.h"
 #include "../InformationManager.h"
+#include "../OffenseManager.h"
+#include "../ScoutManager.h"
+#include <BWAPI.h>
 #include <BWTA.h>
 #include <Windows.h>
-
-DWORD WINAPI AnalyzeThread();
 
 class ExampleAIModule : public BWAPI::AIModule
 {
 public:
 	virtual void onStart();
 	virtual void onFrame();
-	virtual void onUnitComplete(BWAPI::Unit);
+	virtual void onUnitComplete(BWAPI::Unit unit);
 
 	//virtual void onEnd(bool isWinner);
-	virtual void onSendText(std::string);
+	virtual void onSendText(std::string string);
 	//virtual void onReceiveText(BWAPI::Player player, std::string text);
 	//virtual void onPlayerLeft(BWAPI::Player player);
 	//virtual void onNukeDetect(BWAPI::Position target);
@@ -29,17 +31,4 @@ public:
 	//virtual void onUnitMorph(BWAPI::Unit unit);
 	//virtual void onUnitRenegade(BWAPI::Unit unit);
 	//virtual void onSaveGame(std::string gameName);
-	//virtual void onUnitComplete(BWAPI::Unit unit);
-
-	//BWTA Functions
-	void drawTerrainData();
-
-
-	//BWTA Variables
-	BWTA::BaseLocation* scoutedBase;
-	BWTA::BaseLocation* enemyBase;
-	BWTA::BaseLocation* expansion;
-	BWTA::BaseLocation* ourBase;
-	std::set<BWTA::BaseLocation*> baseLocations;
-
 };

@@ -7,8 +7,6 @@ class InformationManager
 {
 public:
 	static InformationManager& getInstance();
-	InformationManager(){};
-	~InformationManager(){};
 
 	void onUnitDiscover(BWAPI::Unit);
 	void onUnitDestroy(BWAPI::Unit);
@@ -34,5 +32,9 @@ public:
 	std::vector<BWAPI::Unit> enemyWorkers;
 	std::vector<BWAPI::Unit> enemyTowers;
 	std::vector<BWAPI::Unit> enemyPassiveBuildings;
+
+private:
+	InformationManager(){};
+	~InformationManager(){};
 };
 
