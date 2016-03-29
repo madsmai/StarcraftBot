@@ -30,13 +30,17 @@ void ExampleAIModule::onFrame(){
 	
 	//Call onFrames
 	ProbeManager::getInstance().onFrame();
-	
-
+	BuildingManager::getInstance().onFrame();
+	BuildOrderManager::getInstance().onFrame();
+	OffenseManager::getInstance().onFrame();
+	ScoutManager::getInstance().onFrame();
 }
 
 void ExampleAIModule::onUnitComplete(BWAPI::Unit unit){
 	//Call onUnitCompletes
 	ProbeManager::getInstance().onUnitComplete(unit);
+	BuildingManager::getInstance().onUnitComplete(unit);
+	OffenseManager::getInstance().onUnitComplete(unit);
 }
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit){
@@ -54,8 +58,13 @@ void ExampleAIModule::onSendText(std::string text){
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
 	InformationManager::getInstance().onUnitDestroy(unit);
+	BuildingManager::getInstance().onUnitDestroy(unit);
+	OffenseManager::getInstance().onUnitDestroy(unit);
+	ProbeManager::getInstance().onUnitDestroy(unit);
+	ScoutManager::getInstance().onUnitDestroy(unit);
 }
 
 void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
 	InformationManager::getInstance().onUnitDiscover(unit);
+	ScoutManager::getInstance().onUnitDiscover(unit);
 }

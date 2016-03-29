@@ -10,7 +10,7 @@ class BuildOrderManager
 public:
 	void onFrame();
 
-	BuildOrderManager& getInstance();
+	static BuildOrderManager& getInstance();
 
 private:
 	BuildOrderManager() {};
