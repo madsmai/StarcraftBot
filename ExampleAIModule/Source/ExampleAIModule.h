@@ -2,6 +2,8 @@
 #include <BWAPI.h>
 #include "../ProbeManager.h"
 #include "../ResourceManager.h"
+#include <BWTA.h>
+#include <Windows.h>
 
 class ExampleAIModule : public BWAPI::AIModule
 {
