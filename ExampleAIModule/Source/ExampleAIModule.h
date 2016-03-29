@@ -23,6 +23,10 @@ public:
 	std::vector<BWAPI::Unit> enemyUnits;
 	std::vector<BWAPI::Unit> ourZealots;
 
+	BWAPI::Unit currentZealot;
+	BWAPI::Unit currentTroop;
+	BWAPI::Unit bestTarget;
+
 	// BWTA variables
 	BWTA::BaseLocation* scoutedBase;
 	BWTA::BaseLocation* enemyBase;
@@ -69,7 +73,7 @@ public:
 	bool isGasWorker(BWAPI::Unit worker);
 	void researchForge(BWAPI::Unit forge);
 	void researchCybernetics_Core(BWAPI::Unit forge);
-
+	void executeRush(BWAPI::Unitset);
 
 	// BWTA functions
 	void drawTerrainData();

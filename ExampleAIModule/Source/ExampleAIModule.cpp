@@ -102,10 +102,17 @@ void ExampleAIModule::onEnd(bool isWinner)
 void ExampleAIModule::onFrame() {
 
 
-
+	BWAPI::Unitset activeGroup;
 	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) >= zealotMAX){
 		for (BWAPI::Unit zealot : ourZealots){
+
+			//Forsøg, tidligere attackmove enemyBase
 			zealot->attack(enemyBase->getPosition());
+			activeGroup.insert(zealot);
+			if (activeGroup.size() >= 3) {
+				executeRush(activeGroup);
+				activeGroup.clear();
+			}
 		}
 		zealotMAX = zealotMAX * 2;
 	}
@@ -184,12 +191,69 @@ void ExampleAIModule::onFrame() {
 			u->attack(u->getClosestUnit((Filter::IsEnemy && Filter::CanAttack), 50));
 		}
 		else if (u->getType() == UnitTypes::Protoss_Zealot && u->isIdle()){
-			u->attack(u->getClosestUnit((Filter::IsEnemy), 200));
+			//u->attack(u->getClosestUnit((Filter::IsEnemy), 200));
+			Broodwar << "Idle" << std::endl;
+			//Forsøg
+			int minDistance = 999999;
+			int secondDistance = 999999;
+			BWAPI::Unit firstZealot = u;
+			BWAPI::Unit secondZealot = u;
+			std::vector<BWAPI::Unit>::iterator zealot;
+			for (zealot = ourZealots.begin(); zealot != ourZealots.end(); ++zealot) {
+				currentZealot = *zealot;
+				if (u->getDistance(currentZealot) <= minDistance) {
+					secondDistance = minDistance;
+					secondZealot = firstZealot;
+					minDistance = u->getDistance(currentZealot);
+					firstZealot = currentZealot;
+				}
+				else if (u->getDistance(currentZealot) <= secondDistance) {
+					secondDistance = u->getDistance(currentZealot);
+					secondZealot = currentZealot;
+				}
+			}
+			if (secondZealot != u && firstZealot != u) {
+				activeGroup.insert(u);
+				activeGroup.insert(firstZealot);
+				activeGroup.insert(secondZealot);
+				executeRush(activeGroup);
+				activeGroup.clear();
+			}
+			
 		}
 
 		if (u->getType() == UnitTypes::Protoss_Zealot && u->isUnderAttack()) {
-			u->attack(u->getClosestUnit((Filter::IsEnemy && Filter::CanAttack), 4));
+			//u->attack(u->getClosestUnit((Filter::IsEnemy && Filter::CanAttack), 4));
+			Broodwar << "Under attack" << std::endl;
+			//Forsøg
+			int minDistance = 999999;
+			int secondDistance = 999999;
+			BWAPI::Unit firstZealot = u;
+			BWAPI::Unit secondZealot = u;
+			std::vector<BWAPI::Unit>::iterator zealot;
+			for (zealot = ourZealots.begin(); zealot != ourZealots.end(); ++zealot) {
+				currentZealot = *zealot;
+				if (u->getDistance(currentZealot) <= minDistance) {
+					secondDistance = minDistance;
+					secondZealot = firstZealot;
+					minDistance = u->getDistance(currentZealot);
+					firstZealot = currentZealot;
+				}
+				else if (u->getDistance(currentZealot) <= secondDistance) {
+					secondDistance = u->getDistance(currentZealot);
+					secondZealot = currentZealot;
+				}
+			}
+			if (secondZealot != u && firstZealot != u) {
+				activeGroup.insert(u);
+				activeGroup.insert(firstZealot);
+				activeGroup.insert(secondZealot);
+				executeRush(activeGroup);
+				activeGroup.clear();
+			}
+			
 		}
+
 
 
 		// Cheese tactic
@@ -972,4 +1036,50 @@ void ExampleAIModule::drawTerrainData() {
 			Broodwar->drawLineMap(point1, point2, Colors::Red);
 		}
 	}
+}
+
+void ExampleAIModule::executeRush(BWAPI::Unitset Attackers) {
+	//Giv metoden et unitset med 3ish units af samme type så de kan microes sammen
+
+	//Current bug: Listen er empty næsten hver gang den kører
+	//Måske fordi unitsne i unitsettet er for langt fra hinanden
+
+	Broodwar << "Executing rush" << std::endl;
+	Attackers.attack(enemyBase->getPosition());
+	BWAPI::Unit ourTroop = *Attackers.begin();
+	BWAPI::Unitset enemyTroops = Attackers.getUnitsInRadius(12, BWAPI::Filter::IsEnemy && BWAPI::Filter::CanAttack && !BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsWorker);
+	Broodwar << "Initilized unitset" << std::endl;
+	if (enemyTroops.empty()) {
+		BWAPI::Unitset enemyTowers = Attackers.getUnitsInRadius(8, BWAPI::Filter::IsEnemy && BWAPI::Filter::CanAttack && BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsWorker);
+	}
+	else {
+		Broodwar << "enemyTroops was not empty" << std::endl;
+		BWAPI::Unitset::iterator troop;
+		int topPriority = 0;
+		for (troop = enemyTroops.begin(); troop != enemyTroops.end(); ++troop) {
+			
+			currentTroop = *troop;
+			//Calculate priority
+
+			Broodwar << "Calculating priority" << std::endl;
+
+			int effectiveHp = currentTroop->getHitPoints() + currentTroop->getShields();
+			int ourDamage = (Broodwar->self()->damage(ourTroop->getType().groundWeapon()) - currentTroop->getPlayer()->armor(currentTroop->getType())) * ourTroop->getType().maxGroundHits();
+			//Integer division round up, hopefully
+			int hitsToKill = effectiveHp + (ourDamage - 1) / ourDamage;
+			int damage = (currentTroop->getPlayer()->damage(currentTroop->getType().groundWeapon()) - Broodwar->self()->armor(ourTroop->getType())) * currentTroop->getType().maxGroundHits();;
+
+			int priority = damage / hitsToKill;
+			Broodwar << "Priority of  " << currentTroop->getType() << "is: " << priority << std::endl;
+			if (priority > topPriority) {
+				topPriority = priority;
+				bestTarget = currentTroop;
+			}
+		}
+		Broodwar << "Top priority was" << topPriority << std::endl;
+		Broodwar << "Best found target  " << bestTarget->getType() << "!" << std::endl;
+		Attackers.attack(bestTarget);
+
+	}
+
 }
