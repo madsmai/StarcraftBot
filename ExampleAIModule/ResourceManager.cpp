@@ -34,5 +34,6 @@ void ResourceManager::onUnitCreate(BWAPI::Unit unit){
 	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
 		reservedMinerals = reservedMinerals - unit->getType().mineralPrice();
 		reservedGas = reservedGas - unit->getType().gasPrice();
+		BWAPI::Broodwar->sendText(std::to_string(reservedMinerals).c_str());
 	}
 }
