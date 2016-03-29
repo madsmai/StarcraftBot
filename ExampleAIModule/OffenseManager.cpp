@@ -43,12 +43,12 @@ void OffenseManager::onFrame(){
 	}
 
 	//Need BWTA or whatever it's called
-	if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Zealot) >= zealotMax){
-		for (BWAPI::Unit zealot : zealots){
-			zealot->attack(enemyBase->getPosition());
-		}
-		zealotMax = zealotMax * 2;
-	}
+	//if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Zealot) >= zealotMax){
+		//for (BWAPI::Unit zealot : zealots){
+			//zealot->attack(enemyBase->getPosition());
+		//}
+		//zealotMax = zealotMax * 2;
+	//}
 }
 
 OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager object

@@ -22,7 +22,7 @@ public:
 	BWTA::BaseLocation* ourBase;
 	std::set<BWTA::BaseLocation*> baseLocations;
 
-	ScoutManager& ScoutManager::getInstance();
+	static ScoutManager& getInstance();
 
 private:
 	ScoutManager() {};

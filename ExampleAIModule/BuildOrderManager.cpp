@@ -164,7 +164,7 @@ void BuildOrderManager::researchCyberneticsCore(){
 	// Singularity_Charge
 	if (FALSE){
 		BuildingManager::getInstance().addUpgrade(singularity_charge);
-		OffenseManager::getInstance().getSingularityCharge = true;
+		OffenseManager::getInstance().getSingularityCharge() = true;
 	}
 }
 
