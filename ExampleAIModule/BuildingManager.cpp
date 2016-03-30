@@ -7,9 +7,9 @@ TODO:
 
 void BuildingManager::onFrame(){
 	//Construct the next unit in the queue
-	std::queue<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
+	std::vector<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
 	if (!queue.empty() && !queue.front().isBuilding()){
-		
+
 		BWAPI::UnitType type = queue.front(); //Type of unit
 		int minPrice = type.mineralPrice(); //Price of unit
 		int gasPrice = type.gasPrice(); //Price of unit
@@ -17,13 +17,13 @@ void BuildingManager::onFrame(){
 		std::vector<BWAPI::Unit>::iterator it;
 		for (it = buildings.begin(); it != buildings.end(); it++){
 			BWAPI::Unit unit = *it;
-			if (unit->canTrain(type) && 
+			if (unit->canTrain(type) &&
 				unit->isIdle() &&
 				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
 				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) {
 
 				unit->train(type);
-				queue.pop();
+				queue.erase(queue.begin());
 			}
 		}
 	}
@@ -41,7 +41,7 @@ void BuildingManager::onFrame(){
 				unit->isIdle() &&
 				BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
 				BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
-				
+
 				unit->upgrade(type);
 				pendingUpgrades.pop();
 			}

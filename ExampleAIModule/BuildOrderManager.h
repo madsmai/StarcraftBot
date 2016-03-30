@@ -13,11 +13,11 @@ public:
 	void onStart();
 
 	static BuildOrderManager& getInstance();
-	void supplyInQueueExecuted(int amount){ supplyInQueue -= amount/2; }
+	void supplyInQueueExecuted(int amount){ supplyInQueue -= amount / 2; }
 	void pylonInQueueExecuted() { pylonsInQueue--; }
 
 	bool &getFixedOrder() { return fixedOrder; }
-	std::queue<BWAPI::UnitType>  &getFixedOrderQueue() { return fixedOrderQueue; }
+	std::vector<BWAPI::UnitType>  &getFixedOrderQueue() { return fixedOrderQueue; }
 
 private:
 	BuildOrderManager() {};
@@ -41,6 +41,6 @@ private:
 	int supplyInQueue;
 	int pylonsInQueue;
 
-	std::queue<BWAPI::UnitType> fixedOrderQueue;
+	std::vector<BWAPI::UnitType> fixedOrderQueue;
 };
 
