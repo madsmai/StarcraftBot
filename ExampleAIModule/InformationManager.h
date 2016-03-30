@@ -2,6 +2,7 @@
 
 #include <BWAPI.h>
 #include <vector> // for std::vector
+#include <BWTA.h>
 
 class InformationManager
 {
@@ -25,13 +26,19 @@ public:
 	void removeEnemyTowers(BWAPI::Unit);
 	void removeEnemyPassiveBuildings(BWAPI::Unit);
 
-	
-
 	std::vector<BWAPI::Unit> enemyBarracks;
 	std::vector<BWAPI::Unit> enemyAttackers;
 	std::vector<BWAPI::Unit> enemyWorkers;
 	std::vector<BWAPI::Unit> enemyTowers;
 	std::vector<BWAPI::Unit> enemyPassiveBuildings;
+
+
+	//BWTA variables
+	BWTA::BaseLocation* scoutedBase;
+	BWTA::BaseLocation* enemyBase;
+	BWTA::BaseLocation* expansion;
+	BWTA::BaseLocation* ourBase;
+	std::set<BWTA::BaseLocation*> baseLocations;
 
 private:
 	InformationManager(){};
