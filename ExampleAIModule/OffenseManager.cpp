@@ -118,22 +118,22 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
 bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	//Called when our fighters are idle in the enemy base
-	BWAPI::Unitset temp;
+	//BWAPI::Unitset temp;
 
-	while (attackers.size() > 3) {
+	/*while (attackers.size() > 3) {
 		BWAPI::Unit immigrant = *attackers.begin();
 		temp.insert(immigrant);
 		attackers.erase(immigrant);
 	}
 	if (!temp.empty()) {
 		searchAndDestroy(temp);
-	}
+	}*/
 
 	//Finds units to kill and kills them in groups of around 3.
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		attackers.attack(InformationManager::getInstance().enemyWorkers.front());
-		InformationManager::getInstance().enemyAttackers.push_back(InformationManager::getInstance().enemyWorkers.front());
-		InformationManager::getInstance().enemyAttackers.erase(InformationManager::getInstance().enemyWorkers.begin());
+		InformationManager::getInstance().enemyWorkers.push_back(InformationManager::getInstance().enemyWorkers.front());
+		InformationManager::getInstance().enemyWorkers.erase(InformationManager::getInstance().enemyWorkers.begin());
 		Broodwar << "Search and destroy targetting workers" << std::endl;
 		return true;
 	}
