@@ -43,7 +43,7 @@ private:
 	bool searchAndDestroy(BWAPI::Unitset);
 	bool avoidTowers(BWAPI::Unit);
 
-	OffenseManager() {};
-	~OffenseManager() {};
+	OffenseManager(){};
+	~OffenseManager(){};
 };
 
