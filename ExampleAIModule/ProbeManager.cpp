@@ -12,7 +12,7 @@ void ProbeManager::onFrame(){
 
 
 
-	std::queue<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
+	std::vector<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
 	if (!queue.empty() && queue.front().isBuilding()){
 		if (builder == NULL || !builder->exists()) {
 			builder = mineralProbes.front(); //Assign a probe as designated builder
@@ -37,7 +37,7 @@ void ProbeManager::onFrame(){
 			BWAPI::Broodwar << "building " << type << std::endl;
 			builder->build(type, position);
 			ResourceManager::getInstance().reserveMinerals(queue.front());
-			queue.pop(); //Remove building from queue
+			queue.erase(queue.begin()); //Remove building from queue
 		}
 	}
 

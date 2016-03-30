@@ -1,4 +1,7 @@
-- Få zealots til at bevæge sig når de spawner, BOHM
-- Sørge for at få ScoutManager, OffenseManager og InformationManager færdige, så de arbejder sammen, SAMI, BERG
-- In probeManager: Put probes into scoutManager, SAMI
-- Fix at der bliver reserveret mineraler der ikke bliver afreserveret igen, KASPER
+- Mere micro management
+
+- Endgame tactics
+	- Conditions for at bygge ting automatisk
+	- Undersøge og udvide på taktikker 
+
+- Lave flere statik buildorders
