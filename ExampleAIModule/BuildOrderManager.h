@@ -13,6 +13,8 @@ public:
 	void onStart();
 
 	static BuildOrderManager& getInstance();
+	void supplyInQueueExecuted(int amount){ supplyInQueue -= amount/2; }
+	void pylonInQueueExecuted() { pylonsInQueue--; }
 
 	bool &getFixedOrder() { return fixedOrder; }
 	std::queue<BWAPI::UnitType>  &getFixedOrderQueue() { return fixedOrderQueue; }
@@ -36,6 +38,8 @@ private:
 	void makeScout();
 
 	bool fixedOrder = true;
+	int supplyInQueue;
+	int pylonsInQueue;
 
 	std::queue<BWAPI::UnitType> fixedOrderQueue;
 };

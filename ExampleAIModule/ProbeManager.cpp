@@ -6,7 +6,12 @@ TODO:
 */
 
 void ProbeManager::onFrame(){
-	//Construct the next building in the queue
+	//Construct the next building in the 
+
+
+
+
+
 	std::queue<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
 	if (!queue.empty() && queue.front().isBuilding()){
 		if (builder == NULL || !builder->exists()) {
@@ -17,9 +22,19 @@ void ProbeManager::onFrame(){
 		int gasPrice = type.gasPrice(); //Price of building
 
 		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
-
+		BWAPI::UnitType pylon = BWAPI::UnitTypes::Protoss_Pylon;
 		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
-			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
+			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
+			&& (type == pylon || BWAPI::Broodwar->self()->completedUnitCount(pylon) >= 1)
+			&& !builder->isConstructing()){
+			BWAPI::Broodwar->registerEvent([position, type](BWAPI::Game*) {
+				BWAPI::Broodwar->drawBoxMap(BWAPI::Position(position),
+					BWAPI::Position(position + type.tileSize()),
+					BWAPI::Colors::Yellow);
+			},
+				nullptr,
+				type.buildTime() + 100);
+			BWAPI::Broodwar << "building " << type << std::endl;
 			builder->build(type, position);
 			ResourceManager::getInstance().reserveMinerals(queue.front());
 			queue.pop(); //Remove building from queue
