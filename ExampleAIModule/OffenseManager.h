@@ -24,7 +24,8 @@ public:
 private:
 	//Zealots
 	int zealotMax = 6;
-	int armySize = 3;
+	unsigned int armySize = 3;
+
 	std::vector<BWAPI::Unit> zealots;
 	BWAPI::Unitset fighters;
 
