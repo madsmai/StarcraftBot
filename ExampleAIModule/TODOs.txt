@@ -1,0 +1,8 @@
+- Lav en total prioritetsliste i BuildOrderManager
+	- Vi kan ikke putte upgrades ind i listen da den ikke har samme type some units. Vi må have seperat logik for dette
+	- Køen er implementeret og virker
+- Få zealots til at bevæge sig når de spawner
+- Få probes der har bygget noget til at mine igen
+- Sørge for at få ScoutManager, OffenseManager og InformationManager færdige, så de arbejder sammen
+- In probeManager: Put probes into scoutManager!
+- Fix at der bliver reserveret mineraler der ikke bliver afreserveret igen
