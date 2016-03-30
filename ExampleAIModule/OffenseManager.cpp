@@ -72,9 +72,11 @@ OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager ob
 }
 bool OffenseManager::rush(BWAPI::Unitset attackers) {
 	//Executes a rush with the gives units
+	static int lastChecked = 0;
 	if (!attackers.empty()) {
-		if (InformationManager::getInstance().enemyBase != NULL) {
+		if (InformationManager::getInstance().enemyBase != NULL && lastChecked + 400 < BWAPI::Broodwar->getFrameCount() ) {
 			attackers.attack(InformationManager::getInstance().enemyBase->getPosition());
+			lastChecked = BWAPI::Broodwar->getFrameCount();
 		}
 		else {
 			Broodwar << "Failed to rush enemyBase was null" << std::endl;
@@ -167,4 +169,57 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	}
 	
 
+}
+
+bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
+	bool underTower;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = InformationManager::getInstance().enemyTowers.begin; it != InformationManager::getInstance().enemyTowers.end(); it++) {
+		BWAPI::Unit tower = *it;
+		if (fighter->getPlayer == Broodwar->self()) {
+			if (fighter->isFlying) {
+				BWAPI::Unitset jeopardizedUnits = tower->getUnitsInWeaponRange(tower->getType().airWeapon, Filter::IsAlly);
+				if (jeopardizedUnits.find(fighter) != jeopardizedUnits.end()) {
+					//Its jeopardized
+					underTower = true;
+				}
+				else {
+					underTower = false;
+				}
+			}
+			else {
+				BWAPI::Unitset jeopardizedUnits = tower->getUnitsInWeaponRange(tower->getType().groundWeapon, Filter::IsAlly);
+				if (jeopardizedUnits.find(fighter) != jeopardizedUnits.end()) {
+					//Its jeopardized
+					underTower = true;
+				}
+				else {
+					underTower = false;
+				}
+			}
+		}
+		else {
+			if (fighter->isFlying) {
+				BWAPI::Unitset defendedUnits = tower->getUnitsInWeaponRange(tower->getType().airWeapon, Filter::IsEnemy && Filter::CanAttack);
+				if (defendedUnits.find(fighter) != defendedUnits.end()) {
+					//Its defended
+					underTower = true;
+				}
+				else {
+					underTower = false;
+				}
+			}
+			else {
+				BWAPI::Unitset defendedUnits = tower->getUnitsInWeaponRange(tower->getType().groundWeapon, Filter::IsEnemy && Filter::CanAttack);
+				if (defendedUnits.find(fighter) != defendedUnits.end()) {
+					//Its defended
+					underTower = true;
+				}
+				else {
+					underTower = false;
+				}
+			}
+		}
+	}
+	return underTower;
 }
