@@ -54,10 +54,13 @@ void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
 		std::vector<BWAPI::Unit>::iterator it;
 
 		//Loop through buildings
-		for (it = buildings.begin(); it != buildings.end(); it++){
+		for (it = buildings.begin(); it != buildings.end(); ){
 			if (*it == unit){
 				buildings.erase(it);
 				break;
+			}
+			else {
+				it++;
 			}
 		}
 	}

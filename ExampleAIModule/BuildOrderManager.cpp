@@ -5,6 +5,7 @@ TODO:
 
 
 */
+using namespace BWAPI;
 
 void BuildOrderManager::onStart(){
 	BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
@@ -308,7 +309,10 @@ void BuildOrderManager::trainProbe(){
 }
 
 void BuildOrderManager::makeScout(){
-	if (BWAPI::Broodwar->self()->supplyTotal() < 19){
+	UnitType pylon = UnitTypes::Protoss_Pylon;
+	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty() 
+		&& ScoutManager::getInstance().getInactiveScouts().empty()
+		&& Broodwar->self()->completedUnitCount(pylon) + Broodwar->self()->incompleteUnitCount(pylon) == 1){
 		ProbeManager::getInstance().addScoutRequest();
 	}
 }

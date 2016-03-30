@@ -41,8 +41,9 @@ private:
 	bool fightBack(BWAPI::Unit);
 	bool getHelp(BWAPI::Unit, BWAPI::Unit);
 	bool searchAndDestroy(BWAPI::Unitset);
+	bool avoidTowers(BWAPI::Unit);
 
-	OffenseManager() {};
-	~OffenseManager() {};
+	OffenseManager(){};
+	~OffenseManager(){};
 };
 
