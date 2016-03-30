@@ -166,10 +166,13 @@ void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyBarracks.begin(); it != enemyBarracks.end(); it++) {
+	for (it = enemyBarracks.begin(); it != enemyBarracks.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == barracks->getID()){
 			enemyBarracks.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
@@ -178,10 +181,12 @@ void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 void InformationManager::removeEnemyAttackers(BWAPI::Unit attacker){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
+	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == attacker->getID()){
 			enemyAttackers.erase(it);
+		} else{
+			it++;
 		}
 	}
 }
@@ -189,10 +194,13 @@ void InformationManager::removeEnemyAttackers(BWAPI::Unit attacker){
 void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyWorkers.begin(); it != enemyWorkers.end(); it++) {
+	for (it = enemyWorkers.begin(); it != enemyWorkers.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == worker->getID()){
 			enemyWorkers.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
@@ -201,10 +209,13 @@ void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyTowers.begin(); it != enemyTowers.end(); it++) {
+	for (it = enemyTowers.begin(); it != enemyTowers.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == tower->getID()){
 			enemyTowers.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
@@ -213,10 +224,13 @@ void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyPassiveBuildings.begin(); it != enemyPassiveBuildings.end(); it++) {
+	for (it = enemyPassiveBuildings.begin(); it != enemyPassiveBuildings.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == passiveBuilding->getID()){
 			enemyPassiveBuildings.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 }

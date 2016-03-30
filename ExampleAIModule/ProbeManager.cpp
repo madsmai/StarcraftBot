@@ -44,7 +44,7 @@ void ProbeManager::onFrame(){
 	//Make a scout
 	if (!scoutRequests == 0){
 		std::vector<BWAPI::Unit>::iterator it;
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
+		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
 			BWAPI::Unit unit = *it;
 			if (unit->isGatheringMinerals()){
 				mineralProbes.erase(it); //Remove probe from list
@@ -52,19 +52,25 @@ void ProbeManager::onFrame(){
 				ScoutManager::getInstance().addScout(unit); //Add a scout
 				break;
 			}
+			else {
+				it++;
+			}
 		}
 	}
 
 	//Make a gas worker
 	if (!gasWorkerRequests == 0){
 		std::vector<BWAPI::Unit>::iterator it;
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
+		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
 			BWAPI::Unit unit = *it;
 			if (unit->isGatheringMinerals()){
 				mineralProbes.erase(it); //Remove probe from list by number in array
 				gasWorkerRequests--; //Remove a  gasWorkerRequest
 				gasProbes.push_back(unit); //Add unit to gasWorkerList
 				break;
+			}
+			else {
+				it++;
 			}
 		}
 	}
@@ -109,18 +115,24 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 		std::vector<BWAPI::Unit>::iterator it;
 
 		//Loop through mineralsProbes
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
+		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
 			if (*it == unit){
 				mineralProbes.erase(it);
 				break;
 			}
+			else {
+				it++;
+			}
 		}
 
 		//Loop through gasProbes
-		for (it = gasProbes.begin(); it != gasProbes.end(); it++){
+		for (it = gasProbes.begin(); it != gasProbes.end(); ){
 			if (*it == unit){
 				gasProbes.erase(it);
 				break;
+			}
+			else {
+				it++;
 			}
 		}
 	}
