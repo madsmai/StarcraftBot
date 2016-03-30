@@ -80,6 +80,12 @@ void ExampleAIModule::onSendText(std::string text){
 	else if (text == "front"){
 		BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().front().getName() << std::endl;
 	}
+	else if (text == "reserved"){
+		BWAPI::Broodwar << "reserved minerals: " << ResourceManager::getInstance().getReservedMinerals() << std::endl;
+	}
+	else if (text == "zealot"){
+		BWAPI::Broodwar << "zealot supply required " << BWAPI::UnitTypes::Protoss_Zealot.supplyRequired() << std::endl;
+	}
 }
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {

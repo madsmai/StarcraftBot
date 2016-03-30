@@ -24,7 +24,10 @@ public:
 private:
 	//Zealots
 	int zealotMax = 6;
+	unsigned int armySize = 3;
+
 	std::vector<BWAPI::Unit> zealots;
+	BWAPI::Unitset fighters;
 
 	//Upgrades
 	int ground_weapons_count = 0;
@@ -33,6 +36,11 @@ private:
 	int air_weapons_count = 0;
 	int air_armor_count = 0;
 	bool singularity_charge = false;
+
+	bool rush(BWAPI::Unitset);
+	bool fightBack(BWAPI::Unit);
+	bool getHelp(BWAPI::Unit, BWAPI::Unit);
+	bool searchAndDestroy(BWAPI::Unitset);
 
 	OffenseManager() {};
 	~OffenseManager() {};
