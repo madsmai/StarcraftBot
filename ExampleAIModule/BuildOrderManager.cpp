@@ -18,7 +18,6 @@ void BuildOrderManager::onFrame(){
 	researchCyberneticsCore();
 	trainZealot();
 	trainProbe();
-	
 	makeScout();
 }
 
