@@ -12,22 +12,9 @@ TODO:
 
 
 void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
-	//if (unit->getType() == BWAPI::UnitTypes::Protoss_Zealot && unit->getPlayer() == BWAPI::Broodwar->self()){
-	//	std::vector<BWAPI::Unit>::iterator it;
-
-	//	//Loop through zealots
-	//	for (it = zealots.begin(); it != zealots.end(); it++){
-	//		if (*it == unit){
-	//			zealots.erase(it);
-	//			break;
-	//		}
-	//	}
-	//}
-
 	if (fighters.find(unit) != fighters.end()) {
 		fighters.erase(fighters.find(unit));
 	}
-
 }
 
 void OffenseManager::onUnitComplete(BWAPI::Unit unit){
