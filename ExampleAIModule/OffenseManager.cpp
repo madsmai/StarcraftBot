@@ -5,7 +5,7 @@ using namespace BWAPI;
 /*
 TODO:
 - Sørg for at samle zealots sammen og angrib med dem sammen, det samlede antal skal varierer
-	alt efter modstanderens forsvar
+alt efter modstanderens forsvar
 - En måde at få zealots til at prioriterer hvad de angriber
 - Mangler BWTA
 */
@@ -21,7 +21,7 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 	//if (unit->getType() == BWAPI::UnitTypes::Protoss_Zealot && unit->getPlayer() == BWAPI::Broodwar->self()){
 	//	zealots.push_back(unit);
 	//}
-	
+
 	if (unit->canAttack() && unit->canMove() && !unit->getType().isWorker()) {
 		fighters.insert(unit);
 	}
@@ -57,13 +57,13 @@ void OffenseManager::onFrame(){
 		rush(fighters);
 	}
 
-	
+
 	/*if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Zealot) >= zealotMax){
 		for (BWAPI::Unit zealot : zealots){
-			zealot->attack(enemyBase->getPosition());
+		zealot->attack(enemyBase->getPosition());
 		}
 		zealotMax = zealotMax * 2;
-	}*/
+		}*/
 }
 
 OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager object
@@ -74,12 +74,14 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 	//Executes a rush with the gives units
 	static int lastChecked = 0;
 	if (!attackers.empty()) {
-		if (InformationManager::getInstance().enemyBase != NULL && lastChecked + 400 < BWAPI::Broodwar->getFrameCount() ) {
-			attackers.attack(InformationManager::getInstance().enemyBase->getPosition());
-			lastChecked = BWAPI::Broodwar->getFrameCount();
-		}
-		else {
-			Broodwar << "Failed to rush enemyBase was null" << std::endl;
+		if (lastChecked + 400 < BWAPI::Broodwar->getFrameCount()) {
+			if (InformationManager::getInstance().enemyBase != NULL) {
+				attackers.attack(InformationManager::getInstance().enemyBase->getPosition());
+				lastChecked = BWAPI::Broodwar->getFrameCount();
+			}
+			else {
+				Broodwar << "Failed to rush enemyBase was null" << std::endl;
+			}
 		}
 	}
 	else {
@@ -100,7 +102,7 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 		return false;
 		Broodwar << "Failed to fightback, attacker was null" << std::endl;
 	}
-	
+
 }
 bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 	BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly && Filter::CanAttack && !Filter::IsWorker && !Filter::IsAttacking && Filter::CanMove);
@@ -167,7 +169,7 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		Broodwar << "Nothing to search and destroy, did we win or is information wrong?" << std::endl;
 		return false;
 	}
-	
+
 
 }
 
