@@ -22,7 +22,6 @@ void ExampleAIModule::onStart(){
 	BWTA::analyze();
 	analyzed = false;
 	analysis_just_finished = false;
-	ourBase = BWTA::getStartLocation(Broodwar->self());
 	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
 
 	//Call on starts

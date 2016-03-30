@@ -13,21 +13,18 @@ void BuildOrderManager::onStart(){
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
 
 	//fixedOrderQueue.push(pylon); for testing
-	fixedOrderQueue.push(probe);
-	fixedOrderQueue.push(probe);
-	fixedOrderQueue.push(probe);
 	fixedOrderQueue.push(pylon);
-	fixedOrderQueue.push(gateway);
-	fixedOrderQueue.push(zealot);
-	fixedOrderQueue.push(gateway);
-	fixedOrderQueue.push(zealot);
-	fixedOrderQueue.push(zealot);
 
 	//This is commented out for testing purposes
 	//fixedOrder = false;
 }
 
 void BuildOrderManager::onFrame(){
+	//Research and scouts has to have their own logic since it can't be in the queue
+	researchForge();
+	researchCyberneticsCore();
+	makeScout();
+
 	if (!fixedOrder){ //FixedOrder might not be needed, since everyhting is enqueued in onStart()
 		trainZealot();
 		trainProbe();
@@ -56,11 +53,6 @@ void BuildOrderManager::onFrame(){
 			return;
 		}
 	}
-
-	//Research and scouts has to have their own logic since it can't be in the queue
-	researchForge();
-	researchCyberneticsCore();
-	makeScout();
 }
 
 bool BuildOrderManager::buildGateway(){
@@ -255,8 +247,13 @@ void BuildOrderManager::trainProbe(){
 }
 
 void BuildOrderManager::makeScout(){
-	if (BWAPI::Broodwar->self()->supplyTotal() < 19){
+	BWAPI::UnitType pylon = BWAPI::UnitTypes::Protoss_Pylon;
+	if (BWAPI::Broodwar->self()->supplyTotal() < 19 
+		&& ScoutManager::getInstance().getActiveScouts().empty() 
+		&& ScoutManager::getInstance().getInactiveScouts().empty()
+		&& BWAPI::Broodwar->self()->completedUnitCount(pylon) + BWAPI::Broodwar->self()->incompleteUnitCount(pylon) == 1){
 		ProbeManager::getInstance().addScoutRequest();
+		BWAPI::Broodwar << "makeScout called" << std::endl;
 	}
 }
 
