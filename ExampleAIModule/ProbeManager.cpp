@@ -49,8 +49,7 @@ void ProbeManager::onFrame(){
 			if (unit->isGatheringMinerals()){
 				mineralProbes.erase(it); //Remove probe from list
 				scoutRequests--; //Remove a scoutRequest
-				//TODO: When scoutmanager is finished enable method
-				//ScoutManager::getInstance().makeScout(unit); //Add a scout
+				ScoutManager::getInstance().addScout(unit); //Add a scout
 				break;
 			}
 		}
@@ -134,15 +133,6 @@ void ProbeManager::onUnitComplete(BWAPI::Unit unit){
 	}
 }
 
-//Add the first 4 probes to list and set scoutRequests to 0
-//void ProbeManager::onStart(){
-//	for (auto &unit : BWAPI::Broodwar->self()->getUnits()) {
-//		if (unit->exists()		&&	  unit->getType().isWorker()){
-//			mineralProbes.push_back(unit);
-//		}
-//	}
-//	scoutRequests = 0;
-//}
 
 //Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
@@ -160,9 +150,3 @@ void ProbeManager::addGasWorkerRequest(){
 	gasWorkerRequests++;
 }
 
-//Add building to queue
-//void ProbeManager::addBuilding(BWAPI::UnitType type){
-//	if (type.isBuilding()){
-//		pendingBuildings.push(type);
-//	}
-//}
