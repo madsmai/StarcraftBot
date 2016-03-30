@@ -69,12 +69,6 @@ void BuildingManager::onUnitComplete(BWAPI::Unit unit){
 	}
 }
 
-//void BuildingManager::addUnit(BWAPI::UnitType type){
-//	if (!type.isBuilding()){
-//		pendingUnits.push(type);
-//	}
-//}
-
 void BuildingManager::addUpgrade(BWAPI::UpgradeType type){
 	pendingUpgrades.push(type);
 }
