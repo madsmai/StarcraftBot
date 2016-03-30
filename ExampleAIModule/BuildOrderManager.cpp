@@ -303,9 +303,10 @@ void BuildOrderManager::trainProbe(){
 }
 
 void BuildOrderManager::makeScout(){
+	UnitType pylon = UnitTypes::Protoss_Pylon;
 	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty() 
 		&& ScoutManager::getInstance().getInactiveScouts().empty()
-		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Pylon) == 1){
+		&& Broodwar->self()->completedUnitCount(pylon) + Broodwar->self()->incompleteUnitCount(pylon) == 1){
 		ProbeManager::getInstance().addScoutRequest();
 	}
 }
