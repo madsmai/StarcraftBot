@@ -219,16 +219,15 @@ void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding
 			enemyPassiveBuildings.erase(it);
 		}
 	}
-
 }
 
 //Prints the current count of enemy units
 void InformationManager::currentStatus(){
-	Broodwar << "Current Status: \n" << enemyAttackers.size() << "enemy attacker(s) \n"
-		<< enemyBarracks.size() << "enemy barrack(s) \n"
-		<< enemyWorkers.size() << "enemy worker(s) \n"
-		<< enemyTowers.size() << "enemy tower(s) \n"
-		<< enemyPassiveBuildings.size() << "passive enemy building(s) \n" <<  std::endl;
+	Broodwar << "Current Status: \n" << enemyAttackers.size() << "  enemy attacker(s) \n"
+		<< enemyBarracks.size() << "  enemy barrack(s) \n"
+		<< enemyWorkers.size() << "  enemy worker(s) \n"
+		<< enemyTowers.size() << "  enemy tower(s) \n"
+		<< enemyPassiveBuildings.size() << "  passive enemy building(s) \n" <<  std::endl;
 
 }
 
