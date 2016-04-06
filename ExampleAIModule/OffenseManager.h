@@ -40,7 +40,7 @@ private:
 	bool rush(BWAPI::Unitset);
 	bool fightBack(BWAPI::Unit);
 	bool getHelp(BWAPI::Unit, BWAPI::Unit);
-	bool searchAndDestroy(BWAPI::Unitset);
+	void searchAndDestroy(BWAPI::Unitset);
 	bool avoidTowers(BWAPI::Unit);
 
 	OffenseManager(){};

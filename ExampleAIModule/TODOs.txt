@@ -5,7 +5,7 @@
 	- Undersøge og udvide på taktikker 
 		
 - Lave flere statik buildorders
-
+- Brug scouting informationen til at finde ud af om de har bygget towers
 - BUGS::
 Scouting er bugged, den sender flere scouts og ser ud til at scoute når vi ser expansions
 

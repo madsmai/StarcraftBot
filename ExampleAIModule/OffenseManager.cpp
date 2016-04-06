@@ -49,9 +49,9 @@ void OffenseManager::onFrame(){
 		if (unit->isUnderAttack()) {
 			fightBack(unit);
 		}
-		if (InformationManager::getInstance().enemyBase == BWTA::getNearestBaseLocation(unit->getPosition())
+		else if (InformationManager::getInstance().enemyBase == BWTA::getNearestBaseLocation(unit->getPosition())
 			&& unit->isIdle()
-			&& lastChecked + 400 < BWAPI::Broodwar->getFrameCount()) {
+			&& lastChecked + 24 < BWAPI::Broodwar->getFrameCount()) {
 			searchAndDestroy(fighters);
 			lastChecked = Broodwar->getFrameCount();
 		}
@@ -97,17 +97,19 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 }
 
 bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
-	BWAPI::Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding);
-	if (attacker != NULL) {
-		attackedUnit->attack(attacker);
-		getHelp(attackedUnit, attacker);
-		return true;
+	if (attackedUnit != NULL) {
+		BWAPI::Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding);
+		if (attacker != NULL) {
+			attackedUnit->attack(attacker);
+			getHelp(attackedUnit, attacker);
+			return true;
+		}
+		else {
+			return false;
+			Broodwar << "Failed to fightback, attacker was null" << std::endl;
+		}
 	}
-	else {
-		return false;
-		Broodwar << "Failed to fightback, attacker was null" << std::endl;
-	}
-
+	return false;
 }
 bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 	BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly 
@@ -116,7 +118,8 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 		&& !Filter::IsAttacking 
 		&& Filter::CanMove);
 	if (helper != NULL
-		&& badGuy->isVisible()) {
+		&& badGuy->isVisible()
+		&& badGuy != NULL) {
 		helper->attack(badGuy);
 		return true;
 	}
@@ -126,7 +129,7 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 	}
 }
 
-bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
+void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	//Called when our fighters are idle in the enemy base
 	BWAPI::Unitset temp;
 
@@ -150,7 +153,6 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 				InformationManager::getInstance().enemyWorkers.push_back(unit);
 				InformationManager::getInstance().enemyWorkers.erase(it);
 				Broodwar << "Search and destroy targetting enemyWorkers" << std::endl;
-				return true;
 			}
 			else {
 				Broodwar << "Unit was under tower" << std::endl;
@@ -158,6 +160,7 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		}
 	}
 	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
+		Broodwar << "enemyBarracks was not empty" << std::endl;
 		for (it = InformationManager::getInstance().enemyBarracks.begin(); it != InformationManager::getInstance().enemyBarracks.end(); it++) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
@@ -165,7 +168,6 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 				InformationManager::getInstance().enemyBarracks.push_back(unit);
 				InformationManager::getInstance().enemyBarracks.erase(it);
 				Broodwar << "Search and destroy targetting enemyBarracks" << std::endl;
-				return true;
 			}
 			else {
 				Broodwar << "Unit was under tower" << std::endl;
@@ -173,6 +175,7 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		}
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
+		Broodwar << "enemyPassiveBuildings was not empty" << std::endl;
 		for (it = InformationManager::getInstance().enemyPassiveBuildings.begin(); it != InformationManager::getInstance().enemyPassiveBuildings.end(); it++) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
@@ -180,7 +183,6 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 				InformationManager::getInstance().enemyPassiveBuildings.push_back(unit);
 				InformationManager::getInstance().enemyPassiveBuildings.erase(it);
 				Broodwar << "Search and destroy targetting enemyPassiveBuildings" << std::endl;
-				return true;
 			}
 			else {
 				Broodwar << "Unit was under tower" << std::endl;
@@ -188,6 +190,7 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		}
 	}
 	else if (!InformationManager::getInstance().enemyAttackers.empty()) {
+		Broodwar << "enemyAttackers was not empty" << std::endl;
 		for (it = InformationManager::getInstance().enemyAttackers.begin(); it != InformationManager::getInstance().enemyAttackers.end(); it++) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
@@ -195,7 +198,6 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 				InformationManager::getInstance().enemyAttackers.push_back(unit);
 				InformationManager::getInstance().enemyAttackers.erase(it);
 				Broodwar << "Search and destroy targetting enemyAttackers" << std::endl;
-				return true;
 			}
 			else {
 				Broodwar << "Unit was under tower" << std::endl;
@@ -203,77 +205,71 @@ bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		}
 	}
 	else if (!InformationManager::getInstance().enemyTowers.empty()) {
-		for (it = InformationManager::getInstance().enemyTowers.begin(); it != InformationManager::getInstance().enemyTowers.end(); it++) {
-			Unit unit = *it;
-			if (!avoidTowers(unit)) {
-				attackers.attack(unit);
-				InformationManager::getInstance().enemyTowers.push_back(unit);
-				InformationManager::getInstance().enemyTowers.erase(it);
-				Broodwar << "Search and destroy targetting enemyTowers" << std::endl;
-				return true;
-			}
-			else {
-				Broodwar << "Unit was under tower" << std::endl;
-			}
-		}
+		Broodwar << "enemyTowers was not empty" << std::endl;
+		attackers.attack(InformationManager::getInstance().enemyTowers.front());
+		InformationManager::getInstance().enemyTowers.push_back(InformationManager::getInstance().enemyTowers.front());
+		InformationManager::getInstance().enemyTowers.erase(InformationManager::getInstance().enemyTowers.begin());
+		Broodwar << "Search and destroy targetting towers" << std::endl;
 	}
 	else {
 		Broodwar << "Nothing to search and destroy, did we win or is information wrong?" << std::endl;
-		return false;
 	}
 
 
 }
 
 bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
-	bool underTower;
+	bool underTower = false;
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = InformationManager::getInstance().enemyTowers.begin(); it != InformationManager::getInstance().enemyTowers.end(); it++) {
-		BWAPI::Unit tower = *it;
-		if (fighter->getPlayer() == Broodwar->self()) {
-			if (fighter->isFlying()) {
-				BWAPI::Unitset jeopardizedUnits = tower->getUnitsInWeaponRange(tower->getType().airWeapon(), Filter::IsAlly);
-				if (jeopardizedUnits.find(fighter) != jeopardizedUnits.end()) {
-					//Its jeopardized
-					underTower = true;
+	if (!InformationManager::getInstance().enemyTowers.empty() && fighter != NULL){
+		for (it = InformationManager::getInstance().enemyTowers.begin(); it != InformationManager::getInstance().enemyTowers.end(); it++) {
+			BWAPI::Unit tower = *it;
+			if (fighter->getPlayer() == Broodwar->self()) {
+				if (fighter->isFlying()) {
+					BWAPI::Unitset jeopardizedUnits = tower->getUnitsInWeaponRange(tower->getType().airWeapon(), Filter::IsAlly);
+					if (jeopardizedUnits.find(fighter) != jeopardizedUnits.end()) {
+						//Its jeopardized
+						underTower = true;
+					}
+					else {
+						underTower = false;
+					}
 				}
 				else {
-					underTower = false;
+					BWAPI::Unitset jeopardizedUnits = tower->getUnitsInWeaponRange(tower->getType().groundWeapon(), Filter::IsAlly);
+					if (jeopardizedUnits.find(fighter) != jeopardizedUnits.end()) {
+						//Its jeopardized
+						underTower = true;
+					}
+					else {
+						underTower = false;
+					}
 				}
 			}
 			else {
-				BWAPI::Unitset jeopardizedUnits = tower->getUnitsInWeaponRange(tower->getType().groundWeapon(), Filter::IsAlly);
-				if (jeopardizedUnits.find(fighter) != jeopardizedUnits.end()) {
-					//Its jeopardized
-					underTower = true;
+				if (fighter->isFlying()) {
+					BWAPI::Unitset defendedUnits = tower->getUnitsInWeaponRange(tower->getType().airWeapon(), Filter::IsEnemy);
+					if (defendedUnits.find(fighter) != defendedUnits.end()) {
+						//Its defended
+						underTower = true;
+					}
+					else {
+						underTower = false;
+					}
 				}
 				else {
-					underTower = false;
-				}
-			}
-		}
-		else {
-			if (fighter->isFlying()) {
-				BWAPI::Unitset defendedUnits = tower->getUnitsInWeaponRange(tower->getType().airWeapon(), Filter::IsEnemy && Filter::CanAttack);
-				if (defendedUnits.find(fighter) != defendedUnits.end()) {
-					//Its defended
-					underTower = true;
-				}
-				else {
-					underTower = false;
-				}
-			}
-			else {
-				BWAPI::Unitset defendedUnits = tower->getUnitsInWeaponRange(tower->getType().groundWeapon(), Filter::IsEnemy && Filter::CanAttack);
-				if (defendedUnits.find(fighter) != defendedUnits.end()) {
-					//Its defended
-					underTower = true;
-				}
-				else {
-					underTower = false;
+					BWAPI::Unitset defendedUnits = tower->getUnitsInWeaponRange(tower->getType().groundWeapon(), Filter::IsEnemy);
+					if (defendedUnits.find(fighter) != defendedUnits.end()) {
+						//Its defended
+						underTower = true;
+					}
+					else {
+						underTower = false;
+					}
 				}
 			}
 		}
 	}
+	
 	return underTower;
 }
