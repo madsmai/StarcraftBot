@@ -20,22 +20,22 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 			addEnemyWorkers(unit);
 		}
 
-		if (unit->getType().canAttack() && unit->getType().canMove() && !unit->getType().isWorker()){
+		else if (unit->getType().canAttack() && unit->getType().canMove()){
 			addEnemyAttackers(unit);
 		}
 
-		if (unit->getType() == UnitTypes::Protoss_Gateway || 
+		else if (unit->getType() == UnitTypes::Protoss_Gateway || 
 			unit->getType() == UnitTypes::Zerg_Spawning_Pool || 
 			unit->getType() == UnitTypes::Terran_Barracks){
 
 			addEnemyBarracks(unit);
 		}
 
-		if (unit->getType().isBuilding() && unit->getType().canAttack()){
+		else if (unit->getType().isBuilding() && unit->getType().canAttack()){
 			addEnemyTowers(unit);
 		}
 
-		if (unit->getType().isBuilding() && !unit->getType().canAttack()){
+		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
 			addEnemyPassiveBuildings(unit);
 		}
 
@@ -51,22 +51,22 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeEnemyWorkers(unit);
 		}
 
-		if (unit->getType().canAttack() && unit->getType().canMove() && unit->getType().isWorker()){
+		else if (unit->getType().canAttack() && unit->getType().canMove()){
 			removeEnemyAttackers(unit);
 		}
 
-		if (unit->getType() == UnitTypes::Protoss_Gateway ||
+		else if (unit->getType() == UnitTypes::Protoss_Gateway ||
 			unit->getType() == UnitTypes::Zerg_Spawning_Pool ||
 			unit->getType() == UnitTypes::Terran_Barracks){
 
 			removeEnemyBarracks(unit);
 		}
 
-		if (unit->getType().isBuilding() && unit->getType().canAttack()){
+		else if (unit->getType().isBuilding() && unit->getType().canAttack()){
 			removeEnemyTowers(unit);
 		}
 
-		if (unit->getType().isBuilding() && !unit->getType().canAttack()){
+		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
 			removeEnemyPassiveBuildings(unit);
 		}
 
@@ -178,12 +178,13 @@ void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 
 }
 
-void InformationManager::removeEnemyAttackers(BWAPI::Unit attacker){
+void InformationManager::removeEnemyAttackers(Unit attacker){
 
 	std::vector<BWAPI::Unit>::iterator it;
 	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); ) {
-		BWAPI::Unit u = *it;
+		Unit u = *it;
 		if (u->getID() == attacker->getID()){
+			Broodwar << "unit removed from enemyAttackers list" << std::endl;
 			enemyAttackers.erase(it);
 		} else{
 			it++;

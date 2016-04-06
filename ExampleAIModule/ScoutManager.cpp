@@ -35,7 +35,7 @@ void ScoutManager::onFrame(){
 }
 
 void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
-	if (unit->getType().isWorker()){
+	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
 		removeScout(unit);
 	}
 }
