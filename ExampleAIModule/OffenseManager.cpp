@@ -145,8 +145,9 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
 void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	//Called when our fighters are idle in the enemy base
+	
 	Broodwar << "Starting searchAndDestroy" << std::endl;
-	BWAPI::Unitset temp;
+	Unitset temp;
 
 	while (attackers.size() > armySize) {
 		Broodwar << "While run" << std::endl;
@@ -170,7 +171,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
-		for (it = InformationManager::getInstance().enemyWorkers.begin(); it != InformationManager::getInstance().enemyWorkers.end();) {
+		for (it = InformationManager::getInstance().enemyWorkers.begin(); it != InformationManager::getInstance().enemyWorkers.end(); ) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
@@ -187,7 +188,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	}
 	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
 		Broodwar << "enemyBarracks was not empty" << std::endl;
-		for (it = InformationManager::getInstance().enemyBarracks.begin(); it != InformationManager::getInstance().enemyBarracks.end();) {
+		for (it = InformationManager::getInstance().enemyBarracks.begin(); it != InformationManager::getInstance().enemyBarracks.end(); ) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
@@ -204,7 +205,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
 		Broodwar << "enemyPassiveBuildings was not empty" << std::endl;
-		for (it = InformationManager::getInstance().enemyPassiveBuildings.begin(); it != InformationManager::getInstance().enemyPassiveBuildings.end();) {
+		for (it = InformationManager::getInstance().enemyPassiveBuildings.begin(); it != InformationManager::getInstance().enemyPassiveBuildings.end(); ) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
