@@ -12,7 +12,7 @@
 
 DWORD WINAPI AnalyzeThread();
 
-class ExampleAIModule : public BWAPI::AIModule
+class GameManager : public BWAPI::AIModule
 {
 public:
 	virtual void onStart();

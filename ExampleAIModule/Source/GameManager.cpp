@@ -1,4 +1,4 @@
-#include "ExampleAIModule.h"
+#include "GameManager.h"
 using namespace BWAPI;
 using namespace Filter;
 
@@ -6,7 +6,7 @@ bool analyzed;
 bool analysis_just_finished;
 
 
-void ExampleAIModule::onStart(){
+void GameManager::onStart(){
 	//Enable user input
 	BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
 
@@ -29,7 +29,12 @@ void ExampleAIModule::onStart(){
 	BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().size() << std::endl;
 }
 
-void ExampleAIModule::onFrame(){
+void GameManager::onEnd(bool isWinner){
+
+}
+
+
+void GameManager::onFrame(){
 	//Display FPS
 	BWAPI::Broodwar->drawTextScreen(200, 0, "FPS: %d", BWAPI::Broodwar->getFPS());
 	BWAPI::Broodwar->drawTextScreen(200, 20, "Average FPS: %f", BWAPI::Broodwar->getAverageFPS());
@@ -56,19 +61,19 @@ void ExampleAIModule::onFrame(){
 	ScoutManager::getInstance().onFrame();
 }
 
-void ExampleAIModule::onUnitComplete(BWAPI::Unit unit){
+void GameManager::onUnitComplete(BWAPI::Unit unit){
 	//Call onUnitCompletes
 	ProbeManager::getInstance().onUnitComplete(unit);
 	BuildingManager::getInstance().onUnitComplete(unit);
 	OffenseManager::getInstance().onUnitComplete(unit);
 }
 
-void ExampleAIModule::onUnitCreate(BWAPI::Unit unit){
+void GameManager::onUnitCreate(BWAPI::Unit unit){
 	//Call onUnitCreates
 	ResourceManager::getInstance().onUnitCreate(unit);
 }
 
-void ExampleAIModule::onSendText(std::string text){
+void GameManager::onSendText(std::string text){
 	//Print out message
 	BWAPI::Broodwar->sendText(text.c_str());
 	if (text == "Current Status") {
@@ -88,7 +93,7 @@ void ExampleAIModule::onSendText(std::string text){
 	}
 }
 
-void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
+void GameManager::onUnitDestroy(BWAPI::Unit unit) {
 	InformationManager::getInstance().onUnitDestroy(unit);
 	BuildingManager::getInstance().onUnitDestroy(unit);
 	OffenseManager::getInstance().onUnitDestroy(unit);
@@ -96,7 +101,7 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit) {
 	ScoutManager::getInstance().onUnitDestroy(unit);
 }
 
-void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit) {
+void GameManager::onUnitDiscover(BWAPI::Unit unit) {
 	InformationManager::getInstance().onUnitDiscover(unit);
 	ScoutManager::getInstance().onUnitDiscover(unit);
 }
@@ -109,7 +114,7 @@ DWORD WINAPI AnalyzeThread() {
 	return 0;
 }
 
-void ExampleAIModule::drawTerrainData() {
+void GameManager::drawTerrainData() {
 	//we will iterate through all the base locations, and draw their outlines.
 	for (const auto& baseLocation : BWTA::getBaseLocations()) {
 		TilePosition p = baseLocation->getTilePosition();
