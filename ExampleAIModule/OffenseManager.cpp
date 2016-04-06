@@ -121,25 +121,25 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
 	Broodwar << "Starting getHelp" << std::endl;
-//	if (victim != NULL) {
-//		BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly
-//			&& Filter::CanAttack
-//			&& !Filter::IsWorker
-//			&& !Filter::IsAttacking
-//			&& Filter::CanMove);
-//
-//		if (helper != NULL
-//			&& badGuy->isVisible()
-//			&& badGuy != NULL) {
-//
-//			helper->attack(badGuy);
-//			return true;
-//		}
-//		else {
-//			return false;
-//			Broodwar << "Failed to get help, helper was null" << std::endl;
-//		}
-//	}
+	if (victim != NULL) {
+		BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly
+			&& Filter::CanAttack
+			&& !Filter::IsWorker
+			&& !Filter::IsAttacking
+			&& Filter::CanMove);
+
+		if (helper != NULL
+			&& badGuy->isVisible()
+			&& badGuy != NULL) {
+
+			helper->attack(badGuy);
+			return true;
+		}
+		else {
+			return false;
+			Broodwar << "Failed to get help, helper was null" << std::endl;
+		}
+	}
 	return false;
 }
 
