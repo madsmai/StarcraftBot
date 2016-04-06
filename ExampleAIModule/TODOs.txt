@@ -3,12 +3,10 @@
 - Endgame tactics
 	- Conditions for at bygge ting automatisk
 	- Undersøge og udvide på taktikker 
-
+		
 - Lave flere statik buildorders
 
 - BUGS::
-Den kalder searchAndDestroy alt for meget det skal kun være når de er idle
 Scouting er bugged, den sender flere scouts og ser ud til at scoute når vi ser expansions
-Lag - måske noget med hvordan vi bygger
 
-SearchAndDestroy er kommenteret delvist ud
+Lag - måske noget med hvordan vi bygger
