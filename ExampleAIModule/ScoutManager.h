@@ -5,6 +5,7 @@
 #include <BWTA.h>
 #include <Windows.h>
 #include "InformationManager.h"
+#include "ProbeManager.h"
 
 
 class ScoutManager

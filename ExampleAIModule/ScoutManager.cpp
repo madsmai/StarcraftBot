@@ -11,8 +11,8 @@ using namespace BWAPI;
 void ScoutManager::onFrame(){
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!inactiveScouts.empty()){
+		Broodwar << "inactive scouts was not empty" << std::endl;
 		for (BWAPI::Unit unit : inactiveScouts){
-			Broodwar << "inactive scouts was not empty" << std::endl;
 			goScout(unit);
 			activeScouts.push_back(unit);
 		}
@@ -27,12 +27,9 @@ void ScoutManager::onFrame(){
 			else if (unit -> isIdle()
 				&& BWTA::getNearestBaseLocation(unit->getPosition()) == InformationManager::getInstance().ourBase){
 				removeScout(unit);
-
+				Broodwar << "removed unit as scout" << std::endl;
+				ProbeManager::getInstance().addMineralProbe(unit);
 			}
-			//else if (unit->isIdle()){
-			//	Broodwar << "Scout was idle, called goScout()" << std::endl;
-			//	goScout(unit);
-			//}
 		}
 	}
 }

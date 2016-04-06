@@ -132,10 +132,14 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 //Add newly made worker to list
 void ProbeManager::onUnitComplete(BWAPI::Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self()){
-		mineralProbes.push_back(unit);
+		addMineralProbe(unit);
 	}
 }
 
+
+void ProbeManager::addMineralProbe(BWAPI::Unit probe){
+	mineralProbes.push_back(probe);
+}
 
 //Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object

@@ -19,7 +19,7 @@ public:
 	virtual void onFrame();
 	virtual void onUnitComplete(BWAPI::Unit unit);
 
-	//virtual void onEnd(bool isWinner);
+	virtual void onEnd(bool isWinner);
 	virtual void onSendText(std::string string);
 	//virtual void onReceiveText(BWAPI::Player player, std::string text);
 	//virtual void onPlayerLeft(BWAPI::Player player);
