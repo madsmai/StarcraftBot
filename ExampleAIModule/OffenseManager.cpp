@@ -12,7 +12,7 @@ alt efter modstanderens forsvar
 
 
 void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
-	if (unit->getPlayer == Broodwar->self()) {
+	if (unit->getPlayer() == Broodwar->self()) {
 		if (fighters.find(unit) != fighters.end()) {
 			fighters.erase(fighters.find(unit));
 		}
@@ -149,12 +149,14 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	BWAPI::Unitset temp;
 
 	while (attackers.size() > armySize) {
+		Broodwar << "While run" << std::endl;
 		BWAPI::Unit immigrant = *attackers.begin();
 		if (immigrant != NULL) {
 			temp.insert(immigrant);
 			attackers.erase(immigrant);
 		}
 		else {
+			Broodwar << "DEPLOY THE BRAKES!!!" << std::endl;
 			break;
 		}
 	}
@@ -162,6 +164,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		searchAndDestroy(temp);
 	}
 
+	Broodwar << "Moved past while loop" << std::endl;
 	//Finds units to kill and kills them in groups of around 3.
 	//Possible bug, it might not reach anything below workers
 
@@ -171,9 +174,10 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyWorkers.push_back(unit);
 				InformationManager::getInstance().removeEnemyWorkers(unit);
+				InformationManager::getInstance().enemyWorkers.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyWorkers" << std::endl;
+				break;
 			}
 			else {
 				it++;
@@ -187,9 +191,10 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyBarracks.push_back(unit);
 				InformationManager::getInstance().removeEnemyBarracks(unit);
+				InformationManager::getInstance().enemyBarracks.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyBarracks" << std::endl;
+				break;
 			}
 			else {
 				it++;
@@ -203,9 +208,10 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyPassiveBuildings.push_back(unit);
 				InformationManager::getInstance().removeEnemyPassiveBuildings(unit);
+				InformationManager::getInstance().enemyPassiveBuildings.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyPassiveBuildings" << std::endl;
+				break;
 			}
 			else {
 				it++;
@@ -219,9 +225,10 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyAttackers.push_back(unit);
 				InformationManager::getInstance().removeEnemyAttackers(unit);
+				InformationManager::getInstance().enemyAttackers.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyAttackers" << std::endl;
+				break;
 			}
 			else {
 				it++;
