@@ -110,8 +110,13 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 
 }
 bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
-	BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly && Filter::CanAttack && !Filter::IsWorker && !Filter::IsAttacking && Filter::CanMove);
-	if (helper != NULL) {
+	BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly 
+		&& Filter::CanAttack 
+		&& !Filter::IsWorker 
+		&& !Filter::IsAttacking 
+		&& Filter::CanMove);
+	if (helper != NULL
+		&& badGuy->isVisible()) {
 		helper->attack(badGuy);
 		return true;
 	}
