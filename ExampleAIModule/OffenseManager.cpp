@@ -59,6 +59,7 @@ void OffenseManager::onFrame(){
 
 	if (fighters.size() >= armySize) {
 		rush(fighters);
+		//armySize += armySize;
 	}
 
 
@@ -112,20 +113,24 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 	return false;
 }
 bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
-	BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly 
-		&& Filter::CanAttack 
-		&& !Filter::IsWorker 
-		&& !Filter::IsAttacking 
-		&& Filter::CanMove);
-	if (helper != NULL
-		&& badGuy->isVisible()
-		&& badGuy != NULL) {
-		helper->attack(badGuy);
-		return true;
-	}
-	else {
-		return false;
-		Broodwar << "Failed to get help, helper was null" << std::endl;
+	if (victim != NULL) {
+		BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly
+			&& Filter::CanAttack
+			&& !Filter::IsWorker
+			&& !Filter::IsAttacking
+			&& Filter::CanMove);
+
+		if (helper != NULL
+			&& badGuy->isVisible()
+			&& badGuy != NULL) {
+
+			helper->attack(badGuy);
+			return true;
+		}
+		else {
+			return false;
+			Broodwar << "Failed to get help, helper was null" << std::endl;
+		}
 	}
 }
 
@@ -144,6 +149,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 
 	//Finds units to kill and kills them in groups of around 3.
 	//Possible bug, it might not reach anything below workers
+
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		for (it = InformationManager::getInstance().enemyWorkers.begin(); it != InformationManager::getInstance().enemyWorkers.end(); it++) {
