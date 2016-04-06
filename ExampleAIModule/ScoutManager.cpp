@@ -2,9 +2,8 @@
 
 /*
 TODO:
-- metode onFrame:
-	- Alle units der ikke scouter bliver sendt ud for at scoute
-	- Husk at hvis scouts bliver angrebet skal de løbe hjem
+- Scouten bevæger sig ud og scouter igen. Nok pga onDiscover
+- Scouten laver ikke noget når den kommer tilbage
 */
 
 using namespace BWAPI;
@@ -23,6 +22,9 @@ void ScoutManager::onFrame(){
 		for (BWAPI::Unit unit : activeScouts){
 			if (unit->isUnderAttack()) {
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
+			}
+			else {
+				goScout(unit);
 			}
 		}
 	}
