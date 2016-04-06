@@ -48,7 +48,7 @@ void OffenseManager::onFrame(){
 		if (unit->isUnderAttack()) {
 			fightBack(unit);
 		}
-		if (InformationManager::getInstance().enemyBase == BWTA::getNearestBaseLocation(unit->getPosition())) {
+		if (InformationManager::getInstance().enemyBase == BWTA::getNearestBaseLocation(unit->getPosition()) && unit->isIdle()) {
 			searchAndDestroy(fighters);
 		}
 	}
@@ -118,16 +118,16 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
 bool OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	//Called when our fighters are idle in the enemy base
-	//BWAPI::Unitset temp;
+	BWAPI::Unitset temp;
 
-	/*while (attackers.size() > 3) {
+	while (attackers.size() > armySize) {
 		BWAPI::Unit immigrant = *attackers.begin();
 		temp.insert(immigrant);
 		attackers.erase(immigrant);
 	}
 	if (!temp.empty()) {
 		searchAndDestroy(temp);
-	}*/
+	}
 
 	//Finds units to kill and kills them in groups of around 3.
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
