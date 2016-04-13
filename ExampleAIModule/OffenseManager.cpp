@@ -12,7 +12,7 @@ alt efter modstanderens forsvar
 
 
 void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
-	if (unit->getPlayer == Broodwar->self()) {
+	if (unit->getPlayer() == Broodwar->self()) {
 		if (fighters.find(unit) != fighters.end()) {
 			fighters.erase(fighters.find(unit));
 		}
