@@ -4,7 +4,7 @@
 TODO:
 
 */
-
+using namespace BWAPI;
 //Currently only possible to reserve/release minerals for buildings
 //Reserve mins
 void ResourceManager::reserveMinerals(BWAPI::UnitType type){
@@ -30,10 +30,22 @@ ResourceManager& ResourceManager::getInstance(){ //Return ref to ResourceManager
 }
 
 //Release the gas and minerals that are reserved
-void ResourceManager::onUnitCreate(BWAPI::Unit unit){
-	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
+void ResourceManager::onUnitCreate(Unit unit){
+	if (unit->getType().isBuilding() && unit->getPlayer() == Broodwar->self()){
+
 		reservedMinerals = reservedMinerals - unit->getType().mineralPrice();
 		reservedGas = reservedGas - unit->getType().gasPrice();
-		BWAPI::Broodwar->sendText(std::to_string(reservedMinerals).c_str());
+		Broodwar->sendText(std::to_string(reservedMinerals).c_str());
+		Broodwar->sendText(std::to_string(reservedGas).c_str());
+	}
+}
+
+//Release the gas and minerals that are reserved
+void ResourceManager::onUnitMorph(Unit unit){
+	if (unit->getType().isBuilding() && unit->getPlayer() == Broodwar->self()){
+
+		reservedMinerals = reservedMinerals - unit->getType().mineralPrice();
+		reservedGas = reservedGas - unit->getType().gasPrice();
+		Broodwar->sendText(std::to_string(reservedMinerals).c_str());
 	}
 }
