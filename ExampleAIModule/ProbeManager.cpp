@@ -8,32 +8,26 @@ TODO:
 using namespace BWAPI;
 
 void ProbeManager::onFrame(){
-	//Construct the next building in the 
-
-
-
-	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) == 1
-		&& gasProbes.size() < 3){
-		addGasWorkerRequest();
-	}
-
-
-
-	std::vector<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
-	if (!queue.empty() && queue.front().isBuilding()){
-		if (builder == NULL || !builder->exists()) {
-			builder = mineralProbes.front(); //Assign a probe as designated builder
-		}
+	//Construct the next building in the queue
+	std::vector<BuildOrderType>& queue = BuildOrderManager::getInstance().getNewFixedOrderQueue();
+	if (!queue.empty()){
+		//Do things with the next unit in the buildOrder
+		if (queue.front().isUnit()){
+			BWAPI::UnitType type = queue.front().getUnitType(); //Find building type
+			if (type.isBuilding()){
+				if (builder == NULL || !builder->exists()) {
+					builder = mineralProbes.front(); //Assign a probe as designated builder
+				}
 		BWAPI::UnitType type = queue.front(); //Find building type
-		int minPrice = type.mineralPrice(); //Price of building
-		int gasPrice = type.gasPrice(); //Price of building
+				int minPrice = type.mineralPrice(); //Price of building
+				int gasPrice = type.gasPrice(); //Price of building
 
 		TilePosition position = Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
 		UnitType pylon = UnitTypes::Protoss_Pylon;
-		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
-			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
-			&& (type == pylon || BWAPI::Broodwar->self()->completedUnitCount(pylon) >= 1)
-			&& !builder->isConstructing()){
+				if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
+					&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
+					&& (type == pylon || BWAPI::Broodwar->self()->completedUnitCount(pylon) >= 1)
+					&& !builder->isConstructing()){
 			
 
 			if (builder->build(type, position)){
@@ -42,36 +36,36 @@ void ProbeManager::onFrame(){
 					Broodwar->drawBoxMap(BWAPI::Position(position),
 						Position(position + type.tileSize()),
 						Colors::Yellow);
-				},
-					nullptr,
-					type.buildTime() + 100);
+					},
+						nullptr,
+						type.buildTime() + 100);
 
-				BWAPI::Broodwar << "building " << type << std::endl;
+					BWAPI::Broodwar << "building " << type << std::endl;
 				ResourceManager::getInstance().reserveMinerals(queue.front());
 				ResourceManager::getInstance().reserveGas(queue.front());
-				queue.erase(queue.begin()); //Remove building from queue
-			}
+					queue.erase(queue.begin()); //Remove building from queue
+				}
 			
 		}
-	}
-
+		//Do things with the next request in the buildOrder
+		if (queue.front().isRequest()){
+			int request = queue.front().getRequestType();
 	//Make a scout
-	if (scoutRequests != 0 && builder != NULL){
+			if (request == requests::scoutRequest && builder != NULL){
 		ScoutManager::getInstance().addScout(builder);
 		mineralProbes.erase(mineralProbes.begin());
+				queue.erase(queue.begin()); //Remove the request from the queue
 		builder = NULL;
-		scoutRequests--;
 	}
-
-	//Make a gas worker
-	if (!gasWorkerRequests == 0){
+			//Make a gasworker
+			else if (request == requests::gasworkerRequest){
 		std::vector<BWAPI::Unit>::iterator it;
 		for (it = mineralProbes.begin(); it != mineralProbes.end();){
 			BWAPI::Unit unit = *it;
 			if (unit->isGatheringMinerals()){
 				mineralProbes.erase(it); //Remove probe from list by number in array
-				gasWorkerRequests--; //Remove a  gasWorkerRequest
 				gasProbes.push_back(unit); //Add unit to gasWorkerList
+						queue.erase(queue.begin()); //Remove the request from the queue
 				if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsRefinery))){
 					BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 				}
@@ -80,6 +74,8 @@ void ProbeManager::onFrame(){
 			else {
 				it++;
 			}
+		}
+	}
 		}
 	}
 
@@ -164,14 +160,3 @@ ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
 }
-
-//Add scoutRequest
-void ProbeManager::addScoutRequest(){
-	scoutRequests++;
-}
-
-//Add gasWorkerRequest
-void ProbeManager::addGasWorkerRequest(){
-	gasWorkerRequests++;
-}
-

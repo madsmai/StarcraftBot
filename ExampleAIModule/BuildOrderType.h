@@ -2,7 +2,6 @@
 
 #include <BWAPI.h>
 
-enum types { UnitType2, UpgradeType, RequestType };
 enum requests { scoutRequest, gasworkerRequest };
 
 class BuildOrderType
@@ -16,11 +15,15 @@ public:
 	bool isUpgrade();
 	bool isRequest();
 
+	std::string getName();
+
 	int getRequestType();
 	BWAPI::UnitType getUnitType();
 	BWAPI::UpgradeType getUpgradeType();
 
 private:
+	enum types { MetaUnitType, MetaUpgradeType, MetaRequestType };
+
 	int type;
 
 	int requestType;
