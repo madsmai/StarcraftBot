@@ -114,15 +114,17 @@ bool BuildOrderManager::buildGateway(){
 	for (BWAPI::UnitType type : fixedOrderQueue){
 		if (type == gateway){
 			gatewaysInQueue++;
+
 		}
 	}
 
-	if (lastChecked + 400 < BWAPI::Broodwar->getFrameCount()
-		&& BWAPI::Broodwar->self()->completedUnitCount(gateway)
-		+ BWAPI::Broodwar->self()->incompleteUnitCount(gateway) + gatewaysInQueue < 3){
+	if (lastChecked + 400 < Broodwar->getFrameCount()
+		&& Broodwar->self()->completedUnitCount(gateway)
+		+ Broodwar->self()->incompleteUnitCount(gateway) + gatewaysInQueue < 3){
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
+		lastChecked = Broodwar->getFrameCount();
 		fixedOrderQueue.push_back(gateway);
+		Broodwar << "Added gateway to build queue" << std::endl;
 		return true;
 	}
 	return false;
@@ -130,13 +132,14 @@ bool BuildOrderManager::buildGateway(){
 
 bool BuildOrderManager::buildSupply(){
 	static int lastChecked = 0;
-	BWAPI::UnitType supplyType = BWAPI::UnitTypes::Protoss_Pylon;
-	if (pylonsInQueue * 8 + BWAPI::Broodwar->self()->supplyTotal() / 2 - 4
-		<= BWAPI::Broodwar->self()->supplyUsed() + supplyInQueue) {
+	UnitType pylon = UnitTypes::Protoss_Pylon;
+	if (pylonsInQueue * 8 + Broodwar->self()->supplyTotal() / 2
+		+ Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
+		<= Broodwar->self()->supplyUsed() + supplyInQueue) {
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
-
-		fixedOrderQueue.push_back(supplyType);
+		lastChecked = Broodwar->getFrameCount();
+		Broodwar << "Added pylon to build queue" << std::endl;
+		fixedOrderQueue.push_back(pylon);
 		pylonsInQueue++;
 		return true;
 	}
@@ -144,16 +147,26 @@ bool BuildOrderManager::buildSupply(){
 }
 
 bool BuildOrderManager::buildForge(){
-	BWAPI::UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
+	UnitType forge = UnitTypes::Protoss_Forge;
 	static int lastChecked = 0;
 
-	if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >= 2
-		&& lastChecked + 400 < BWAPI::Broodwar->getFrameCount()
-		&& BWAPI::Broodwar->self()->allUnitCount(forge) == 0){
+	bool forgeInQueue = false;
+	for (BWAPI::UnitType type : fixedOrderQueue){
+		if (type == forge){
+			forgeInQueue = true;
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
+		}
+	}
+
+	if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
+		&& lastChecked + 400 < Broodwar->getFrameCount()
+		&& Broodwar->self()->allUnitCount(forge) == 0
+		&& !forgeInQueue){
+
+		lastChecked = Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(forge);
 		fixedOrderQueue.push_back(forge);
+		Broodwar << "Added forge to build queue" << std::endl;
 		return true;
 	}
 	return false;
@@ -161,12 +174,12 @@ bool BuildOrderManager::buildForge(){
 
 bool BuildOrderManager::buildRefinery(){
 	static int lastChecked = 0;
-	BWAPI::UnitType refineryType = BWAPI::UnitTypes::Protoss_Assimilator;
-	if (BWAPI::Broodwar->self()->allUnitCount(refineryType) == 0
-		&& (BWAPI::Broodwar->self()->supplyUsed() / 2) > 12
-		&& lastChecked + 400 < BWAPI::Broodwar->getFrameCount()){
+	UnitType refineryType = UnitTypes::Protoss_Assimilator;
+	if (Broodwar->self()->allUnitCount(refineryType) == 0
+		&& (Broodwar->self()->supplyUsed() / 2) > 12
+		&& lastChecked + 400 < Broodwar->getFrameCount()){
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
+		lastChecked = Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(refineryType);
 		fixedOrderQueue.push_back(refineryType);
 		return true;
@@ -310,7 +323,7 @@ void BuildOrderManager::trainProbe(){
 
 void BuildOrderManager::makeScout(){
 	UnitType pylon = UnitTypes::Protoss_Pylon;
-	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty() 
+	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty()
 		&& ScoutManager::getInstance().getInactiveScouts().empty()
 		&& Broodwar->self()->completedUnitCount(pylon) + Broodwar->self()->incompleteUnitCount(pylon) == 1){
 		ProbeManager::getInstance().addScoutRequest();

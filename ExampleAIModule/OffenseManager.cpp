@@ -121,40 +121,43 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
 	Broodwar << "Starting getHelp" << std::endl;
-//	if (victim != NULL) {
-//		BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly
-//			&& Filter::CanAttack
-//			&& !Filter::IsWorker
-//			&& !Filter::IsAttacking
-//			&& Filter::CanMove);
-//
-//		if (helper != NULL
-//			&& badGuy->isVisible()
-//			&& badGuy != NULL) {
-//
-//			helper->attack(badGuy);
-//			return true;
-//		}
-//		else {
-//			return false;
-//			Broodwar << "Failed to get help, helper was null" << std::endl;
-//		}
-//	}
+	if (victim != NULL) {
+		BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly
+			&& Filter::CanAttack
+			&& !Filter::IsWorker
+			&& !Filter::IsAttacking
+			&& Filter::CanMove);
+
+		if (helper != NULL
+			&& badGuy->isVisible()
+			&& badGuy != NULL) {
+
+			helper->attack(badGuy);
+			return true;
+		}
+		else {
+			return false;
+			Broodwar << "Failed to get help, helper was null" << std::endl;
+		}
+	}
 	return false;
 }
 
 void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	//Called when our fighters are idle in the enemy base
+	
 	Broodwar << "Starting searchAndDestroy" << std::endl;
-	BWAPI::Unitset temp;
+	Unitset temp;
 
 	while (attackers.size() > armySize) {
+		Broodwar << "While run" << std::endl;
 		BWAPI::Unit immigrant = *attackers.begin();
 		if (immigrant != NULL) {
 			temp.insert(immigrant);
 			attackers.erase(immigrant);
 		}
 		else {
+			Broodwar << "DEPLOY THE BRAKES!!!" << std::endl;
 			break;
 		}
 	}
@@ -162,18 +165,20 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		searchAndDestroy(temp);
 	}
 
+	Broodwar << "Moved past while loop" << std::endl;
 	//Finds units to kill and kills them in groups of around 3.
 	//Possible bug, it might not reach anything below workers
 
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
-		for (it = InformationManager::getInstance().enemyWorkers.begin(); it != InformationManager::getInstance().enemyWorkers.end();) {
+		for (it = InformationManager::getInstance().enemyWorkers.begin(); it != InformationManager::getInstance().enemyWorkers.end(); ) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyWorkers.push_back(unit);
 				InformationManager::getInstance().removeEnemyWorkers(unit);
+				InformationManager::getInstance().enemyWorkers.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyWorkers" << std::endl;
+				break;
 			}
 			else {
 				it++;
@@ -183,13 +188,14 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	}
 	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
 		Broodwar << "enemyBarracks was not empty" << std::endl;
-		for (it = InformationManager::getInstance().enemyBarracks.begin(); it != InformationManager::getInstance().enemyBarracks.end();) {
+		for (it = InformationManager::getInstance().enemyBarracks.begin(); it != InformationManager::getInstance().enemyBarracks.end(); ) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyBarracks.push_back(unit);
 				InformationManager::getInstance().removeEnemyBarracks(unit);
+				InformationManager::getInstance().enemyBarracks.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyBarracks" << std::endl;
+				break;
 			}
 			else {
 				it++;
@@ -199,13 +205,14 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
 		Broodwar << "enemyPassiveBuildings was not empty" << std::endl;
-		for (it = InformationManager::getInstance().enemyPassiveBuildings.begin(); it != InformationManager::getInstance().enemyPassiveBuildings.end();) {
+		for (it = InformationManager::getInstance().enemyPassiveBuildings.begin(); it != InformationManager::getInstance().enemyPassiveBuildings.end(); ) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyPassiveBuildings.push_back(unit);
 				InformationManager::getInstance().removeEnemyPassiveBuildings(unit);
+				InformationManager::getInstance().enemyPassiveBuildings.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyPassiveBuildings" << std::endl;
+				break;
 			}
 			else {
 				it++;
@@ -219,9 +226,10 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
 				attackers.attack(unit);
-				InformationManager::getInstance().enemyAttackers.push_back(unit);
 				InformationManager::getInstance().removeEnemyAttackers(unit);
+				InformationManager::getInstance().enemyAttackers.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyAttackers" << std::endl;
+				break;
 			}
 			else {
 				it++;

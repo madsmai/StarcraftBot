@@ -80,16 +80,22 @@ void GameManager::onSendText(std::string text){
 		InformationManager::getInstance().currentStatus();
 	}
 	else if (text == "size"){
-		BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().size() << std::endl;
+		Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().size() << std::endl;
 	}
 	else if (text == "front"){
-		BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().front().getName() << std::endl;
+		Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().front().getName() << std::endl;
 	}
 	else if (text == "reserved"){
-		BWAPI::Broodwar << "reserved minerals: " << ResourceManager::getInstance().getReservedMinerals() << std::endl;
+		Broodwar << "reserved minerals: " << ResourceManager::getInstance().getReservedMinerals() << std::endl;
 	}
 	else if (text == "zealot"){
-		BWAPI::Broodwar << "zealot supply required " << BWAPI::UnitTypes::Protoss_Zealot.supplyRequired() << std::endl;
+		Broodwar << "zealot supply required " << UnitTypes::Protoss_Zealot.supplyRequired() << std::endl;
+	}
+	else if (text == "enemyattackers"){
+		for (Unit attacker : InformationManager::getInstance().enemyAttackers){
+			Broodwar << "Enemy attackers: " << attacker->getType() << std::endl;
+		}
+
 	}
 }
 
