@@ -4,7 +4,10 @@
 using namespace BWAPI;
 /*
 TODO:
-
+- Sørg for at samle zealots sammen og angrib med dem sammen, det samlede antal skal varierer
+alt efter modstanderens forsvar
+- En måde at få zealots til at prioriterer hvad de angriber
+- Mangler BWTA
 */
 
 
@@ -51,7 +54,7 @@ void OffenseManager::onFrame(){
 		}
 		else if (InformationManager::getInstance().enemyBase == BWTA::getNearestBaseLocation(unit->getPosition())
 			&& unit->isIdle()
-			&& lastChecked + 24 < BWAPI::Broodwar->getFrameCount()) {
+			&& lastChecked + 75 < BWAPI::Broodwar->getFrameCount()) {
 			searchAndDestroy(fighters);
 			lastChecked = Broodwar->getFrameCount();
 		}
@@ -87,7 +90,7 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
 			else {
-				Broodwar << "Failed to rush enemyBase was null" << std::endl;
+				Broodwar << "Failed to rush, enemyBase was null" << std::endl;
 			}
 		}
 	}
@@ -101,9 +104,11 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 	if (attackedUnit != NULL) {
 		BWAPI::Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding);
-
 		if (attacker != NULL) {
-			attackedUnit->attack(attacker);
+			calculatePriority(attacker, attackedUnit);
+			if (attackedUnit->isAttacking()) {
+				attackedUnit->attack(attacker);
+			}
 			getHelp(attackedUnit, attacker);
 			return true;
 		}
@@ -217,11 +222,22 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		for (it = InformationManager::getInstance().enemyAttackers.begin(); it != InformationManager::getInstance().enemyAttackers.end();) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
-				attackers.attack(unit);
-				InformationManager::getInstance().removeEnemyAttackers(unit);
-				InformationManager::getInstance().enemyAttackers.push_back(unit);
-				Broodwar << "Search and destroy targetting enemyAttackers" << std::endl;
-				break;
+				if (!unit->isVisible()) {
+					attackers.move(unit->getPosition());
+					attackers.attack(unit,true);
+					InformationManager::getInstance().removeEnemyAttackers(unit);
+					InformationManager::getInstance().enemyAttackers.push_back(unit);
+					Broodwar << "Search and destroy targetting enemyAttackers" << std::endl;
+					break;
+				}
+				else {
+					attackers.attack(unit);
+					InformationManager::getInstance().removeEnemyAttackers(unit);
+					InformationManager::getInstance().enemyAttackers.push_back(unit);
+					Broodwar << "Search and destroy targetting enemyAttackers" << std::endl;
+					break;
+				}
+				
 			}
 			else {
 				it++;
@@ -300,4 +316,21 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 	}
 
 	return underTower;
+}
+int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
+
+	Broodwar << "Calculating priority" << std::endl;
+
+	int effectiveHp = enemy->getHitPoints() + enemy->getShields();
+	int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())); //* ourUnit->getType().maxGroundHits();
+
+	//Integer division round up, hopefully
+	int hitsToKill = effectiveHp + (ourDamage - 1) / ourDamage;
+
+	int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())); //* enemy->getType().maxGroundHits();
+
+	int priority = damage / hitsToKill;
+
+	Broodwar << "Priority of " << enemy->getType() << "is: " << priority << std::endl;
+	return priority;
 }

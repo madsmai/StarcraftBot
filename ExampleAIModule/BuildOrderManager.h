@@ -7,6 +7,7 @@
 #include "BuildOrderType.h"
 #include <queue>
 
+using namespace BWAPI;
 class BuildOrderManager
 {
 public:
@@ -39,7 +40,7 @@ private:
 	void trainProbe();
 //	void makeScout();
 
-	bool fixedOrder = false;
+	bool fixedOrder = true;
 	int supplyInQueue;
 	int pylonsInQueue;
 

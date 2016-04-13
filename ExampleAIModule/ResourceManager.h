@@ -1,11 +1,12 @@
 #pragma once
 #include <BWAPI.h>
-
+using namespace BWAPI;
 class ResourceManager
 {
 public:
 	//onUnitCreated
-	void onUnitCreate(BWAPI::Unit);
+	void onUnitCreate(Unit);
+	void onUnitMorph(Unit);
 
 	//Function for getting an instance
 	static ResourceManager& getInstance();
