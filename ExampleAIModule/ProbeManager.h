@@ -26,6 +26,9 @@ public:
 	//Add gas worker
 	void addGasWorkerRequest();
 
+	//Add probe to the list of mineralProbes
+	void addMineralProbe(BWAPI::Unit probe);
+
 	//Add building to list
 	//void addBuilding(BWAPI::UnitType);
 

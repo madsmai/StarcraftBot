@@ -20,23 +20,35 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 			addEnemyWorkers(unit);
 		}
 
-		if (unit->getType().canAttack() && unit->getType().canMove() && !unit->getType().isWorker()){
+		else if (unit->getType().canAttack() && unit->getType().canMove()){
 			addEnemyAttackers(unit);
 		}
+		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar ){
+			addDarkTemplar(unit);
 
-		if (unit->getType() == UnitTypes::Protoss_Gateway || 
+		}
+
+		else if (unit->getType() == UnitTypes::Protoss_Gateway || 
 			unit->getType() == UnitTypes::Zerg_Spawning_Pool || 
 			unit->getType() == UnitTypes::Terran_Barracks){
 
 			addEnemyBarracks(unit);
 		}
 
-		if (unit->getType().isBuilding() && unit->getType().canAttack()){
+		else if (unit->getType().isBuilding() && unit->getType().canAttack()){
 			addEnemyTowers(unit);
 		}
 
-		if (unit->getType().isBuilding() && !unit->getType().canAttack()){
+		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
 			addEnemyPassiveBuildings(unit);
+		} 
+		
+		else if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
+			citadelOfAdun = true;
+		}
+
+		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives){
+			templarArchives = true;
 		}
 
 
@@ -51,23 +63,34 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeEnemyWorkers(unit);
 		}
 
-		if (unit->getType().canAttack() && unit->getType().canMove() && unit->getType().isWorker()){
+		else if (unit->getType().canAttack() && unit->getType().canMove()){
 			removeEnemyAttackers(unit);
 		}
 
-		if (unit->getType() == UnitTypes::Protoss_Gateway ||
+		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar){
+			removeDarkTemplar(unit);
+		}
+
+		else if (unit->getType() == UnitTypes::Protoss_Gateway ||
 			unit->getType() == UnitTypes::Zerg_Spawning_Pool ||
 			unit->getType() == UnitTypes::Terran_Barracks){
 
 			removeEnemyBarracks(unit);
 		}
 
-		if (unit->getType().isBuilding() && unit->getType().canAttack()){
-			removeEnemyTowers(unit);
-		}
-
-		if (unit->getType().isBuilding() && !unit->getType().canAttack()){
-			removeEnemyPassiveBuildings(unit);
+		else if (unit->getType().isBuilding()){
+			if (unit->getType().canAttack()){
+				removeEnemyTowers(unit);
+			}
+			else if (!unit->getType().canAttack()){
+				removeEnemyPassiveBuildings(unit);
+			}
+			if (unit->getType().isResourceDepot()
+				&& unit->getTilePosition() == enemyBase->getTilePosition()){
+				
+				// rush succesful
+				OffenseManager::getInstance().rushFinished = true;
+			}
 		}
 
 
@@ -127,6 +150,24 @@ void InformationManager::addEnemyWorkers(BWAPI::Unit worker){
 
 }
 
+
+void InformationManager::addDarkTemplar(BWAPI::Unit darkTemplar){
+
+	bool exists = false;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = darkTemplars.begin(); it != darkTemplars.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == darkTemplar->getID()){
+			exists = true;
+			break;
+		}
+	}
+	if (!exists) {
+		darkTemplars.push_back(darkTemplar);
+	}
+
+}
+
 void InformationManager::addEnemyTowers(BWAPI::Unit tower){
 
 	bool exists = false;
@@ -166,22 +207,28 @@ void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyBarracks.begin(); it != enemyBarracks.end(); it++) {
+	for (it = enemyBarracks.begin(); it != enemyBarracks.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == barracks->getID()){
 			enemyBarracks.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
 }
 
-void InformationManager::removeEnemyAttackers(BWAPI::Unit attacker){
+void InformationManager::removeEnemyAttackers(Unit attacker){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
-		BWAPI::Unit u = *it;
+	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); ) {
+		Unit u = *it;
 		if (u->getID() == attacker->getID()){
+			Broodwar << "unit removed from enemyAttackers list" << std::endl;
 			enemyAttackers.erase(it);
+		} else{
+			it++;
 		}
 	}
 }
@@ -189,10 +236,29 @@ void InformationManager::removeEnemyAttackers(BWAPI::Unit attacker){
 void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyWorkers.begin(); it != enemyWorkers.end(); it++) {
+	for (it = enemyWorkers.begin(); it != enemyWorkers.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == worker->getID()){
 			enemyWorkers.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+
+}
+
+
+void InformationManager::removeDarkTemplar(BWAPI::Unit darkTemplar){
+
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = darkTemplars.begin(); it != darkTemplars.end();) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == darkTemplar->getID()){
+			darkTemplars.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
@@ -201,10 +267,13 @@ void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyTowers.begin(); it != enemyTowers.end(); it++) {
+	for (it = enemyTowers.begin(); it != enemyTowers.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == tower->getID()){
 			enemyTowers.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
 
@@ -213,22 +282,27 @@ void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyPassiveBuildings.begin(); it != enemyPassiveBuildings.end(); it++) {
+	for (it = enemyPassiveBuildings.begin(); it != enemyPassiveBuildings.end(); ) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == passiveBuilding->getID()){
 			enemyPassiveBuildings.erase(it);
 		}
+		else {
+			it++;
+		}
 	}
-
 }
 
 //Prints the current count of enemy units
 void InformationManager::currentStatus(){
-	Broodwar << "Current Status: \n" << enemyAttackers.size() << "enemy attacker(s) \n"
-		<< enemyBarracks.size() << "enemy barrack(s) \n"
-		<< enemyWorkers.size() << "enemy worker(s) \n"
-		<< enemyTowers.size() << "enemy tower(s) \n"
-		<< enemyPassiveBuildings.size() << "passive enemy building(s) \n" <<  std::endl;
+	Broodwar << "Current Status: \n" << enemyAttackers.size() << "  enemy attacker(s) \n"
+		<< enemyBarracks.size() << "  enemy barrack(s) \n"
+		<< enemyWorkers.size() << "  enemy worker(s) \n"
+		<< enemyTowers.size() << "  enemy tower(s) \n"
+		" Any Citadel of Adun? " << citadelOfAdun << "\n"
+		" Any Templar Archives? " << templarArchives << "\n"
+		<< enemyTowers.size() << "  enemy dark templars(s) \n"
+		<< enemyPassiveBuildings.size() << "  passive enemy building(s) \n" <<  std::endl;
 
 }
 

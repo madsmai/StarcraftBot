@@ -6,8 +6,13 @@ TODO:
 */
 
 void ProbeManager::onFrame(){
-	//Construct the next building in the queue
-	std::queue<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
+	//Construct the next building in the 
+
+
+
+
+
+	std::vector<BWAPI::UnitType>& queue = BuildOrderManager::getInstance().getFixedOrderQueue();
 	if (!queue.empty() && queue.front().isBuilding()){
 		if (builder == NULL || !builder->exists()) {
 			builder = mineralProbes.front(); //Assign a probe as designated builder
@@ -17,40 +22,46 @@ void ProbeManager::onFrame(){
 		int gasPrice = type.gasPrice(); //Price of building
 
 		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
-
+		BWAPI::UnitType pylon = BWAPI::UnitTypes::Protoss_Pylon;
 		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
-			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
+			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
+			&& (type == pylon || BWAPI::Broodwar->self()->completedUnitCount(pylon) >= 1)
+			&& !builder->isConstructing()){
+			BWAPI::Broodwar->registerEvent([position, type](BWAPI::Game*) {
+				BWAPI::Broodwar->drawBoxMap(BWAPI::Position(position),
+					BWAPI::Position(position + type.tileSize()),
+					BWAPI::Colors::Yellow);
+			},
+				nullptr,
+				type.buildTime() + 100);
+			BWAPI::Broodwar << "building " << type << std::endl;
 			builder->build(type, position);
 			ResourceManager::getInstance().reserveMinerals(queue.front());
-			queue.pop(); //Remove building from queue
+			queue.erase(queue.begin()); //Remove building from queue
 		}
 	}
 
 	//Make a scout
-	if (!scoutRequests == 0){
-		std::vector<BWAPI::Unit>::iterator it;
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
-			BWAPI::Unit unit = *it;
-			if (unit->isGatheringMinerals()){
-				mineralProbes.erase(it); //Remove probe from list
-				scoutRequests--; //Remove a scoutRequest
-				//TODO: When scoutmanager is finished enable method
-				//ScoutManager::getInstance().makeScout(unit); //Add a scout
-				break;
-			}
-		}
+	if (scoutRequests != 0 && builder != NULL){
+		ScoutManager::getInstance().addScout(builder);
+		mineralProbes.erase(mineralProbes.begin());
+		builder = NULL;
+		scoutRequests--;
 	}
 
 	//Make a gas worker
 	if (!gasWorkerRequests == 0){
 		std::vector<BWAPI::Unit>::iterator it;
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
+		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
 			BWAPI::Unit unit = *it;
 			if (unit->isGatheringMinerals()){
 				mineralProbes.erase(it); //Remove probe from list by number in array
 				gasWorkerRequests--; //Remove a  gasWorkerRequest
 				gasProbes.push_back(unit); //Add unit to gasWorkerList
 				break;
+			}
+			else {
+				it++;
 			}
 		}
 	}
@@ -95,18 +106,24 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 		std::vector<BWAPI::Unit>::iterator it;
 
 		//Loop through mineralsProbes
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
+		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
 			if (*it == unit){
 				mineralProbes.erase(it);
 				break;
 			}
+			else {
+				it++;
+			}
 		}
 
 		//Loop through gasProbes
-		for (it = gasProbes.begin(); it != gasProbes.end(); it++){
+		for (it = gasProbes.begin(); it != gasProbes.end(); ){
 			if (*it == unit){
 				gasProbes.erase(it);
 				break;
+			}
+			else {
+				it++;
 			}
 		}
 	}
@@ -115,19 +132,14 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 //Add newly made worker to list
 void ProbeManager::onUnitComplete(BWAPI::Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self()){
-		mineralProbes.push_back(unit);
+		addMineralProbe(unit);
 	}
 }
 
-//Add the first 4 probes to list and set scoutRequests to 0
-//void ProbeManager::onStart(){
-//	for (auto &unit : BWAPI::Broodwar->self()->getUnits()) {
-//		if (unit->exists()		&&	  unit->getType().isWorker()){
-//			mineralProbes.push_back(unit);
-//		}
-//	}
-//	scoutRequests = 0;
-//}
+
+void ProbeManager::addMineralProbe(BWAPI::Unit probe){
+	mineralProbes.push_back(probe);
+}
 
 //Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
@@ -145,9 +157,3 @@ void ProbeManager::addGasWorkerRequest(){
 	gasWorkerRequests++;
 }
 
-//Add building to queue
-//void ProbeManager::addBuilding(BWAPI::UnitType type){
-//	if (type.isBuilding()){
-//		pendingBuildings.push(type);
-//	}
-//}

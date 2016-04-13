@@ -5,29 +5,72 @@ TODO:
 
 
 */
+using namespace BWAPI;
 
 void BuildOrderManager::onStart(){
 	BWAPI::UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
 	BWAPI::UnitType pylon = BWAPI::UnitTypes::Protoss_Pylon;
 	BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
+	BWAPI::UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
 
-	//fixedOrderQueue.push(pylon); for testing
-	fixedOrderQueue.push(probe);
-	fixedOrderQueue.push(probe);
-	fixedOrderQueue.push(probe);
-	fixedOrderQueue.push(pylon);
-	fixedOrderQueue.push(gateway);
-	fixedOrderQueue.push(zealot);
-	fixedOrderQueue.push(gateway);
-	fixedOrderQueue.push(zealot);
-	fixedOrderQueue.push(zealot);
+	//fixedOrderQueue.push_back(pylon); for testing
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(pylon);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(gateway);
+	fixedOrderQueue.push_back(gateway);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(pylon);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(pylon);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(gateway);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(pylon);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(pylon);
+	fixedOrderQueue.push_back(probe);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);
+
+
+	supplyInQueue = (14 * 2) + (13);
+	pylonsInQueue = 5;
 
 	//This is commented out for testing purposes
 	//fixedOrder = false;
 }
 
 void BuildOrderManager::onFrame(){
+
+
+	if (pylonsInQueue * 8 + BWAPI::Broodwar->self()->supplyTotal() / 2 - 4
+		<= BWAPI::Broodwar->self()->supplyUsed() + supplyInQueue){
+
+		fixedOrderQueue.push_back(BWAPI::UnitTypes::Protoss_Pylon);
+		pylonsInQueue++;
+
+	}
+
+
 	if (!fixedOrder){ //FixedOrder might not be needed, since everyhting is enqueued in onStart()
 		trainZealot();
 		trainProbe();
@@ -66,13 +109,22 @@ void BuildOrderManager::onFrame(){
 bool BuildOrderManager::buildGateway(){
 	static int lastChecked = 0;
 	BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
-	if (((BWAPI::Broodwar->self()->supplyUsed() / 2 >= 10 && BWAPI::Broodwar->self()->allUnitCount(gateway) == 0) || 
-		(BWAPI::Broodwar->self()->supplyUsed() / 2 >= 12 && BWAPI::Broodwar->self()->allUnitCount(gateway) == 1)) && 
-		lastChecked + 400 < BWAPI::Broodwar->getFrameCount()){
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
-		//ProbeManager::getInstance().addBuilding(gateway);
-		fixedOrderQueue.push(gateway);
+	int gatewaysInQueue = 0;
+	for (BWAPI::UnitType type : fixedOrderQueue){
+		if (type == gateway){
+			gatewaysInQueue++;
+
+		}
+	}
+
+	if (lastChecked + 400 < Broodwar->getFrameCount()
+		&& Broodwar->self()->completedUnitCount(gateway)
+		+ Broodwar->self()->incompleteUnitCount(gateway) + gatewaysInQueue < 3){
+
+		lastChecked = Broodwar->getFrameCount();
+		fixedOrderQueue.push_back(gateway);
+		Broodwar << "Added gateway to build queue" << std::endl;
 		return true;
 	}
 	return false;
@@ -80,30 +132,41 @@ bool BuildOrderManager::buildGateway(){
 
 bool BuildOrderManager::buildSupply(){
 	static int lastChecked = 0;
-	BWAPI::UnitType supplyType = BWAPI::UnitTypes::Protoss_Pylon;
-	if (((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) / 2 < 5|| 
-		BWAPI::Broodwar->self()->supplyUsed() < 17) && lastChecked + 400 < BWAPI::Broodwar->getFrameCount() && 
-		BWAPI::Broodwar->self()->incompleteUnitCount(supplyType) == 0) {
+	UnitType pylon = UnitTypes::Protoss_Pylon;
+	if (pylonsInQueue * 8 + Broodwar->self()->supplyTotal() / 2
+		+ Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
+		<= Broodwar->self()->supplyUsed() + supplyInQueue) {
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
-		//ProbeManager::getInstance().addBuilding(supplyType);
-		fixedOrderQueue.push(supplyType);
+		lastChecked = Broodwar->getFrameCount();
+		Broodwar << "Added pylon to build queue" << std::endl;
+		fixedOrderQueue.push_back(pylon);
+		pylonsInQueue++;
 		return true;
 	}
 	return false;
 }
 
 bool BuildOrderManager::buildForge(){
-	BWAPI::UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
+	UnitType forge = UnitTypes::Protoss_Forge;
 	static int lastChecked = 0;
 
-	if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >= 2
-		&& lastChecked + 400 < BWAPI::Broodwar->getFrameCount()
-		&& BWAPI::Broodwar->self()->allUnitCount(forge) == 0){
+	bool forgeInQueue = false;
+	for (BWAPI::UnitType type : fixedOrderQueue){
+		if (type == forge){
+			forgeInQueue = true;
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
+		}
+	}
+
+	if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Gateway) >= 2
+		&& lastChecked + 400 < Broodwar->getFrameCount()
+		&& Broodwar->self()->allUnitCount(forge) == 0
+		&& !forgeInQueue){
+
+		lastChecked = Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(forge);
-		fixedOrderQueue.push(forge);
+		fixedOrderQueue.push_back(forge);
+		Broodwar << "Added forge to build queue" << std::endl;
 		return true;
 	}
 	return false;
@@ -111,14 +174,14 @@ bool BuildOrderManager::buildForge(){
 
 bool BuildOrderManager::buildRefinery(){
 	static int lastChecked = 0;
-	BWAPI::UnitType refineryType = BWAPI::UnitTypes::Protoss_Assimilator;
-	if (BWAPI::Broodwar->self()->allUnitCount(refineryType) == 0
-		&& (BWAPI::Broodwar->self()->supplyUsed() / 2) > 12
-		&& lastChecked + 400 < BWAPI::Broodwar->getFrameCount()){
+	UnitType refineryType = UnitTypes::Protoss_Assimilator;
+	if (Broodwar->self()->allUnitCount(refineryType) == 0
+		&& (Broodwar->self()->supplyUsed() / 2) > 12
+		&& lastChecked + 400 < Broodwar->getFrameCount()){
 
-		lastChecked = BWAPI::Broodwar->getFrameCount();
+		lastChecked = Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(refineryType);
-		fixedOrderQueue.push(refineryType);
+		fixedOrderQueue.push_back(refineryType);
 		return true;
 	}
 	return false;
@@ -134,7 +197,7 @@ bool BuildOrderManager::buildCitadelOfAdun(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(citadel_Of_Adun);
-		fixedOrderQueue.push(citadel_Of_Adun);
+		fixedOrderQueue.push_back(citadel_Of_Adun);
 		return true;
 	}
 	return false;
@@ -156,7 +219,7 @@ bool BuildOrderManager::buildCyberneticsCore(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(cybernetics_Core);
-		fixedOrderQueue.push(cybernetics_Core);
+		fixedOrderQueue.push_back(cybernetics_Core);
 		return true;
 	}
 	return false;
@@ -172,7 +235,7 @@ bool BuildOrderManager::buildPhotonCannon(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(photon_cannon);
-		fixedOrderQueue.push(photon_cannon);
+		fixedOrderQueue.push_back(photon_cannon);
 		return true;
 	}
 	return false;
@@ -234,13 +297,15 @@ void BuildOrderManager::researchCyberneticsCore(){
 void BuildOrderManager::trainZealot(){
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
 
-	if ((BWAPI::Broodwar->self()->incompleteUnitCount(zealot) + 
+	if ((BWAPI::Broodwar->self()->incompleteUnitCount(zealot) +
 		BWAPI::Broodwar->self()->completedUnitCount(zealot)) < OffenseManager::getInstance().getZealotMax()
-		&& BWAPI::Broodwar->self()->supplyUsed() < BWAPI::Broodwar->self()->supplyTotal() 
-		&& BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >=1){
+		&& BWAPI::Broodwar->self()->supplyUsed() < BWAPI::Broodwar->self()->supplyTotal()
+		&& BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >= 1){
 
 		//BuildingManager::getInstance().addUnit(zealot);
-		fixedOrderQueue.push(zealot);
+		fixedOrderQueue.push_back(zealot);
+
+		supplyInQueueExecuted(zealot.supplyRequired() / 2);
 	}
 }
 
@@ -250,12 +315,17 @@ void BuildOrderManager::trainProbe(){
 	int gatewayCount = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway);
 	if (workerCount < 25 && (!(workerCount >= 10 && gatewayCount == 0) || !(workerCount >= 12 && gatewayCount == 1))){
 		//BuildingManager::getInstance().addUnit(probe);
-		fixedOrderQueue.push(probe);
+		fixedOrderQueue.push_back(probe);
+
+		supplyInQueueExecuted(probe.supplyRequired() / 2);
 	}
 }
 
 void BuildOrderManager::makeScout(){
-	if (BWAPI::Broodwar->self()->supplyTotal() < 19){
+	UnitType pylon = UnitTypes::Protoss_Pylon;
+	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty()
+		&& ScoutManager::getInstance().getInactiveScouts().empty()
+		&& Broodwar->self()->completedUnitCount(pylon) + Broodwar->self()->incompleteUnitCount(pylon) == 1){
 		ProbeManager::getInstance().addScoutRequest();
 	}
 }
