@@ -15,7 +15,7 @@ BuildOrderType::BuildOrderType(int request){
 }
 
 BuildOrderType::BuildOrderType(BWAPI::UnitType unit){
-	type = types::UnitType;
+	type = types::UnitType2;
 	unitType = unit;
 }
 
@@ -25,7 +25,7 @@ BuildOrderType::BuildOrderType(BWAPI::UpgradeType upgrade){
 }
 
 bool BuildOrderType::isUnit(){
-	return type == types::UnitType;
+	return type == types::UnitType2;
 }
 
 bool BuildOrderType::isUpgrade(){

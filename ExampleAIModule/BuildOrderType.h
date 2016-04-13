@@ -2,7 +2,7 @@
 
 #include <BWAPI.h>
 
-enum types { UnitType, UpgradeType, RequestType };
+enum types { UnitType2, UpgradeType, RequestType };
 enum requests { scoutRequest, gasworkerRequest };
 
 class BuildOrderType
