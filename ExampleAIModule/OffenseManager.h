@@ -21,6 +21,8 @@ public:
 	int &getAirArmor(){ return air_armor_count; }
 	bool &getSingularityCharge(){ return singularity_charge; }
 
+	bool rushFinished = false;
+
 private:
 	//Zealots
 	int zealotMax = 6;
@@ -42,6 +44,7 @@ private:
 	bool getHelp(BWAPI::Unit, BWAPI::Unit);
 	void searchAndDestroy(BWAPI::Unitset);
 	bool avoidTowers(BWAPI::Unit);
+
 
 	OffenseManager(){};
 	~OffenseManager(){};
