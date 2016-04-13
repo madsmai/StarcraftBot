@@ -31,6 +31,10 @@ void GameManager::onStart(){
 
 void GameManager::onEnd(bool isWinner){
 
+	if (isWinner){
+
+	}
+
 }
 
 
@@ -72,6 +76,12 @@ void GameManager::onUnitCreate(BWAPI::Unit unit){
 	//Call onUnitCreates
 	ResourceManager::getInstance().onUnitCreate(unit);
 }
+
+void GameManager::onUnitMorph(Unit unit){
+	//Call onUnitMorph
+	ResourceManager::getInstance().onUnitMorph(unit);
+}
+
 
 void GameManager::onSendText(std::string text){
 	//Print out message
