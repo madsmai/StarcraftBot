@@ -7,6 +7,15 @@ void BuildOrderManager::onStart(){
 	BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
 	UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
+	UnitType assimilator = BWAPI::UnitTypes::Protoss_Assimilator;
+	UnitType cybercore = BWAPI::UnitTypes::Protoss_Cybernetics_Core;
+	UnitType dragoon = BWAPI::UnitTypes::Protoss_Dragoon;
+	UnitType citadel = BWAPI::UnitTypes::Protoss_Citadel_of_Adun;
+	UnitType archives = BWAPI::UnitTypes::Protoss_Templar_Archives;
+	UnitType dtemplar = BWAPI::UnitTypes::Protoss_Dark_Templar;
+	UnitType cannon = BWAPI::UnitTypes::Protoss_Photon_Cannon;
+
+
 	int scoutRequest = requests::scoutRequest;
 	int gasworkerRequest = requests::gasworkerRequest;
 
@@ -14,54 +23,65 @@ void BuildOrderManager::onStart(){
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));			// 8 - pylon
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(gateway));			// 10 - gateway
+	newFixedOrderQueue.push_back(BuildOrderType(scoutRequest));		// 10 - scout
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(assimilator));		//12 - Assimilator
+	newFixedOrderQueue.push_back(BuildOrderType(gasworkerRequest)); //12 - Gasworker request
+	newFixedOrderQueue.push_back(BuildOrderType(gasworkerRequest)); //12 - Gasworker request
+	newFixedOrderQueue.push_back(BuildOrderType(gasworkerRequest)); //12 - Gasworker request
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));			//13 - Zealot
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));			//16 - Pylon
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(cybercore));		//18 - Cybernetics Core
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));			//19 - Zealot
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));			//21 - Pylon
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(dragoon));			//23 - Dragoon
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(citadel));			//26 - Citadel
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(dragoon));			//27 - Dragoon
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(gateway));			//29 - Gateway
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));			//29 - Pylon
+	newFixedOrderQueue.push_back(BuildOrderType(archives));			//29 - Templar Archives
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
-	newFixedOrderQueue.push_back(BuildOrderType(pylon));
-	newFixedOrderQueue.push_back(BuildOrderType(pylon));
-	newFixedOrderQueue.push_back(BuildOrderType(pylon));
-
-	//fixedOrderQueue.push_back(pylon); for testing
-	/*fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(gateway);
-	fixedOrderQueue.push_back(gateway);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(gateway);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);*/
-
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(dtemplar));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(dtemplar));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(forge));
+	newFixedOrderQueue.push_back(BuildOrderType(cannon));
+	newFixedOrderQueue.push_back(BuildOrderType(cannon));
+	newFixedOrderQueue.push_back(BuildOrderType(cannon));
 
 	supplyInQueue = (14 * 2) + (13);
 	pylonsInQueue = 5;
 
-	//This is commented out for testing purposes
-	//fixedOrder = false;
 }
 
 void BuildOrderManager::onFrame(){
