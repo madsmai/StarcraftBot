@@ -7,6 +7,7 @@
 #include "BuildOrderType.h"
 #include <queue>
 
+using namespace BWAPI;
 class BuildOrderManager
 {
 public:

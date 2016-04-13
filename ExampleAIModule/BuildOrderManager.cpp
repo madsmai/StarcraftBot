@@ -1,10 +1,4 @@
 #include "BuildOrderManager.h"
-
-/*
-TODO:
-
-
-*/
 using namespace BWAPI;
 
 void BuildOrderManager::onStart(){
@@ -12,7 +6,7 @@ void BuildOrderManager::onStart(){
 	BWAPI::UnitType pylon = BWAPI::UnitTypes::Protoss_Pylon;
 	BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
-	BWAPI::UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
+	UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
 	UnitType core = UnitTypes::Protoss_Cybernetics_Core;
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
 	UnitType adun = UnitTypes::Protoss_Citadel_of_Adun;
@@ -20,7 +14,7 @@ void BuildOrderManager::onStart(){
 	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
 	UnitType refinery = UnitTypes::Protoss_Assimilator;
 	UnitType dragoon = UnitTypes::Protoss_Dragoon;
-	
+
 
 	fixedOrderQueue.push_back(probe);
 	fixedOrderQueue.push_back(probe);
@@ -37,9 +31,9 @@ void BuildOrderManager::onStart(){
 	fixedOrderQueue.push_back(zealot);
 	fixedOrderQueue.push_back(probe); // 16
 	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(probe); 
+	fixedOrderQueue.push_back(probe);
 	fixedOrderQueue.push_back(probe); // 18
-	fixedOrderQueue.push_back(core); 
+	fixedOrderQueue.push_back(core);
 	fixedOrderQueue.push_back(zealot);
 	fixedOrderQueue.push_back(probe);
 	fixedOrderQueue.push_back(probe); // 22
@@ -75,7 +69,7 @@ void BuildOrderManager::onStart(){
 void BuildOrderManager::onFrame(){
 
 	if (!fixedOrder){ //FixedOrder might not be needed, since everyhting is enqueued in onStart()
-		
+
 		if (pylonsInQueue * 8 + BWAPI::Broodwar->self()->supplyTotal() / 2 - 4
 			<= BWAPI::Broodwar->self()->supplyUsed() + supplyInQueue){
 
@@ -83,7 +77,7 @@ void BuildOrderManager::onFrame(){
 			pylonsInQueue++;
 
 		}
-		
+
 		trainZealot();
 		trainProbe();
 
@@ -262,7 +256,7 @@ void BuildOrderManager::researchForge(){
 
 	//Prioritised list of upgrades
 	// Ground weapons
-	if (OffenseManager::getInstance().getGroundWeapons() == 0 
+	if (OffenseManager::getInstance().getGroundWeapons() == 0
 		&& BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >= 2){
 		BuildingManager::getInstance().addUpgrade(ground_weapons);
 		OffenseManager::getInstance().getGroundWeapons()++;
