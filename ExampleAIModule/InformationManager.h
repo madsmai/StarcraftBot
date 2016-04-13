@@ -3,6 +3,7 @@
 #include <BWAPI.h>
 #include <vector> // for std::vector
 #include <BWTA.h>
+#include "OffenseManager.h"
 
 class InformationManager
 {

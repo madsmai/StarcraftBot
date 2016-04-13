@@ -62,12 +62,19 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeEnemyBarracks(unit);
 		}
 
-		else if (unit->getType().isBuilding() && unit->getType().canAttack()){
-			removeEnemyTowers(unit);
-		}
-
-		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
-			removeEnemyPassiveBuildings(unit);
+		else if (unit->getType().isBuilding()){
+			if (unit->getType().canAttack()){
+				removeEnemyTowers(unit);
+			}
+			else if (!unit->getType().canAttack()){
+				removeEnemyPassiveBuildings(unit);
+			}
+			if (unit->getType().isResourceDepot()
+				&& unit->getTilePosition() == enemyBase->getTilePosition()){
+				
+				// rush succesful
+				OffenseManager::getInstance().rushFinished = true;
+			}
 		}
 
 
