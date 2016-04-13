@@ -4,10 +4,7 @@
 using namespace BWAPI;
 /*
 TODO:
-- Sørg for at samle zealots sammen og angrib med dem sammen, det samlede antal skal varierer
-alt efter modstanderens forsvar
-- En måde at få zealots til at prioriterer hvad de angriber
-- Mangler BWTA
+
 */
 
 
