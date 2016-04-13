@@ -38,7 +38,6 @@ private:
 	void researchCyberneticsCore();
 	void trainZealot();
 	void trainProbe();
-//	void makeScout();
 
 	bool fixedOrder = true;
 	int supplyInQueue;
