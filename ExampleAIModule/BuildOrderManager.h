@@ -37,7 +37,7 @@ private:
 	void trainProbe();
 	void makeScout();
 
-	bool fixedOrder = false;
+	bool fixedOrder = true;
 	int supplyInQueue;
 	int pylonsInQueue;
 

@@ -5,10 +5,17 @@ TODO:
 - FIX: building two things in a row produces an error where the buildings want to be placed on same spot
 */
 
+using namespace BWAPI;
+
 void ProbeManager::onFrame(){
 	//Construct the next building in the 
 
 
+
+	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) == 1
+		&& gasProbes.size() < 3){
+		addGasWorkerRequest();
+	}
 
 
 
@@ -21,23 +28,30 @@ void ProbeManager::onFrame(){
 		int minPrice = type.mineralPrice(); //Price of building
 		int gasPrice = type.gasPrice(); //Price of building
 
-		BWAPI::TilePosition position = BWAPI::Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
-		BWAPI::UnitType pylon = BWAPI::UnitTypes::Protoss_Pylon;
+		TilePosition position = Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
+		UnitType pylon = UnitTypes::Protoss_Pylon;
 		if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
 			&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
 			&& (type == pylon || BWAPI::Broodwar->self()->completedUnitCount(pylon) >= 1)
 			&& !builder->isConstructing()){
-			BWAPI::Broodwar->registerEvent([position, type](BWAPI::Game*) {
-				BWAPI::Broodwar->drawBoxMap(BWAPI::Position(position),
-					BWAPI::Position(position + type.tileSize()),
-					BWAPI::Colors::Yellow);
-			},
-				nullptr,
-				type.buildTime() + 100);
-			BWAPI::Broodwar << "building " << type << std::endl;
-			builder->build(type, position);
-			ResourceManager::getInstance().reserveMinerals(queue.front());
-			queue.erase(queue.begin()); //Remove building from queue
+			
+
+			if (builder->build(type, position)){
+
+				Broodwar->registerEvent([position, type](BWAPI::Game*) {
+					Broodwar->drawBoxMap(BWAPI::Position(position),
+						Position(position + type.tileSize()),
+						Colors::Yellow);
+				},
+					nullptr,
+					type.buildTime() + 100);
+
+				BWAPI::Broodwar << "building " << type << std::endl;
+				ResourceManager::getInstance().reserveMinerals(queue.front());
+				ResourceManager::getInstance().reserveGas(queue.front());
+				queue.erase(queue.begin()); //Remove building from queue
+			}
+			
 		}
 	}
 
@@ -52,12 +66,15 @@ void ProbeManager::onFrame(){
 	//Make a gas worker
 	if (!gasWorkerRequests == 0){
 		std::vector<BWAPI::Unit>::iterator it;
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
+		for (it = mineralProbes.begin(); it != mineralProbes.end();){
 			BWAPI::Unit unit = *it;
 			if (unit->isGatheringMinerals()){
 				mineralProbes.erase(it); //Remove probe from list by number in array
 				gasWorkerRequests--; //Remove a  gasWorkerRequest
 				gasProbes.push_back(unit); //Add unit to gasWorkerList
+				if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsRefinery))){
+					BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
+				}
 				break;
 			}
 			else {
@@ -92,6 +109,7 @@ void ProbeManager::onFrame(){
 			if (u->isCarryingGas() || u->isCarryingMinerals()) {
 				u->returnCargo();
 			}
+
 			if (!u->gather(u->getClosestUnit(BWAPI::Filter::IsRefinery))){
 				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 			}
@@ -106,7 +124,7 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 		std::vector<BWAPI::Unit>::iterator it;
 
 		//Loop through mineralsProbes
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
+		for (it = mineralProbes.begin(); it != mineralProbes.end();){
 			if (*it == unit){
 				mineralProbes.erase(it);
 				break;
@@ -117,7 +135,7 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 		}
 
 		//Loop through gasProbes
-		for (it = gasProbes.begin(); it != gasProbes.end(); ){
+		for (it = gasProbes.begin(); it != gasProbes.end();){
 			if (*it == unit){
 				gasProbes.erase(it);
 				break;
