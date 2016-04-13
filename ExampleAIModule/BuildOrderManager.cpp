@@ -14,8 +14,14 @@ void BuildOrderManager::onStart(){
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
 	BWAPI::UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
 
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+
 	//fixedOrderQueue.push_back(pylon); for testing
-	fixedOrderQueue.push_back(probe);
+	/*fixedOrderQueue.push_back(probe);
 	fixedOrderQueue.push_back(probe);
 	fixedOrderQueue.push_back(probe);
 	fixedOrderQueue.push_back(probe);
@@ -49,11 +55,11 @@ void BuildOrderManager::onStart(){
 	fixedOrderQueue.push_back(probe);
 	fixedOrderQueue.push_back(zealot);
 	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
+	fixedOrderQueue.push_back(zealot);*/
 
 
-	supplyInQueue = (14 * 2) + (13);
-	pylonsInQueue = 5;
+	supplyInQueue = 0;// (14 * 2) + (13);
+	pylonsInQueue = 0;// 5;
 
 	//This is commented out for testing purposes
 	//fixedOrder = false;
@@ -132,7 +138,7 @@ bool BuildOrderManager::buildGateway(){
 
 bool BuildOrderManager::buildSupply(){
 	static int lastChecked = 0;
-	UnitType pylon = UnitTypes::Protoss_Pylon;
+	BWAPI::UnitType pylon = UnitTypes::Protoss_Pylon;
 	if (pylonsInQueue * 8 + Broodwar->self()->supplyTotal() / 2
 		+ Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
 		<= Broodwar->self()->supplyUsed() + supplyInQueue) {
@@ -147,7 +153,7 @@ bool BuildOrderManager::buildSupply(){
 }
 
 bool BuildOrderManager::buildForge(){
-	UnitType forge = UnitTypes::Protoss_Forge;
+	BWAPI::UnitType forge = UnitTypes::Protoss_Forge;
 	static int lastChecked = 0;
 
 	bool forgeInQueue = false;
@@ -174,7 +180,7 @@ bool BuildOrderManager::buildForge(){
 
 bool BuildOrderManager::buildRefinery(){
 	static int lastChecked = 0;
-	UnitType refineryType = UnitTypes::Protoss_Assimilator;
+	BWAPI::UnitType refineryType = UnitTypes::Protoss_Assimilator;
 	if (Broodwar->self()->allUnitCount(refineryType) == 0
 		&& (Broodwar->self()->supplyUsed() / 2) > 12
 		&& lastChecked + 400 < Broodwar->getFrameCount()){
@@ -322,7 +328,7 @@ void BuildOrderManager::trainProbe(){
 }
 
 void BuildOrderManager::makeScout(){
-	UnitType pylon = UnitTypes::Protoss_Pylon;
+	BWAPI::UnitType pylon = UnitTypes::Protoss_Pylon;
 	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty()
 		&& ScoutManager::getInstance().getInactiveScouts().empty()
 		&& Broodwar->self()->completedUnitCount(pylon) + Broodwar->self()->incompleteUnitCount(pylon) == 1){

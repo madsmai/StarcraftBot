@@ -4,6 +4,7 @@
 #include "ProbeManager.h"
 #include "BuildingManager.h"
 #include "OffenseManager.h"
+#include "BuildOrderType.h"
 #include <queue>
 
 class BuildOrderManager
@@ -18,6 +19,8 @@ public:
 
 	bool &getFixedOrder() { return fixedOrder; }
 	std::vector<BWAPI::UnitType>  &getFixedOrderQueue() { return fixedOrderQueue; }
+	std::vector<BuildOrderType>  &getNewFixedOrderQueue() { return newFixedOrderQueue; }
+
 
 private:
 	BuildOrderManager() {};
@@ -42,5 +45,6 @@ private:
 	int pylonsInQueue;
 
 	std::vector<BWAPI::UnitType> fixedOrderQueue;
+	std::vector<BuildOrderType> newFixedOrderQueue;
 };
 
