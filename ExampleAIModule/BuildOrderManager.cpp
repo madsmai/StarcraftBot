@@ -13,73 +13,87 @@ void BuildOrderManager::onStart(){
 	BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
 	BWAPI::UnitType zealot = BWAPI::UnitTypes::Protoss_Zealot;
 	BWAPI::UnitType forge = BWAPI::UnitTypes::Protoss_Forge;
+	int scoutRequest = requests::scoutRequest;
+	int gasworkerRequest = requests::gasworkerRequest;
 
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(scoutRequest));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(gateway));
+	newFixedOrderQueue.push_back(BuildOrderType(gateway));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(gateway));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(pylon));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
+	newFixedOrderQueue.push_back(BuildOrderType(zealot));
 
-	//fixedOrderQueue.push_back(pylon); for testing
-	/*fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(gateway);
-	fixedOrderQueue.push_back(gateway);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(gateway);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(pylon);
-	fixedOrderQueue.push_back(probe);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);
-	fixedOrderQueue.push_back(zealot);*/
 
 
-	supplyInQueue = 0;// (14 * 2) + (13);
-	pylonsInQueue = 0;// 5;
+	supplyInQueue = (14 * 2) + (13);
+	pylonsInQueue = 5;
 
 	//This is commented out for testing purposes
 	//fixedOrder = false;
 }
 
 void BuildOrderManager::onFrame(){
-
-
-	if (pylonsInQueue * 8 + BWAPI::Broodwar->self()->supplyTotal() / 2 - 4
-		<= BWAPI::Broodwar->self()->supplyUsed() + supplyInQueue){
-
-		fixedOrderQueue.push_back(BWAPI::UnitTypes::Protoss_Pylon);
-		pylonsInQueue++;
-
-	}
-
+	researchForge();
+	researchCyberneticsCore();
 
 	if (!fixedOrder){ //FixedOrder might not be needed, since everyhting is enqueued in onStart()
 		trainZealot();
 		trainProbe();
+
+		if (pylonsInQueue * 8 + BWAPI::Broodwar->self()->supplyTotal() / 2 - 4
+			<= BWAPI::Broodwar->self()->supplyUsed() + supplyInQueue){
+
+			newFixedOrderQueue.push_back(BWAPI::UnitTypes::Protoss_Pylon);
+			pylonsInQueue++;
+
+		}
 
 		//Make sure we only build one building per frame
 		//This might fuck shit up; it might only build Gateways since those are first; as long as the logic allows it
@@ -105,11 +119,6 @@ void BuildOrderManager::onFrame(){
 			return;
 		}
 	}
-
-	//Research and scouts has to have their own logic since it can't be in the queue
-	researchForge();
-	researchCyberneticsCore();
-	makeScout();
 }
 
 bool BuildOrderManager::buildGateway(){
@@ -117,10 +126,12 @@ bool BuildOrderManager::buildGateway(){
 	BWAPI::UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
 
 	int gatewaysInQueue = 0;
-	for (BWAPI::UnitType type : fixedOrderQueue){
-		if (type == gateway){
-			gatewaysInQueue++;
+	for (BuildOrderType type : newFixedOrderQueue){
+		if (type.isUnit()){
+			if (type.getUnitType() == gateway){
+				gatewaysInQueue++;
 
+			}
 		}
 	}
 
@@ -129,7 +140,7 @@ bool BuildOrderManager::buildGateway(){
 		+ Broodwar->self()->incompleteUnitCount(gateway) + gatewaysInQueue < 3){
 
 		lastChecked = Broodwar->getFrameCount();
-		fixedOrderQueue.push_back(gateway);
+		newFixedOrderQueue.push_back(gateway);
 		Broodwar << "Added gateway to build queue" << std::endl;
 		return true;
 	}
@@ -145,7 +156,7 @@ bool BuildOrderManager::buildSupply(){
 
 		lastChecked = Broodwar->getFrameCount();
 		Broodwar << "Added pylon to build queue" << std::endl;
-		fixedOrderQueue.push_back(pylon);
+		newFixedOrderQueue.push_back(pylon);
 		pylonsInQueue++;
 		return true;
 	}
@@ -157,10 +168,11 @@ bool BuildOrderManager::buildForge(){
 	static int lastChecked = 0;
 
 	bool forgeInQueue = false;
-	for (BWAPI::UnitType type : fixedOrderQueue){
-		if (type == forge){
-			forgeInQueue = true;
-
+	for (BuildOrderType type : newFixedOrderQueue){
+		if (type.isUnit()){
+			if (type.getUnitType() == forge){
+				forgeInQueue = true;
+			}
 		}
 	}
 
@@ -171,7 +183,7 @@ bool BuildOrderManager::buildForge(){
 
 		lastChecked = Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(forge);
-		fixedOrderQueue.push_back(forge);
+		newFixedOrderQueue.push_back(forge);
 		Broodwar << "Added forge to build queue" << std::endl;
 		return true;
 	}
@@ -187,7 +199,7 @@ bool BuildOrderManager::buildRefinery(){
 
 		lastChecked = Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(refineryType);
-		fixedOrderQueue.push_back(refineryType);
+		newFixedOrderQueue.push_back(refineryType);
 		return true;
 	}
 	return false;
@@ -203,7 +215,7 @@ bool BuildOrderManager::buildCitadelOfAdun(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(citadel_Of_Adun);
-		fixedOrderQueue.push_back(citadel_Of_Adun);
+		newFixedOrderQueue.push_back(citadel_Of_Adun);
 		return true;
 	}
 	return false;
@@ -225,7 +237,7 @@ bool BuildOrderManager::buildCyberneticsCore(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(cybernetics_Core);
-		fixedOrderQueue.push_back(cybernetics_Core);
+		newFixedOrderQueue.push_back(cybernetics_Core);
 		return true;
 	}
 	return false;
@@ -241,7 +253,7 @@ bool BuildOrderManager::buildPhotonCannon(){
 
 		lastChecked = BWAPI::Broodwar->getFrameCount();
 		//ProbeManager::getInstance().addBuilding(photon_cannon);
-		fixedOrderQueue.push_back(photon_cannon);
+		newFixedOrderQueue.push_back(photon_cannon);
 		return true;
 	}
 	return false;
@@ -309,7 +321,7 @@ void BuildOrderManager::trainZealot(){
 		&& BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Gateway) >= 1){
 
 		//BuildingManager::getInstance().addUnit(zealot);
-		fixedOrderQueue.push_back(zealot);
+		newFixedOrderQueue.push_back(zealot);
 
 		supplyInQueueExecuted(zealot.supplyRequired() / 2);
 	}
@@ -321,20 +333,20 @@ void BuildOrderManager::trainProbe(){
 	int gatewayCount = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Protoss_Gateway);
 	if (workerCount < 25 && (!(workerCount >= 10 && gatewayCount == 0) || !(workerCount >= 12 && gatewayCount == 1))){
 		//BuildingManager::getInstance().addUnit(probe);
-		fixedOrderQueue.push_back(probe);
+		newFixedOrderQueue.push_back(probe);
 
 		supplyInQueueExecuted(probe.supplyRequired() / 2);
 	}
 }
 
-void BuildOrderManager::makeScout(){
-	BWAPI::UnitType pylon = UnitTypes::Protoss_Pylon;
-	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty()
-		&& ScoutManager::getInstance().getInactiveScouts().empty()
-		&& Broodwar->self()->completedUnitCount(pylon) + Broodwar->self()->incompleteUnitCount(pylon) == 1){
-		ProbeManager::getInstance().addScoutRequest();
-	}
-}
+//void BuildOrderManager::makeScout(){
+//	BWAPI::UnitType pylon = UnitTypes::Protoss_Pylon;
+//	if (Broodwar->self()->supplyTotal() < 19 && ScoutManager::getInstance().getActiveScouts().empty()
+//		&& ScoutManager::getInstance().getInactiveScouts().empty()
+//		&& Broodwar->self()->completedUnitCount(pylon) + Broodwar->self()->incompleteUnitCount(pylon) == 1){
+//		ProbeManager::getInstance().addScoutRequest();
+//	}
+//}
 
 BuildOrderManager& BuildOrderManager::getInstance(){ //Return ref to BuildOrderManager object
 	static BuildOrderManager i; //Make static instance i

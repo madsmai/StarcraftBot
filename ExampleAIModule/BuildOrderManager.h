@@ -18,7 +18,6 @@ public:
 	void pylonInQueueExecuted() { pylonsInQueue--; }
 
 	bool &getFixedOrder() { return fixedOrder; }
-	std::vector<BWAPI::UnitType>  &getFixedOrderQueue() { return fixedOrderQueue; }
 	std::vector<BuildOrderType>  &getNewFixedOrderQueue() { return newFixedOrderQueue; }
 
 
@@ -38,13 +37,12 @@ private:
 	void researchCyberneticsCore();
 	void trainZealot();
 	void trainProbe();
-	void makeScout();
+//	void makeScout();
 
 	bool fixedOrder = false;
 	int supplyInQueue;
 	int pylonsInQueue;
 
-	std::vector<BWAPI::UnitType> fixedOrderQueue;
 	std::vector<BuildOrderType> newFixedOrderQueue;
 };
 

@@ -9,6 +9,7 @@ void ProbeManager::onFrame(){
 	//Construct the next building in the queue
 	std::vector<BuildOrderType>& queue = BuildOrderManager::getInstance().getNewFixedOrderQueue();
 	if (!queue.empty()){
+		//Do things with the next unit in the buildOrder
 		if (queue.front().isUnit()){
 			BWAPI::UnitType type = queue.front().getUnitType(); //Find building type
 			if (type.isBuilding()){
@@ -38,30 +39,31 @@ void ProbeManager::onFrame(){
 				}
 			}
 		}
-	}
-
-	//Make a scout
-	if (scoutRequests != 0 && builder != NULL){
-		ScoutManager::getInstance().addScout(builder);
-		mineralProbes.erase(mineralProbes.begin());
-		builder = NULL;
-		scoutRequests--;
-	}
-
-	//Make a gas worker
-	if (!gasWorkerRequests == 0){
-		std::vector<BWAPI::Unit>::iterator it;
-		for (it = mineralProbes.begin(); it != mineralProbes.end(); ){
-			BWAPI::Unit unit = *it;
-
-			if (unit->isGatheringMinerals()){
-				mineralProbes.erase(it); //Remove probe from list by number in array
-				gasWorkerRequests--; //Remove a  gasWorkerRequest
-				gasProbes.push_back(unit); //Add unit to gasWorkerList
-				break;
+		//Do things with the next request in the buildOrder
+		if (queue.front().isRequest()){
+			int request = queue.front().getRequestType();
+			//Make a scout
+			if (request == requests::scoutRequest && builder != NULL){
+				ScoutManager::getInstance().addScout(builder);
+				mineralProbes.erase(mineralProbes.begin());
+				queue.erase(queue.begin()); //Remove the request from the queue
+				builder = NULL;
 			}
-			else {
-				it++;
+			//Make a gasworker
+			else if (request == requests::gasworkerRequest){
+				std::vector<BWAPI::Unit>::iterator it;
+				for (it = mineralProbes.begin(); it != mineralProbes.end();){
+					BWAPI::Unit unit = *it;
+					if (unit->isGatheringMinerals()){
+						mineralProbes.erase(it); //Remove probe from list by number in array
+						gasProbes.push_back(unit); //Add unit to gasWorkerList
+						queue.erase(queue.begin()); //Remove the request from the queue
+						break;
+					}
+					else {
+						it++;
+					}
+				}
 			}
 		}
 	}
@@ -146,14 +148,3 @@ ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
 }
-
-//Add scoutRequest
-void ProbeManager::addScoutRequest(){
-	scoutRequests++;
-}
-
-//Add gasWorkerRequest
-void ProbeManager::addGasWorkerRequest(){
-	gasWorkerRequests++;
-}
-
