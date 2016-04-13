@@ -3,14 +3,14 @@
 
 BuildOrderType::BuildOrderType(int request){
 	type = types::MetaRequestType;
-	if (request == 0){
+	if (request == requests::scoutRequest){
 		requestType = requests::scoutRequest;
 	}
-	else if (request == 1){
+	else if (request == requests::gasworkerRequest){
 		requestType = requests::gasworkerRequest;
 	}
 	else {
-		BWAPI::Broodwar << "No such request";
+		BWAPI::Broodwar << "Error. No such request";
 	}
 }
 

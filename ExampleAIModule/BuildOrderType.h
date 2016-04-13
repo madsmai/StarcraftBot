@@ -24,9 +24,9 @@ public:
 private:
 	enum types { MetaUnitType, MetaUpgradeType, MetaRequestType };
 
-	int type;
+	int type = -1;
 
-	int requestType;
+	int requestType = -1;
 	BWAPI::UnitType unitType;
 	BWAPI::UpgradeType upgradeType;
 
