@@ -48,10 +48,11 @@ void ProbeManager::onFrame(){
 		if (queue.front().isRequest()){
 			int request = queue.front().getRequestType();
 			//Make a scout
-			if (request == requests::scoutRequest && builder != NULL){
-				ScoutManager::getInstance().addScout(builder);
+			if (request == requests::scoutRequest){
+				ScoutManager::getInstance().addScout(mineralProbes.front());
 				mineralProbes.erase(mineralProbes.begin());
 				queue.erase(queue.begin()); //Remove the request from the queue
+				Broodwar << "Removed a scout request";
 				builder = NULL;
 			}
 			//Make a gasworker
@@ -63,6 +64,7 @@ void ProbeManager::onFrame(){
 						mineralProbes.erase(it); //Remove probe from list by number in array
 						gasProbes.push_back(unit); //Add unit to gasWorkerList
 						queue.erase(queue.begin()); //Remove the request from the queue
+						Broodwar << "Removed a gasworker request";
 						if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsRefinery))){
 							BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 						}
@@ -89,6 +91,8 @@ void ProbeManager::onFrame(){
 			}
 		}
 	}
+
+	//Make an idle builder do stuff
 	if (builder != NULL && builder->isIdle()) {
 		if (!builder->gather(builder->getClosestUnit(BWAPI::Filter::IsMineralField))) {
 			BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
@@ -98,12 +102,11 @@ void ProbeManager::onFrame(){
 	//Make idle gasWorkers do stuff
 	for (it = gasProbes.begin(); it != gasProbes.end(); it++){
 		BWAPI::Unit u = *it;
-		if (u->exists() && u->isIdle() && u->getPlayer() == BWAPI::Broodwar->self()){
+		if (u->exists() && (u->isIdle() || u->isGatheringMinerals()) && u->getPlayer() == BWAPI::Broodwar->self()){
 			if (u->isCarryingGas() || u->isCarryingMinerals()) {
 				u->returnCargo();
 			}
-
-			if (!u->gather(u->getClosestUnit(BWAPI::Filter::IsRefinery))){
+			else if (!u->gather(u->getClosestUnit(BWAPI::Filter::IsRefinery))){
 				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
 			}
 		}

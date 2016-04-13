@@ -29,25 +29,24 @@ void BuildingManager::onFrame(){
 				}
 			}
 		}
-	}
+		//Reasearch to the next upgrade in the queue
+		if (queue.front().isUpgrade()){
+			BWAPI::UpgradeType type = queue.front().getUpgradeType();
+			int minPrice = type.mineralPrice(); //Price of unit
+			int gasPrice = type.gasPrice(); //Price of unit
 
-	//Reasearch to the next upgrade in the queue
-	if (!pendingUpgrades.empty()){
-		BWAPI::UpgradeType type = pendingUpgrades.front();
-		int minPrice = type.mineralPrice(); //Price of unit
-		int gasPrice = type.gasPrice(); //Price of unit
+			std::vector<BWAPI::Unit>::iterator it;
+			for (it = buildings.begin(); it != buildings.end(); it++){
+				BWAPI::Unit unit = *it;
+				if (unit->isCompleted()
+					&& unit->canUpgrade(type)
+					&& unit->isIdle()
+					&& BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
+					&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
 
-		std::vector<BWAPI::Unit>::iterator it;
-		for (it = buildings.begin(); it != buildings.end(); it++){
-			BWAPI::Unit unit = *it;
-			if (unit->isCompleted()
-				&& unit->canUpgrade(type) 
-				&& unit->isIdle() 
-				&& BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice 
-				&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
-
-				unit->upgrade(type);
-				pendingUpgrades.pop();
+					unit->upgrade(type);
+					queue.erase(queue.begin());
+				}
 			}
 		}
 	}
@@ -74,10 +73,6 @@ void BuildingManager::onUnitComplete(BWAPI::Unit unit){
 	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
 		buildings.push_back(unit);
 	}
-}
-
-void BuildingManager::addUpgrade(BWAPI::UpgradeType type){
-	pendingUpgrades.push(type);
 }
 
 BuildingManager& BuildingManager::getInstance(){ //Return ref to BuildingManager object
