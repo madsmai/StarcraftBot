@@ -48,7 +48,7 @@ void ProbeManager::onFrame(){
 		if (queue.front().isRequest()){
 			int request = queue.front().getRequestType();
 			//Make a scout
-			if (request == requests::scoutRequest
+			if (request == BuildOrderType::scoutRequest
 				&& !builder->isConstructing()){
 				ScoutManager::getInstance().addScout(mineralProbes.front());
 				mineralProbes.erase(mineralProbes.begin());
@@ -57,7 +57,7 @@ void ProbeManager::onFrame(){
 				builder = NULL;
 			}
 			//Make a gasworker
-			else if (request == requests::gasworkerRequest){
+			else if (request == BuildOrderType::gasworkerRequest){
 				std::vector<BWAPI::Unit>::iterator it;
 				for (it = mineralProbes.begin(); it != mineralProbes.end();){
 					BWAPI::Unit unit = *it;

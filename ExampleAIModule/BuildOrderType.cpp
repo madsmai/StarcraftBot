@@ -3,7 +3,7 @@
 
 BuildOrderType::BuildOrderType(int request){
 	type = types::MetaRequestType;
-	if (request == requests::scoutRequest){
+	if (request == BuildOrderType::scoutRequest){
 		requestType = requests::scoutRequest;
 	}
 	else if (request == requests::gasworkerRequest){
