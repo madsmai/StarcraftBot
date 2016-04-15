@@ -47,32 +47,25 @@ void ProbeManager::onFrame(){
 		//Do things with the next request in the buildOrder
 		if (queue.front().isRequest()){
 			int request = queue.front().getRequestType();
-			//Make a scout
-			if (request == requests::scoutRequest){
-				ScoutManager::getInstance().addScout(mineralProbes.front());
-				mineralProbes.erase(mineralProbes.begin());
-				queue.erase(queue.begin()); //Remove the request from the queue
-				Broodwar << "Removed a scout request";
-				builder = NULL;
-			}
-			//Make a gasworker
-			else if (request == requests::gasworkerRequest){
-				std::vector<BWAPI::Unit>::iterator it;
-				for (it = mineralProbes.begin(); it != mineralProbes.end();){
-					BWAPI::Unit unit = *it;
-					if (unit->isGatheringMinerals()){
-						mineralProbes.erase(it); //Remove probe from list by number in array
+			std::vector<BWAPI::Unit>::iterator it;
+			for (it = mineralProbes.begin()++; it != mineralProbes.end();){ //Maybe remove the '++'
+				BWAPI::Unit unit = *it;
+				if (unit->isGatheringMinerals() && unit != builder && !unit->isConstructing()){ //If this unit isnt building anything
+					if (request == BuildOrderType::requests::scoutRequest){
+						ScoutManager::getInstance().addScout(mineralProbes.front());
+					}
+					else if (request == BuildOrderType::requests::gasworkerRequest){
 						gasProbes.push_back(unit); //Add unit to gasWorkerList
-						queue.erase(queue.begin()); //Remove the request from the queue
-						Broodwar << "Removed a gasworker request";
-						if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsRefinery))){
-							BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
+						if (Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Assimilator) > 0){
+							unit->gather(unit->getClosestUnit(BWAPI::Filter::IsRefinery));
 						}
-						break;
 					}
-					else {
-						it++;
-					}
+					mineralProbes.erase(it); //Remove probe from list by number in array
+					queue.erase(queue.begin()); //Remove the request from the queue
+					break;
+				}
+				else {
+					it++;
 				}
 			}
 		}
@@ -102,13 +95,16 @@ void ProbeManager::onFrame(){
 	//Make idle gasWorkers do stuff
 	for (it = gasProbes.begin(); it != gasProbes.end(); it++){
 		BWAPI::Unit u = *it;
-		if (u->exists() && (u->isIdle() || u->isGatheringMinerals()) && u->getPlayer() == BWAPI::Broodwar->self()){
-			if (u->isCarryingGas() || u->isCarryingMinerals()) {
+		if ((u->isIdle() || u->isGatheringMinerals()) && u->exists() && u->getPlayer() == BWAPI::Broodwar->self()){
+
+			u->gather(u->getClosestUnit(BWAPI::Filter::IsRefinery));
+
+			/*if (u->isCarryingGas() || u->isCarryingMinerals()) {
 				u->returnCargo();
 			}
 			else if (!u->gather(u->getClosestUnit(BWAPI::Filter::IsRefinery))){
 				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
-			}
+			}*/
 		}
 	}
 }

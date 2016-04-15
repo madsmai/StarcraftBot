@@ -6,6 +6,7 @@
 #include "OffenseManager.h"
 #include "BuildOrderType.h"
 #include <queue>
+#include "Strategy.h"
 
 using namespace BWAPI;
 class BuildOrderManager
