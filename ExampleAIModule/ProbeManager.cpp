@@ -48,7 +48,8 @@ void ProbeManager::onFrame(){
 		if (queue.front().isRequest()){
 			int request = queue.front().getRequestType();
 			//Make a scout
-			if (request == requests::scoutRequest){
+			if (request == requests::scoutRequest
+				&& !builder->isConstructing()){
 				ScoutManager::getInstance().addScout(mineralProbes.front());
 				mineralProbes.erase(mineralProbes.begin());
 				queue.erase(queue.begin()); //Remove the request from the queue
