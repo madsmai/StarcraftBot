@@ -103,6 +103,7 @@
     <ClCompile Include="ScoutManager.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\GameManager.cpp" />
+    <ClCompile Include="Strategy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildingManager.h" />
@@ -114,6 +115,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ScoutManager.h" />
     <ClInclude Include="Source\GameManager.h" />
+    <ClInclude Include="Strategy.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODOs.txt" />

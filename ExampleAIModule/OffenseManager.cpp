@@ -322,15 +322,22 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	Broodwar << "Calculating priority" << std::endl;
 
 	int effectiveHp = enemy->getHitPoints() + enemy->getShields();
-	int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())); //* ourUnit->getType().maxGroundHits();
+
+	int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
 	//Integer division round up, hopefully
 	int hitsToKill = effectiveHp + (ourDamage - 1) / ourDamage;
 
-	int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())); //* enemy->getType().maxGroundHits();
+	int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
 
 	int priority = damage / hitsToKill;
 
-	Broodwar << "Priority of " << enemy->getType() << "is: " << priority << std::endl;
+
+	Broodwar << "Effectivehp of " << enemy->getType() << " is: " << effectiveHp << std::endl;
+	Broodwar << "ourDamage of " << ourUnit->getType() << " is: " << ourDamage << std::endl;
+	Broodwar << "hitsToKill of " << enemy->getType() << " is: " << hitsToKill << std::endl;
+	Broodwar << "damage of " << enemy->getType() << " is: " << damage << std::endl;
+	Broodwar << "Priority of " << enemy->getType() << " is: " << priority << std::endl;
+
 	return priority;
 }

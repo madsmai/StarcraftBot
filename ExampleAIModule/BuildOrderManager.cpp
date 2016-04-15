@@ -2,6 +2,14 @@
 using namespace BWAPI;
 
 void BuildOrderManager::onStart(){
+
+	//Just copy a strategy chosen from an enumerator of strategies
+
+	if (true){ //Insert logic for choosing this strategy over another here
+		newFixedOrderQueue = Strategy(Strategy::strategies::justSomeStrategy).getStrategyQueue();
+	}
+
+	/*
 	UnitType probe = BWAPI::UnitTypes::Protoss_Probe;
 	UnitType pylon = BWAPI::UnitTypes::Protoss_Pylon;
 	UnitType gateway = BWAPI::UnitTypes::Protoss_Gateway;
@@ -15,9 +23,8 @@ void BuildOrderManager::onStart(){
 	UnitType dtemplar = BWAPI::UnitTypes::Protoss_Dark_Templar;
 	UnitType cannon = BWAPI::UnitTypes::Protoss_Photon_Cannon;
 
-
-	int scoutRequest = requests::scoutRequest;
-	int gasworkerRequest = requests::gasworkerRequest;
+	int scoutRequest = BuildOrderType::requests::scoutRequest;
+	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
 
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
@@ -82,8 +89,7 @@ void BuildOrderManager::onStart(){
 	newFixedOrderQueue.push_back(BuildOrderType(forge));
 	newFixedOrderQueue.push_back(BuildOrderType(cannon));
 	newFixedOrderQueue.push_back(BuildOrderType(cannon));
-	newFixedOrderQueue.push_back(BuildOrderType(cannon));
-
+	newFixedOrderQueue.push_back(BuildOrderType(cannon)); */
 }
 
 void BuildOrderManager::onFrame(){
