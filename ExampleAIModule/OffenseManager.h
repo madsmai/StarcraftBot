@@ -30,6 +30,7 @@ private:
 
 	std::vector<BWAPI::Unit> zealots;
 	BWAPI::Unitset fighters;
+	BWAPI::Unitset squad;
 
 	//Upgrades
 	int ground_weapons_count = 0;

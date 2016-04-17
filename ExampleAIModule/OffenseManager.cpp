@@ -7,7 +7,8 @@ TODO:
 - Sørg for at samle zealots sammen og angrib med dem sammen, det samlede antal skal varierer
 alt efter modstanderens forsvar
 - En måde at få zealots til at prioriterer hvad de angriber
-- Mangler BWTA
+-Bør search and destroy faktisk bruge et unitset, måske skal de blot bruge 1 unit
+
 */
 
 
@@ -17,33 +18,15 @@ void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 			fighters.erase(fighters.find(unit));
 		}
 	}
-
 }
 
 void OffenseManager::onUnitComplete(BWAPI::Unit unit){
-	//if (unit->getType() == BWAPI::UnitTypes::Protoss_Zealot && unit->getPlayer() == BWAPI::Broodwar->self()){
-	//	zealots.push_back(unit);
-	//}
-
 	if (unit->canAttack() && unit->canMove() && !unit->getType().isWorker()) {
 		fighters.insert(unit);
 	}
-
-
 }
 
 void OffenseManager::onFrame(){
-	//Loop through zealots
-	//std::vector<BWAPI::Unit>::iterator it;
-	//for (it = zealots.begin(); it != zealots.end(); it++){
-	//	BWAPI::Unit unit = *it;
-	//	if (unit->isIdle()){
-	//		unit->attack(unit->getClosestUnit((BWAPI::Filter::IsEnemy && BWAPI::Filter::CanAttack), 50));
-	//	}
-	//	if (unit->getType() == BWAPI::UnitTypes::Protoss_Zealot && unit->isUnderAttack()) {
-	//		unit->attack(unit->getClosestUnit((BWAPI::Filter::IsEnemy && BWAPI::Filter::CanAttack), 4));
-	//	}
-	//}
 
 	BWAPI::Unitset::iterator it;
 	static int lastChecked = 0;
@@ -54,9 +37,16 @@ void OffenseManager::onFrame(){
 		}
 		else if (InformationManager::getInstance().enemyBase == BWTA::getNearestBaseLocation(unit->getPosition())
 			&& unit->isIdle()
-			&& lastChecked + 75 < BWAPI::Broodwar->getFrameCount()) {
-			searchAndDestroy(fighters);
-			lastChecked = Broodwar->getFrameCount();
+			/*&& lastChecked + 75 < BWAPI::Broodwar->getFrameCount()*/) {
+
+			//BWAPI::Unit squadMate = unit->getClosestUnit(Filter::GetType == unit->getType() && Filter::IsAlly);
+			//if (squad.find(squadMate) != squad.end()) {
+			//	squad.insert(squadMate);
+			//}
+			squad = unit->getUnitsInRadius(128, Filter::GetType == unit->getType() && Filter::IsAlly && !Filter::IsAttacking && !Filter::IsStartingAttack);
+				
+			searchAndDestroy(squad);
+			//lastChecked = Broodwar->getFrameCount();
 		}
 	}
 
@@ -64,14 +54,6 @@ void OffenseManager::onFrame(){
 		rush(fighters);
 		//armySize += armySize;
 	}
-
-
-	/*if (BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::Protoss_Zealot) >= zealotMax){
-		for (BWAPI::Unit zealot : zealots){
-		zealot->attack(enemyBase->getPosition());
-		}
-		zealotMax = zealotMax * 2;
-		}*/
 }
 
 OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager object
@@ -104,8 +86,11 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 	if (attackedUnit != NULL) {
 		BWAPI::Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding);
+		BWAPI::Unitset nearbyEnemies = attackedUnit->getUnitsInRadius(128, Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding && Filter::IsVisible);
 		if (attacker != NULL) {
 			calculatePriority(attacker, attackedUnit);
+			Broodwar << "Nearby Enemies size = " << nearbyEnemies.size() << std::endl;
+			Broodwar << "Range of " << attacker->getType() << " is " << attacker->getType().groundWeapon().maxRange() << std::endl;
 			if (attackedUnit->isAttacking()) {
 				attackedUnit->attack(attacker);
 			}
@@ -113,7 +98,6 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 			return true;
 		}
 		else {
-			Broodwar << "Failed to fightback, attacker was null" << std::endl;
 			return false;
 		}
 	}
@@ -171,7 +155,8 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		for (it = InformationManager::getInstance().enemyWorkers.begin(); it != InformationManager::getInstance().enemyWorkers.end();) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
-				attackers.attack(unit);
+				attackers.move(unit->getPosition());
+				attackers.attack(unit,true);
 				InformationManager::getInstance().removeEnemyWorkers(unit);
 				InformationManager::getInstance().enemyWorkers.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyWorkers" << std::endl;
@@ -188,7 +173,8 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		for (it = InformationManager::getInstance().enemyBarracks.begin(); it != InformationManager::getInstance().enemyBarracks.end();) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
-				attackers.attack(unit);
+				attackers.move(unit->getPosition());
+				attackers.attack(unit,true);
 				InformationManager::getInstance().removeEnemyBarracks(unit);
 				InformationManager::getInstance().enemyBarracks.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyBarracks" << std::endl;
@@ -205,7 +191,8 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 		for (it = InformationManager::getInstance().enemyPassiveBuildings.begin(); it != InformationManager::getInstance().enemyPassiveBuildings.end();) {
 			Unit unit = *it;
 			if (!avoidTowers(unit)) {
-				attackers.attack(unit);
+				attackers.move(unit->getPosition());
+				attackers.attack(unit,true);
 				InformationManager::getInstance().removeEnemyPassiveBuildings(unit);
 				InformationManager::getInstance().enemyPassiveBuildings.push_back(unit);
 				Broodwar << "Search and destroy targetting enemyPassiveBuildings" << std::endl;
@@ -247,7 +234,8 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 	}
 	else if (!InformationManager::getInstance().enemyTowers.empty()) {
 		Broodwar << "enemyTowers was not empty" << std::endl;
-		attackers.attack(InformationManager::getInstance().enemyTowers.front());
+		attackers.move(InformationManager::getInstance().enemyTowers.front()->getPosition());
+		attackers.attack(InformationManager::getInstance().enemyTowers.front(),true);
 		InformationManager::getInstance().enemyTowers.push_back(InformationManager::getInstance().enemyTowers.front());
 		InformationManager::getInstance().removeEnemyTowers(*InformationManager::getInstance().enemyTowers.begin());
 		Broodwar << "Search and destroy targetting towers" << std::endl;
@@ -261,7 +249,6 @@ void OffenseManager::searchAndDestroy(BWAPI::Unitset attackers) {
 
 
 bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
-	Broodwar << "Starting avoidTowers" << std::endl;
 	bool underTower = false;
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -330,7 +317,7 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
 	//Integer division round up, hopefully
-	int hitsToKill = effectiveHp + (ourDamage - 1) / ourDamage;
+	int hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
 
 	int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
 
