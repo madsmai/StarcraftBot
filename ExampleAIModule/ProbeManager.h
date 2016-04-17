@@ -28,7 +28,10 @@ private:
 	std::vector<BWAPI::Unit> mineralProbes;
 	std::vector<BWAPI::Unit> gasProbes;
 
-	BWAPI::Unit builder;
+	// auxialliary functions
+	void executeQueue();
+
+	Unit builder;
 
 	//Con- and destructor aren't needed since class is used as static
 	ProbeManager(){};

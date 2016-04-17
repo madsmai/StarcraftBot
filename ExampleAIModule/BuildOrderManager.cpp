@@ -6,7 +6,10 @@ void BuildOrderManager::onStart(){
 	//Just copy a strategy chosen from an enumerator of strategies
 
 	if (true){ //Insert logic for choosing this strategy over another here
-		newFixedOrderQueue = Strategy(Strategy::strategies::justSomeStrategy).getStrategyQueue();
+		
+		//newFixedOrderQueue = Strategy(Strategy::strategies::justSomeStrategy).getStrategyQueue();
+
+		newFixedOrderQueue = Strategy(Strategy::strategies::standardZealotRush).getStrategyQueue();
 	}
 
 	/*
@@ -104,7 +107,7 @@ bool BuildOrderManager::buildGateway(){
 	for (BuildOrderType type : newFixedOrderQueue){
 		if (type.isUnit()){
 			if (type.getUnitType() == gateway){
-			gatewaysInQueue++;
+				gatewaysInQueue++;
 			}
 		}
 	}
@@ -145,7 +148,7 @@ bool BuildOrderManager::buildForge(){
 	for (BuildOrderType type : newFixedOrderQueue){
 		if (type.isUnit()){
 			if (type.getUnitType() == forge){
-			forgeInQueue = true;
+				forgeInQueue = true;
 			}
 		}
 	}

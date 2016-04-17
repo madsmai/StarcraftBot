@@ -1,16 +1,27 @@
 #include "Strategy.h"
 
 Strategy::Strategy(int strategy){
-	if (strategy == strategies::justSomeStrategy){
+
+	switch (strategy) {
+
+	case strategies::justSomeStrategy:
 		theFirstStrat();
 		name = "justSomeStrategy";
 		starter = true;
+		break;
+
+	case strategies::standardZealotRush:
+		initialStrat();
+		name = "Standard Zealot Rush 10/12";
+		starter = true;
+		break;
 	}
+
 }
 
 
 void Strategy::theFirstStrat(){
-	
+
 	strategyQueue.push_back(BuildOrderType(probe));
 	strategyQueue.push_back(BuildOrderType(probe));
 	strategyQueue.push_back(BuildOrderType(probe));
@@ -75,5 +86,61 @@ void Strategy::theFirstStrat(){
 	strategyQueue.push_back(BuildOrderType(cannon));
 	strategyQueue.push_back(BuildOrderType(cannon));
 	strategyQueue.push_back(BuildOrderType(cannon));
+
+}
+
+void Strategy::initialStrat(){
+
+	strategyQueue.push_back(BuildOrderType(probe));
+	strategyQueue.push_back(BuildOrderType(probe));
+	strategyQueue.push_back(BuildOrderType(probe));
+	strategyQueue.push_back(BuildOrderType(probe)); // 8. Pylon then scout
+	strategyQueue.push_back(BuildOrderType(pylon));
+	strategyQueue.push_back(BuildOrderType(scoutRequest));
+
+	strategyQueue.push_back(BuildOrderType(probe));
+	strategyQueue.push_back(BuildOrderType(probe)); // 10. Gateway
+	strategyQueue.push_back(BuildOrderType(gateway));
+
+	strategyQueue.push_back(BuildOrderType(probe));
+	strategyQueue.push_back(BuildOrderType(probe)); // 12. Gateway
+	strategyQueue.push_back(BuildOrderType(gateway));
+
+	strategyQueue.push_back(BuildOrderType(probe));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(probe)); // 16. Pylon
+	strategyQueue.push_back(BuildOrderType(pylon));
+
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot)); // First attack
+	// TODO: Set a new army size or smth
+
+
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(pylon));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+
+	strategyQueue.push_back(BuildOrderType(pylon));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+
+	strategyQueue.push_back(BuildOrderType(pylon));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+
+	strategyQueue.push_back(BuildOrderType(pylon));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+
+	strategyQueue.push_back(BuildOrderType(pylon));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
+	strategyQueue.push_back(BuildOrderType(zealot));
 
 }

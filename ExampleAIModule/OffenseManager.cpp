@@ -270,6 +270,7 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 			BWAPI::Unit tower = *it;
 			if (fighter->getPlayer() == Broodwar->self()) {
 				if (fighter->isFlying()) {
+
 					BWAPI::Unitset jeopardizedUnits = tower->getUnitsInWeaponRange(tower->getType().airWeapon(), Filter::IsAlly);
 					if (jeopardizedUnits.find(fighter) != jeopardizedUnits.end()) {
 						//Its jeopardized
@@ -317,6 +318,9 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 
 	return underTower;
 }
+
+
+
 int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 
 	Broodwar << "Calculating priority" << std::endl;

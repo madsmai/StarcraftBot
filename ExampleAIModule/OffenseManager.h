@@ -46,7 +46,6 @@ private:
 	bool avoidTowers(BWAPI::Unit);
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
 
-
 	OffenseManager(){};
 	~OffenseManager(){};
 };

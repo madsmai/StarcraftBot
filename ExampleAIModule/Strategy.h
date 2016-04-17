@@ -4,11 +4,10 @@
 
 using namespace BWAPI;
 
-class Strategy
-{
+class Strategy {
 public:
 
-	enum strategies { justSomeStrategy };
+	enum strategies { justSomeStrategy, standardZealotRush };
 
 	Strategy(int strategy);
 	std::string getName(){ return name; }
@@ -36,8 +35,10 @@ private:
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
 
-	//Just some template strategy
+	//Template strategies
 	void theFirstStrat();
+	void initialStrat();
+
 
 };
 
