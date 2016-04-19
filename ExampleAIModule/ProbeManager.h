@@ -20,29 +20,18 @@ public:
 	//Function for getting an instance
 	static ProbeManager& getInstance();
 
-	//Add scoutRequest
-	void addScoutRequest();
-
-	//Add gas worker
-	void addGasWorkerRequest();
-
 	//Add probe to the list of mineralProbes
 	void addMineralProbe(BWAPI::Unit probe);
-
-	//Add building to list
-	//void addBuilding(BWAPI::UnitType);
 
 private:
 	//The lists
 	std::vector<BWAPI::Unit> mineralProbes;
 	std::vector<BWAPI::Unit> gasProbes;
-	//std::queue<BWAPI::UnitType> pendingBuildings;
 
-	BWAPI::Unit builder;
+	// auxialliary functions
+	void executeQueue();
 
-	//Amount of scoutRequests
-	int scoutRequests = 0;
-	int gasWorkerRequests = 0;
+	Unit builder;
 
 	//Con- and destructor aren't needed since class is used as static
 	ProbeManager(){};

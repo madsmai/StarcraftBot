@@ -26,10 +26,14 @@ void GameManager::onStart(){
 
 	//Call on starts
 	BuildOrderManager::getInstance().onStart();
-	BWAPI::Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().size() << std::endl;
+	BWAPI::Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;
 }
 
 void GameManager::onEnd(bool isWinner){
+
+	if (isWinner){
+
+	}
 
 }
 
@@ -73,6 +77,12 @@ void GameManager::onUnitCreate(BWAPI::Unit unit){
 	ResourceManager::getInstance().onUnitCreate(unit);
 }
 
+void GameManager::onUnitMorph(Unit unit){
+	//Call onUnitMorph
+	ResourceManager::getInstance().onUnitMorph(unit);
+}
+
+
 void GameManager::onSendText(std::string text){
 	//Print out message
 	BWAPI::Broodwar->sendText(text.c_str());
@@ -80,10 +90,10 @@ void GameManager::onSendText(std::string text){
 		InformationManager::getInstance().currentStatus();
 	}
 	else if (text == "size"){
-		Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().size() << std::endl;
+		Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;
 	}
 	else if (text == "front"){
-		Broodwar << BuildOrderManager::getInstance().getFixedOrderQueue().front().getName() << std::endl;
+		Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().front().getName() << std::endl;
 	}
 	else if (text == "reserved"){
 		Broodwar << "reserved minerals: " << ResourceManager::getInstance().getReservedMinerals() << std::endl;

@@ -23,6 +23,10 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 		else if (unit->getType().canAttack() && unit->getType().canMove()){
 			addEnemyAttackers(unit);
 		}
+		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar ){
+			addDarkTemplar(unit);
+
+		}
 
 		else if (unit->getType() == UnitTypes::Protoss_Gateway || 
 			unit->getType() == UnitTypes::Zerg_Spawning_Pool || 
@@ -37,6 +41,14 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 
 		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
 			addEnemyPassiveBuildings(unit);
+		} 
+		
+		else if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
+			citadelOfAdun = true;
+		}
+
+		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives){
+			templarArchives = true;
 		}
 
 
@@ -55,6 +67,10 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeEnemyAttackers(unit);
 		}
 
+		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar){
+			removeDarkTemplar(unit);
+		}
+
 		else if (unit->getType() == UnitTypes::Protoss_Gateway ||
 			unit->getType() == UnitTypes::Zerg_Spawning_Pool ||
 			unit->getType() == UnitTypes::Terran_Barracks){
@@ -62,12 +78,19 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeEnemyBarracks(unit);
 		}
 
-		else if (unit->getType().isBuilding() && unit->getType().canAttack()){
-			removeEnemyTowers(unit);
-		}
-
-		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
-			removeEnemyPassiveBuildings(unit);
+		else if (unit->getType().isBuilding()){
+			if (unit->getType().canAttack()){
+				removeEnemyTowers(unit);
+			}
+			else if (!unit->getType().canAttack()){
+				removeEnemyPassiveBuildings(unit);
+			}
+			if (unit->getType().isResourceDepot()
+				&& unit->getTilePosition() == enemyBase->getTilePosition()){
+				
+				// rush succesful
+				OffenseManager::getInstance().rushFinished = true;
+			}
 		}
 
 
@@ -123,6 +146,24 @@ void InformationManager::addEnemyWorkers(BWAPI::Unit worker){
 	}
 	if (!exists) {
 		enemyWorkers.push_back(worker);
+	}
+
+}
+
+
+void InformationManager::addDarkTemplar(BWAPI::Unit darkTemplar){
+
+	bool exists = false;
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = darkTemplars.begin(); it != darkTemplars.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == darkTemplar->getID()){
+			exists = true;
+			break;
+		}
+	}
+	if (!exists) {
+		darkTemplars.push_back(darkTemplar);
 	}
 
 }
@@ -207,6 +248,22 @@ void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 
 }
 
+
+void InformationManager::removeDarkTemplar(BWAPI::Unit darkTemplar){
+
+	std::vector<BWAPI::Unit>::iterator it;
+	for (it = darkTemplars.begin(); it != darkTemplars.end();) {
+		BWAPI::Unit u = *it;
+		if (u->getID() == darkTemplar->getID()){
+			darkTemplars.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+
+}
+
 void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -242,6 +299,9 @@ void InformationManager::currentStatus(){
 		<< enemyBarracks.size() << "  enemy barrack(s) \n"
 		<< enemyWorkers.size() << "  enemy worker(s) \n"
 		<< enemyTowers.size() << "  enemy tower(s) \n"
+		" Any Citadel of Adun? " << citadelOfAdun << "\n"
+		" Any Templar Archives? " << templarArchives << "\n"
+		<< enemyTowers.size() << "  enemy dark templars(s) \n"
 		<< enemyPassiveBuildings.size() << "  passive enemy building(s) \n" <<  std::endl;
 
 }

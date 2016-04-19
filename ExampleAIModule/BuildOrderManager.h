@@ -4,8 +4,11 @@
 #include "ProbeManager.h"
 #include "BuildingManager.h"
 #include "OffenseManager.h"
+#include "BuildOrderType.h"
 #include <queue>
+#include "Strategy.h"
 
+using namespace BWAPI;
 class BuildOrderManager
 {
 public:
@@ -17,7 +20,8 @@ public:
 	void pylonInQueueExecuted() { pylonsInQueue--; }
 
 	bool &getFixedOrder() { return fixedOrder; }
-	std::vector<BWAPI::UnitType>  &getFixedOrderQueue() { return fixedOrderQueue; }
+	std::vector<BuildOrderType>  &getNewFixedOrderQueue() { return newFixedOrderQueue; }
+
 
 private:
 	BuildOrderManager() {};
@@ -35,12 +39,11 @@ private:
 	void researchCyberneticsCore();
 	void trainZealot();
 	void trainProbe();
-	void makeScout();
 
-	bool fixedOrder = false;
+	bool fixedOrder = true;
 	int supplyInQueue;
 	int pylonsInQueue;
 
-	std::vector<BWAPI::UnitType> fixedOrderQueue;
+	std::vector<BuildOrderType> newFixedOrderQueue;
 };
 

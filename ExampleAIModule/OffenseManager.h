@@ -21,6 +21,8 @@ public:
 	int &getAirArmor(){ return air_armor_count; }
 	bool &getSingularityCharge(){ return singularity_charge; }
 
+	bool rushFinished = false;
+
 private:
 	//Zealots
 	int zealotMax = 6;
@@ -28,6 +30,7 @@ private:
 
 	std::vector<BWAPI::Unit> zealots;
 	BWAPI::Unitset fighters;
+	BWAPI::Unitset squad;
 
 	//Upgrades
 	int ground_weapons_count = 0;
@@ -42,6 +45,7 @@ private:
 	bool getHelp(BWAPI::Unit, BWAPI::Unit);
 	void searchAndDestroy(BWAPI::Unitset);
 	bool avoidTowers(BWAPI::Unit);
+	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
 
 	OffenseManager(){};
 	~OffenseManager(){};
