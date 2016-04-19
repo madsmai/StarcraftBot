@@ -43,7 +43,7 @@ private:
 	bool rush(BWAPI::Unitset);
 	bool fightBack(BWAPI::Unit);
 	bool getHelp(BWAPI::Unit, BWAPI::Unit);
-	void searchAndDestroy(BWAPI::Unitset);
+	void searchAndDestroy(BWAPI::Unit);
 	bool avoidTowers(BWAPI::Unit);
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
 
