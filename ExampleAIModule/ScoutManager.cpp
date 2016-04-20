@@ -20,6 +20,8 @@ void ScoutManager::onFrame(){
 	}
 
 	if (!activeScouts.empty()){
+
+		Broodwar << InformationManager::getInstance().baseLocations.size() << std::endl;
 		for (BWAPI::Unit unit : activeScouts){
 			if (unit->isUnderAttack()) {
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
@@ -32,7 +34,28 @@ void ScoutManager::onFrame(){
 			}
 			else if (unit->isIdle()
 				&& BWTA::getNearestBaseLocation(unit->getPosition()) == InformationManager::getInstance().emptyMainBase){
-				goScout(unit);
+				Broodwar->sendText("Stuck in empty main base :'(");
+				//goScout(unit);
+
+				double minDistance = 9999999;
+				std::set<BWTA::BaseLocation*>::iterator it; 		// iteratation set
+				for (it = InformationManager::getInstance().baseLocations.begin(); it != InformationManager::getInstance().baseLocations.end(); ++it){
+					InformationManager::getInstance().scoutedBase = *it;
+					// Remove main base if it is empty
+					if (unit->getPosition() == InformationManager::getInstance().scoutedBase->getPosition()){
+						InformationManager::getInstance().baseLocations.erase(*it);
+						Broodwar->sendText("Removed empty main base");
+					}
+					/*else if (InformationManager::getInstance().ourBase->getGroundDistance(InformationManager::getInstance().scoutedBase) < minDistance) {
+						minDistance = InformationManager::getInstance().ourBase->getGroundDistance(InformationManager::getInstance().scoutedBase);
+						Broodwar->sendText("Moving to enemy base");
+						unit->move(InformationManager::getInstance().scoutedBase->getPosition());
+						InformationManager::getInstance().baseLocations.erase(*it);
+					}*/
+					//else if (){
+
+					
+				}
 			}
 		}
 	}
@@ -68,10 +91,7 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 
 			Broodwar->sendText("Test empty start base");
 
-
-
-			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());
-			std::vector<BWAPI::Unit>::iterator it;			
+			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());		
 
 			Broodwar->sendText("Found Empty base");
 		}
