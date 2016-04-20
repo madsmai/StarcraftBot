@@ -98,6 +98,7 @@
     <ClCompile Include="BuildOrderManager.cpp" />
     <ClCompile Include="BuildOrderType.cpp" />
     <ClCompile Include="CommonZealotRush.cpp" />
+    <ClCompile Include="EarlyDarkTemplar.cpp" />
     <ClCompile Include="InformationManager.cpp" />
     <ClCompile Include="OffenseManager.cpp" />
     <ClCompile Include="ProbeManager.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="BuildOrderManager.h" />
     <ClInclude Include="BuildOrderType.h" />
     <ClInclude Include="CommonZealotRush.h" />
+    <ClInclude Include="EarlyDarkTemplar.h" />
     <ClInclude Include="InformationManager.h" />
     <ClInclude Include="OffenseManager.h" />
     <ClInclude Include="ProbeManager.h" />

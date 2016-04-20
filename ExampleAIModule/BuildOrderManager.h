@@ -10,6 +10,7 @@
 // include strategies
 #include "CommonZealotRush.h"
 #include "AggressiveZealotRush.h"
+#include "EarlyDarkTemplar.h"
 
 using namespace BWAPI;
 class BuildOrderManager

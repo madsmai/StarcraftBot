@@ -20,18 +20,6 @@ public:
 
 
 
-private:
-
-	bool starter;
-	bool endgame;
-	bool antiAir, antiInvis, antiRush, antiTurtle;
-
-	// Build order for the specific tactic
-	std::vector<BuildOrderType> buildOrder;
-
-	// name of the tactic
-	std::string name;
-
 
 };
 
