@@ -64,7 +64,7 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 
 			Broodwar->sendText("Test empty start base");
 
-			InformationManager::getInstance().enemyBase = BWTA::getNearestBaseLocation(unit->getPosition());
+			InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());
 			std::vector<BWAPI::Unit>::iterator it;
 			for (it = activeScouts.begin(); it != activeScouts.end(); it++) { //Change where the active scouts are going
 				BWAPI::Unit u = *it;

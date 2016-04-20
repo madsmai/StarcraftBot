@@ -13,6 +13,7 @@ void BuildOrderManager::onStart(){
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
+	newFixedOrderQueue.push_back(BuildOrderType(scoutRequest));
 	newFixedOrderQueue.push_back(BuildOrderType(probe));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
 	newFixedOrderQueue.push_back(BuildOrderType(pylon));
