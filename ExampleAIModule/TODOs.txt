@@ -1,6 +1,8 @@
-- BUGS
-
-Det ser ud som om vores builder begynder at scoute inden den sætter en bygning i gang med at bygge. 
-Det virker som en dum ide at sende byggeren ud for at scoute, da det nemt kan gå galt.
-
-Desuden bygge vores scout en pylon i modstanderens base.
+Strategi-skift-design:
+- Hvis modstanderen har bygget tech som vi skal lave counters til for ikke at blive tæsket (air, invis)
+	- Tjek om vores nuværende strategi har counters til dette.
+	- Ellers skift strategi til en der indeholder et counter til modstanderen
+- Hvis vores nuværende buildQueue er tom
+	- Skift til en strategi der er god mod det vi ved modstanderen har (informationManager)
+- Hvis vi bliver rushed
+- Hvis modstanderen turtler
