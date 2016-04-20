@@ -7,7 +7,7 @@ void BuildOrderManager::onStart(){
 	if (true){ //Insert logic for choosing this strategy over another here
 
 
-		newFixedOrderQueue = EarlyDarkTemplar().getBuildOrder();
+		newFixedOrderQueue = CommonZealotRush().getBuildOrder();
 
 
 	}
