@@ -93,6 +93,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AggressiveZealotRush.cpp" />
     <ClCompile Include="BuildingManager.cpp" />
     <ClCompile Include="BuildOrderManager.cpp" />
     <ClCompile Include="BuildOrderType.cpp" />
@@ -104,10 +105,9 @@
     <ClCompile Include="ScoutManager.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\GameManager.cpp" />
-    <ClCompile Include="Strategy.cpp" />
-    <ClCompile Include="Strategys.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AggressiveZealotRush.h" />
     <ClInclude Include="BuildingManager.h" />
     <ClInclude Include="BuildOrderManager.h" />
     <ClInclude Include="BuildOrderType.h" />
@@ -119,7 +119,6 @@
     <ClInclude Include="ScoutManager.h" />
     <ClInclude Include="Source\GameManager.h" />
     <ClInclude Include="Strategy.h" />
-    <ClInclude Include="Strategys.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODOs.txt" />

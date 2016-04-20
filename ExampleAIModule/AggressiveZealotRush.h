@@ -3,7 +3,7 @@
 
 using namespace BWAPI;
 
-class CommonZealotRush :public Strategy {
+class AggressiveZealotRush :public Strategy {
 public:
 
 	std::string getName() { return name; }
@@ -18,7 +18,7 @@ public:
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
 
 	// constructor
-	CommonZealotRush();
+	AggressiveZealotRush();
 
 private:
 
@@ -49,7 +49,7 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "10/12 Gateway zealot rush";
+	std::string name = "9/9 Gateway zealot rush";
 
 };
 

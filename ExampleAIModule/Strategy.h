@@ -18,8 +18,7 @@ public:
 
 	virtual std::vector<BuildOrderType> getBuildOrder() = 0;
 
-	// constructor
-	Strategy();
+
 
 private:
 

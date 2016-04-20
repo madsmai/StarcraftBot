@@ -6,10 +6,15 @@ void BuildOrderManager::onStart(){
 	//Just copy a strategy chosen from an enumerator of strategies
 
 	if (true){ //Insert logic for choosing this strategy over another here
-		
+
 		//newFixedOrderQueue = Strategy(Strategy::strategies::justSomeStrategy).getStrategyQueue();
 
-		newFixedOrderQueue = Strategys(Strategys::strategies::standardZealotRush).getStrategyQueue();
+		//newFixedOrderQueue = Strategys(Strategys::strategies::standardZealotRush).getStrategyQueue();
+
+
+		newFixedOrderQueue = CommonZealotRush().getBuildOrder();
+
+
 	}
 
 	/*
