@@ -21,11 +21,7 @@ public:
 	// constructor
 	Strategy();
 
-
-
 private:
-
-
 
 	bool starter;
 	bool endgame;
