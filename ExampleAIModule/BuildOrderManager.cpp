@@ -9,7 +9,7 @@ void BuildOrderManager::onStart(){
 		
 		//newFixedOrderQueue = Strategy(Strategy::strategies::justSomeStrategy).getStrategyQueue();
 
-		newFixedOrderQueue = Strategy(Strategy::strategies::standardZealotRush).getStrategyQueue();
+		newFixedOrderQueue = Strategys(Strategys::strategies::standardZealotRush).getStrategyQueue();
 	}
 
 	/*

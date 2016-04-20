@@ -24,6 +24,7 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 	if (unit->canAttack() && unit->canMove() && !unit->getType().isWorker()) {
 		fighters.insert(unit);
 	}
+
 }
 
 void OffenseManager::onFrame(){
@@ -55,6 +56,15 @@ void OffenseManager::onFrame(){
 		rush(fighters);
 		//armySize += armySize;
 	}
+	for (Unit troop : fighters) {
+		rushFinished = true;
+		if (BWTA::getNearestBaseLocation(troop->getPosition())) {
+			rush(fighters);
+			rushFinished = true;
+		}
+
+	}
+
 }
 
 OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager object
@@ -62,14 +72,14 @@ OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager ob
 	return i;
 }
 bool OffenseManager::rush(BWAPI::Unitset attackers) {
-	//Executes a rush with the gives units
+	//Executes a rush with the given units
 	static int lastChecked = 0;
 	if (!attackers.empty()) {
 		if (lastChecked + 400 < BWAPI::Broodwar->getFrameCount()
 			&& !rushFinished) {
 			if (InformationManager::getInstance().enemyBase != NULL) {
 				//Trying to use move instead of attack, hoping SearchAndDestroy will take over
-				attackers.move(InformationManager::getInstance().enemyBase->getPosition());
+				attackers.move(BWTA::getNearestChokepoint(InformationManager::getInstance().enemyBase->getTilePosition())->getCenter());
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
 			else {
