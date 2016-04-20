@@ -30,6 +30,7 @@ private:
 
 	std::vector<BWAPI::Unit> zealots;
 	BWAPI::Unitset fighters;
+	BWAPI::Unitset squad;
 
 	//Upgrades
 	int ground_weapons_count = 0;
@@ -42,10 +43,9 @@ private:
 	bool rush(BWAPI::Unitset);
 	bool fightBack(BWAPI::Unit);
 	bool getHelp(BWAPI::Unit, BWAPI::Unit);
-	void searchAndDestroy(BWAPI::Unitset);
+	void searchAndDestroy(BWAPI::Unit);
 	bool avoidTowers(BWAPI::Unit);
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
-
 
 	OffenseManager(){};
 	~OffenseManager(){};

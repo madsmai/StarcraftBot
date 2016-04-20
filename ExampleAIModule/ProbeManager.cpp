@@ -8,113 +8,53 @@ TODO:
 using namespace BWAPI;
 
 void ProbeManager::onFrame(){
-	//Construct the next building in the queue
-	std::vector<BuildOrderType>& queue = BuildOrderManager::getInstance().getNewFixedOrderQueue();
-	if (!queue.empty()){
-		//Do things with the next unit in the buildOrder
-		if (queue.front().isUnit()){
-			BWAPI::UnitType type = queue.front().getUnitType(); //Find building type
-			if (type.isBuilding()){
-				if (builder == NULL || !builder->exists()) {
-					builder = mineralProbes.front(); //Assign a probe as designated builder
-				}
-				int minPrice = type.mineralPrice(); //Price of building
-				int gasPrice = type.gasPrice(); //Price of building
 
-				TilePosition position = Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
-				UnitType pylon = UnitTypes::Protoss_Pylon;
-				if (BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
-					&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
-					&& (type == pylon || BWAPI::Broodwar->self()->completedUnitCount(pylon) >= 1)
-					&& !builder->isConstructing()){
-
-					if (builder->build(type, position)){
-
-						Broodwar->registerEvent([position, type](BWAPI::Game*) {
-							Broodwar->drawBoxMap(BWAPI::Position(position),
-								Position(position + type.tileSize()),
-								Colors::Yellow);
-						}, nullptr, type.buildTime() + 100);
-
-						BWAPI::Broodwar << "building " << type << std::endl;
-						ResourceManager::getInstance().reserveMinerals(type);
-						ResourceManager::getInstance().reserveGas(type);
-						queue.erase(queue.begin()); //Remove building from queue
-					}
-				}
-			}
-		}
-		//Do things with the next request in the buildOrder
-		if (queue.front().isRequest()){
-			int request = queue.front().getRequestType();
-			//Make a scout
-			if (request == requests::scoutRequest && builder != NULL){
-				ScoutManager::getInstance().addScout(builder);
-				mineralProbes.erase(mineralProbes.begin());
-				queue.erase(queue.begin()); //Remove the request from the queue
-				builder = NULL;
-			}
-			//Make a gasworker
-			else if (request == requests::gasworkerRequest){
-				std::vector<BWAPI::Unit>::iterator it;
-				for (it = mineralProbes.begin(); it != mineralProbes.end();){
-					BWAPI::Unit unit = *it;
-					if (unit->isGatheringMinerals()){
-						mineralProbes.erase(it); //Remove probe from list by number in array
-						gasProbes.push_back(unit); //Add unit to gasWorkerList
-						queue.erase(queue.begin()); //Remove the request from the queue
-						if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsRefinery))){
-							BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
-						}
-						break;
-					}
-					else {
-						it++;
-					}
-				}
-			}
-		}
-	} //End of !queue.empty()
+	executeQueue();
 
 	//Make idle mineralWorkers do stuff
-	std::vector<BWAPI::Unit>::iterator it;
+	std::vector<Unit>::iterator it;
 	for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
-		BWAPI::Unit unit = *it;
-		if (unit->exists() && unit->isIdle() && unit->getPlayer() == BWAPI::Broodwar->self()){
+		Unit unit = *it;
+		if (unit->exists() && unit->isIdle() && unit->getPlayer() == Broodwar->self()){
 			if (unit->isCarryingGas() || unit->isCarryingMinerals()) {
 				unit->returnCargo();
 			}
-			else if (!unit->gather(unit->getClosestUnit(BWAPI::Filter::IsMineralField))) {
-				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
+			else if (!unit->gather(unit->getClosestUnit(Filter::IsMineralField))) {
+				Broodwar << Broodwar->getLastError() << std::endl;
 			}
 		}
 	}
+
+	//Make an idle builder do stuff
 	if (builder != NULL && builder->isIdle()) {
-		if (!builder->gather(builder->getClosestUnit(BWAPI::Filter::IsMineralField))) {
-			BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
+		if (!builder->gather(builder->getClosestUnit(Filter::IsMineralField))) {
+			Broodwar << Broodwar->getLastError() << std::endl;
 		}
 	}
 
 	//Make idle gasWorkers do stuff
 	for (it = gasProbes.begin(); it != gasProbes.end(); it++){
-		BWAPI::Unit u = *it;
-		if (u->exists() && u->isIdle() && u->getPlayer() == BWAPI::Broodwar->self()){
+		Unit u = *it;
+		if (u->exists() && (u->isIdle() || u->isGatheringMinerals()) && u->getPlayer() == Broodwar->self()){
 			if (u->isCarryingGas() || u->isCarryingMinerals()) {
 				u->returnCargo();
 			}
-
-			if (!u->gather(u->getClosestUnit(BWAPI::Filter::IsRefinery))){
-				BWAPI::Broodwar << BWAPI::Broodwar->getLastError() << std::endl;
+			else if (!u->gather(u->getClosestUnit(Filter::IsRefinery))){
+				Broodwar << Broodwar->getLastError() << std::endl;
 			}
 		}
 	}
 }
 
 
+
+
+
+
 //Remove destroyed worker
-void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
-	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self()){
-		std::vector<BWAPI::Unit>::iterator it;
+void ProbeManager::onUnitDestroy(Unit unit){
+	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
+		std::vector<Unit>::iterator it;
 
 		//Loop through mineralsProbes
 		for (it = mineralProbes.begin(); it != mineralProbes.end();){
@@ -141,14 +81,94 @@ void ProbeManager::onUnitDestroy(BWAPI::Unit unit){
 }
 
 //Add newly made worker to list
-void ProbeManager::onUnitComplete(BWAPI::Unit unit){
-	if (unit->getType().isWorker() && unit->getPlayer() == BWAPI::Broodwar->self()){
+void ProbeManager::onUnitComplete(Unit unit){
+	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
 		addMineralProbe(unit);
 	}
 }
 
 
-void ProbeManager::addMineralProbe(BWAPI::Unit probe){
+void ProbeManager::executeQueue(){
+
+	std::vector<BuildOrderType>& queue = BuildOrderManager::getInstance().getNewFixedOrderQueue();
+	if (!queue.empty()){
+		//Do things with the next unit in the buildOrder
+		if (queue.front().isUnit()){
+			UnitType type = queue.front().getUnitType(); //Find building type
+			if (type.isBuilding()){
+				if (builder == NULL || !builder->exists()) {
+					builder = mineralProbes.front(); //Assign a probe as designated builder
+				}
+				int minPrice = type.mineralPrice(); //Price of building
+				int gasPrice = type.gasPrice(); //Price of building
+
+				TilePosition position = Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
+				UnitType pylon = UnitTypes::Protoss_Pylon;
+				if (Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
+					&& Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
+					&& !builder->isConstructing()){
+
+					if (builder->build(type, position)){
+						Broodwar->registerEvent([position, type](Game*) {
+							Broodwar->drawBoxMap(Position(position),
+								Position(position + type.tileSize()),
+								Colors::Yellow);
+						}, nullptr, type.buildTime() + 100);
+
+						Broodwar << "building " << type << std::endl;
+						ResourceManager::getInstance().reserveMinerals(type);
+						ResourceManager::getInstance().reserveGas(type);
+						queue.erase(queue.begin()); //Remove building from queue
+					}
+				}
+			}
+		}
+
+		//Do things with the next request in the buildOrder
+		if (queue.front().isRequest()){
+			int request = queue.front().getRequestType();
+			//Make a scout
+			if (request == BuildOrderType::scoutRequest
+				&& !builder->isConstructing()){
+				ScoutManager::getInstance().addScout(mineralProbes.front());
+
+				// sets the builder to NULL if scout is builder
+				if (builder == mineralProbes.front()){
+					builder = NULL;
+				}
+
+				mineralProbes.erase(mineralProbes.begin());
+				queue.erase(queue.begin()); //Remove the request from the queue
+				Broodwar << "Removed a scout request";
+
+			}
+
+			//Make a gasworker
+			else if (request == BuildOrderType::gasworkerRequest){
+				std::vector<Unit>::iterator it;
+				for (it = mineralProbes.begin(); it != mineralProbes.end();){
+					Unit unit = *it;
+					if (unit->isGatheringMinerals() && unit != builder){
+						if (unit->gather(unit->getClosestUnit(Filter::IsRefinery))){
+							mineralProbes.erase(it); //Remove probe from list by number in array
+							gasProbes.push_back(unit); //Add unit to gasWorkerList
+							queue.erase(queue.begin()); //Remove the request from the queue
+							Broodwar << "Removed a gasworker request";
+						}
+						else {
+							Broodwar << Broodwar->getLastError() << std::endl;
+						}
+						break;
+					}
+					it++;
+				}
+			}
+		}
+	} //End of !queue.empty()
+
+}
+
+void ProbeManager::addMineralProbe(Unit probe){
 	mineralProbes.push_back(probe);
 }
 

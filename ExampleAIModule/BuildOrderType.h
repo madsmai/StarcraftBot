@@ -2,14 +2,14 @@
 
 #include <BWAPI.h>
 
-enum requests { scoutRequest, gasworkerRequest };
-
 class BuildOrderType
 {
 public:
 	BuildOrderType(int request);
 	BuildOrderType(BWAPI::UnitType unit);
 	BuildOrderType(BWAPI::UpgradeType upgrade);
+
+	enum requests { scoutRequest, gasworkerRequest };
 
 	bool isUnit();
 	bool isUpgrade();
@@ -24,9 +24,9 @@ public:
 private:
 	enum types { MetaUnitType, MetaUpgradeType, MetaRequestType };
 
-	int type;
+	int type = -1;
 
-	int requestType;
+	int requestType = -1;
 	BWAPI::UnitType unitType;
 	BWAPI::UpgradeType upgradeType;
 

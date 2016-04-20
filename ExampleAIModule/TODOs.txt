@@ -1,12 +1,6 @@
-- Mere micro management
+- BUGS
 
-- Endgame tactics
-	- Conditions for at bygge ting automatisk
-	- Undersøge og udvide på taktikker 
-		
-- Lave flere statik buildorders
-- Brug scouting informationen til at finde ud af om de har bygget towers
-- BUGS::
-Scouting er bugged, den sender flere scouts og ser ud til at scoute når vi ser expansions
+Det ser ud som om vores builder begynder at scoute inden den sætter en bygning i gang med at bygge. 
+Det virker som en dum ide at sende byggeren ud for at scoute, da det nemt kan gå galt.
 
-Lag - måske noget med hvordan vi bygger
+Desuden bygge vores scout en pylon i modstanderens base.

@@ -115,9 +115,9 @@ void ScoutManager::goScout(BWAPI::Unit scout){
 
 void ScoutManager::addScout(BWAPI::Unit scout){
 	inactiveScouts.push_back(scout);
-	BWAPI::Broodwar->sendText("Added scout to inactive scouts");
-	BWAPI::Broodwar << inactiveScouts.front()->getType().getName() << std::endl;
-	BWAPI::Broodwar << inactiveScouts.size() << std::endl;
+	Broodwar->sendText("Added scout to inactive scouts");
+	Broodwar << inactiveScouts.front()->getType().getName() << std::endl;
+	Broodwar << inactiveScouts.size() << std::endl;
 }
 
 void ScoutManager::removeScout(BWAPI::Unit scout){
