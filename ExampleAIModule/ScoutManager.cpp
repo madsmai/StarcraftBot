@@ -24,11 +24,15 @@ void ScoutManager::onFrame(){
 			if (unit->isUnderAttack()) {
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
 			}
-			else if (unit -> isIdle()
+			else if (unit->isIdle()
 				&& BWTA::getNearestBaseLocation(unit->getPosition()) == InformationManager::getInstance().ourBase){
 				removeScout(unit);
 				Broodwar << "removed unit as scout" << std::endl;
 				ProbeManager::getInstance().addMineralProbe(unit);
+			}
+			else if (unit->isIdle()
+				&& BWTA::getNearestBaseLocation(unit->getPosition()) == InformationManager::getInstance().emptyMainBase){
+				goScout(unit);
 			}
 		}
 	}
@@ -64,29 +68,20 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 
 			Broodwar->sendText("Test empty start base");
 
-			InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());
-			std::vector<BWAPI::Unit>::iterator it;
-			for (it = activeScouts.begin(); it != activeScouts.end(); it++) { //Change where the active scouts are going
-				BWAPI::Unit u = *it;
-				u->move(unit->getPosition());
-				goScout(u);
-			}
+
+
+			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());
+			std::vector<BWAPI::Unit>::iterator it;			
 
 			Broodwar->sendText("Found Empty base");
 		}
-
 		else if (unit->getPlayer() != Broodwar->self()
 			&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
 
 			Broodwar->sendText("Test expasion");
 
-			//InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());
-			//std::vector<BWAPI::Unit>::iterator it;
-			//for (it = activeScouts.begin(); it != activeScouts.end(); it++) { //Change where the active scouts are going
-			//	BWAPI::Unit u = *it;
-			//	u->move(unit->getPosition());
-			//	goScout(u);
-			//}
+			InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());
+			
 			Broodwar->sendText("Found expansion");
 		}
 	}
@@ -100,7 +95,8 @@ void ScoutManager::goScout(BWAPI::Unit scout){
 	for (it = InformationManager::getInstance().baseLocations.begin(); it != InformationManager::getInstance().baseLocations.end(); ++it){
 		InformationManager::getInstance().scoutedBase = *it;
 		// Remove our baselocation
-		if (InformationManager::getInstance().scoutedBase->getPosition() == InformationManager::getInstance().ourBase->getPosition()){
+		if (InformationManager::getInstance().scoutedBase->getPosition() == InformationManager::getInstance().ourBase->getPosition()
+			|| scout->getPosition() == InformationManager::getInstance().scoutedBase->getPosition()){
 			InformationManager::getInstance().baseLocations.erase(*it);
 			Broodwar->sendText("Removed our base");
 		}	

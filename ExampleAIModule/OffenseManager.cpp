@@ -23,19 +23,22 @@ void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 	if (unit->canAttack() && unit->canMove() && !unit->getType().isWorker()) {
 		fighters.insert(unit);
+		if (rushOngoing) {
+			unit->move(InformationManager::getInstance().enemyBase->getPosition());
+		}
 	}
+
 }
 
 void OffenseManager::onFrame(){
 
 	BWAPI::Unitset::iterator it;
-	static int lastChecked = 0;
 	for (it = fighters.begin(); it != fighters.end(); it++) {
 		BWAPI::Unit unit = *it;
 		if (unit->isUnderAttack()) {
 			fightBack(unit);
 		}
-		else if (InformationManager::getInstance().enemyBase == BWTA::getNearestBaseLocation(unit->getPosition())
+		else if (InformationManager::getInstance().ourBase != BWTA::getNearestBaseLocation(unit->getPosition())
 			&& unit->isIdle()
 			/*&& lastChecked + 75 < BWAPI::Broodwar->getFrameCount()*/) {
 
@@ -50,10 +53,15 @@ void OffenseManager::onFrame(){
 			//lastChecked = Broodwar->getFrameCount();
 		}
 	}
-
-	if (fighters.size() >= armySize) {
-		rush(fighters);
-		//armySize += armySize;
+	Unitset squad;
+	for (Unit troop : fighters) {
+		if (!rushOngoing && troop->isIdle()) {
+			squad.insert(troop);
+		}
+	}
+	if (squad.size() >= armySize) {
+		rush(squad);
+		squad.empty();
 	}
 }
 
@@ -62,7 +70,7 @@ OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager ob
 	return i;
 }
 bool OffenseManager::rush(BWAPI::Unitset attackers) {
-	//Executes a rush with the gives units
+	//Executes a rush with the given units
 	static int lastChecked = 0;
 	if (!attackers.empty()) {
 		if (lastChecked + 400 < BWAPI::Broodwar->getFrameCount()
@@ -70,6 +78,7 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 			if (InformationManager::getInstance().enemyBase != NULL) {
 				//Trying to use move instead of attack, hoping SearchAndDestroy will take over
 				attackers.move(InformationManager::getInstance().enemyBase->getPosition());
+				rushOngoing = true;
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
 			else {
@@ -149,7 +158,6 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	}*/
 
 	//Finds units to kill and kills them in groups of around 3.
-
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		attacker->attack(attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy));

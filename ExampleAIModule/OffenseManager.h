@@ -22,6 +22,7 @@ public:
 	bool &getSingularityCharge(){ return singularity_charge; }
 
 	bool rushFinished = false;
+	bool rushOngoing = false;
 
 private:
 	//Zealots
