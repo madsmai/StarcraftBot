@@ -99,8 +99,8 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 		BWAPI::Unitset nearbyEnemies = attackedUnit->getUnitsInRadius(128, Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding && Filter::IsVisible);
 		if (attacker != NULL) {
 			calculatePriority(attacker, attackedUnit);
-			Broodwar << "Nearby Enemies size = " << nearbyEnemies.size() << std::endl;
-			Broodwar << "Range of " << attacker->getType() << " is " << attacker->getType().groundWeapon().maxRange() << std::endl;
+			//Broodwar << "Nearby Enemies size = " << nearbyEnemies.size() << std::endl;
+			//Broodwar << "Range of " << attacker->getType() << " is " << attacker->getType().groundWeapon().maxRange() << std::endl;
 			if (attackedUnit->isAttacking()) {
 				attackedUnit->attack(attacker);
 			}
@@ -244,8 +244,6 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 
 int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 
-	Broodwar << "Calculating priority" << std::endl;
-
 	int effectiveHp = enemy->getHitPoints() + enemy->getShields();
 
 	int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
@@ -258,11 +256,11 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	int priority = damage / hitsToKill;
 
 
-	Broodwar << "Effectivehp of " << enemy->getType() << " is: " << effectiveHp << std::endl;
-	Broodwar << "ourDamage of " << ourUnit->getType() << " is: " << ourDamage << std::endl;
-	Broodwar << "hitsToKill of " << enemy->getType() << " is: " << hitsToKill << std::endl;
-	Broodwar << "damage of " << enemy->getType() << " is: " << damage << std::endl;
-	Broodwar << "Priority of " << enemy->getType() << " is: " << priority << std::endl;
+	//Broodwar << "Effectivehp of " << enemy->getType() << " is: " << effectiveHp << std::endl;
+	//Broodwar << "ourDamage of " << ourUnit->getType() << " is: " << ourDamage << std::endl;
+	//Broodwar << "hitsToKill of " << enemy->getType() << " is: " << hitsToKill << std::endl;
+	//Broodwar << "damage of " << enemy->getType() << " is: " << damage << std::endl;
+	//Broodwar << "Priority of " << enemy->getType() << " is: " << priority << std::endl;
 
 	return priority;
 }

@@ -15,6 +15,7 @@ public:
 
 	void currentStatus();
 
+	int calculateArmyStrength(BWAPI::Player);
 	void addEnemyBarracks(BWAPI::Unit);
 	void addEnemyAttackers(BWAPI::Unit);
 	void addEnemyWorkers(BWAPI::Unit);

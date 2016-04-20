@@ -20,7 +20,7 @@ void ProbeManager::onFrame(){
 				unit->returnCargo();
 			}
 			else if (!unit->gather(unit->getClosestUnit(Filter::IsMineralField))) {
-				Broodwar << Broodwar->getLastError() << std::endl;
+				//Broodwar << Broodwar->getLastError() << std::endl;
 			}
 		}
 	}
