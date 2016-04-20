@@ -50,6 +50,7 @@ public:
 	BWTA::BaseLocation* enemyBase;
 	BWTA::BaseLocation* expansion;
 	BWTA::BaseLocation* ourBase = BWTA::getStartLocation(BWAPI::Broodwar->self());
+	BWTA::BaseLocation* emptyMainBase;
 	std::set<BWTA::BaseLocation*> baseLocations;
 
 private:
