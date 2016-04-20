@@ -23,6 +23,21 @@ public:
 
 private:
 
+	BuildOrderType probe = BuildOrderType(UnitTypes::Protoss_Probe);
+	BuildOrderType pylon = BuildOrderType(UnitTypes::Protoss_Pylon);
+	BuildOrderType gateway = BuildOrderType(UnitTypes::Protoss_Gateway);
+	BuildOrderType scoutRequest = BuildOrderType(BuildOrderType::requests::scoutRequest);
+	BuildOrderType assimilator = BuildOrderType(UnitTypes::Protoss_Assimilator);
+	BuildOrderType gasworkerRequest = BuildOrderType(BuildOrderType::requests::gasworkerRequest);
+	BuildOrderType zealot = BuildOrderType(UnitTypes::Protoss_Zealot);
+	BuildOrderType cybercore = BuildOrderType(UnitTypes::Protoss_Cybernetics_Core);
+	BuildOrderType dragoon = BuildOrderType(UnitTypes::Protoss_Dragoon);
+	BuildOrderType citadel = BuildOrderType(UnitTypes::Protoss_Citadel_of_Adun);
+	BuildOrderType dtemplar = BuildOrderType(UnitTypes::Protoss_Dark_Templar);
+	BuildOrderType archives = BuildOrderType(UnitTypes::Protoss_Templar_Archives);
+	BuildOrderType forge = BuildOrderType(UnitTypes::Protoss_Forge);
+	BuildOrderType cannon = BuildOrderType(UnitTypes::Protoss_Photon_Cannon);
+
 	bool starter;
 	bool endgame;
 	bool antiAir, antiInvis, antiRush, antiTurtle;
