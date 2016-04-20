@@ -20,7 +20,7 @@ public:
 	int &getAirArmor(){ return air_armor_count; }
 	bool &getSingularityCharge(){ return singularity_charge; }
 
-	bool rushFinished = false;
+	BWAPI::Unitset fighters;
 	bool rushOngoing = false;
 
 	void setArmySize(int size){ armySize = size; }
@@ -31,7 +31,7 @@ private:
 	unsigned int armySize;
 
 	std::vector<BWAPI::Unit> zealots;
-	BWAPI::Unitset fighters;
+
 	BWAPI::Unitset squad;
 
 	//Upgrades

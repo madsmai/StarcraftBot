@@ -87,9 +87,6 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			}
 			if (unit->getType().isResourceDepot()
 				&& unit->getTilePosition() == enemyBase->getTilePosition()){
-				
-				// rush succesful
-				OffenseManager::getInstance().rushFinished = true;
 			}
 		}
 
@@ -228,7 +225,7 @@ void InformationManager::removeEnemyAttackers(Unit attacker){
 			Broodwar << "unit removed from enemyAttackers list" << std::endl;
 			enemyAttackers.erase(it);
 		} else{
-			it++;
+it++;
 		}
 	}
 }
@@ -236,7 +233,7 @@ void InformationManager::removeEnemyAttackers(Unit attacker){
 void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyWorkers.begin(); it != enemyWorkers.end(); ) {
+	for (it = enemyWorkers.begin(); it != enemyWorkers.end();) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == worker->getID()){
 			enemyWorkers.erase(it);
@@ -267,7 +264,7 @@ void InformationManager::removeDarkTemplar(BWAPI::Unit darkTemplar){
 void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyTowers.begin(); it != enemyTowers.end(); ) {
+	for (it = enemyTowers.begin(); it != enemyTowers.end();) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == tower->getID()){
 			enemyTowers.erase(it);
@@ -282,7 +279,7 @@ void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyPassiveBuildings.begin(); it != enemyPassiveBuildings.end(); ) {
+	for (it = enemyPassiveBuildings.begin(); it != enemyPassiveBuildings.end();) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == passiveBuilding->getID()){
 			enemyPassiveBuildings.erase(it);
@@ -302,11 +299,36 @@ void InformationManager::currentStatus(){
 		" Any Citadel of Adun? " << citadelOfAdun << "\n"
 		" Any Templar Archives? " << templarArchives << "\n"
 		<< enemyTowers.size() << "  enemy dark templars(s) \n"
-		<< enemyPassiveBuildings.size() << "  passive enemy building(s) \n" <<  std::endl;
+		<< enemyPassiveBuildings.size() << "  passive enemy building(s) \n" << std::endl;
 
 }
 
 InformationManager& InformationManager::getInstance(){ //Return ref to InformationManager object
 	static InformationManager i; //Make static instance i
 	return i;
+}
+
+int InformationManager::calculateArmyStrength(BWAPI::Player player) {
+	Unitset fighters;
+	if (player == Broodwar->self()) {
+		fighters = OffenseManager::getInstance().fighters;
+	}
+	else if (player->isEnemy(Broodwar->self())) {
+		std::vector<BWAPI::Unit>::iterator it;
+		for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
+			Unit u = *it;
+			fighters.insert(u);
+		}
+	}
+	int armyStrength = 0;
+	for (Unit troop : fighters) {
+		int effectiveHp = troop->getHitPoints() + troop->getShields();
+		int damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
+		if (troop->getType().groundWeapon().maxRange() > 100) {
+			damage = (damage * 6)/5;
+		}
+		int strength = effectiveHp * damage;
+		armyStrength = armyStrength + strength;
+	}
+	return armyStrength;
 }

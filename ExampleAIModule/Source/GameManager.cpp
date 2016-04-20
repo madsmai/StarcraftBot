@@ -89,6 +89,13 @@ void GameManager::onSendText(std::string text){
 	if (text == "Current Status") {
 		InformationManager::getInstance().currentStatus();
 	}
+	else if (text == "Army Strength enemy") {
+		
+		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy()) << std::endl;
+	}
+	else if (text == "Army Strength self") {
+		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) << std::endl;
+	}
 	else if (text == "size"){
 		Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;
 	}
