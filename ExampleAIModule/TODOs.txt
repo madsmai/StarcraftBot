@@ -6,7 +6,9 @@ Strategi-skift-design:
 	- Skift til en strategi der er god mod det vi ved modstanderen har (informationManager)
 - Hvis vi bliver rushed
 - Hvis modstanderen turtler
+- Hvis vi rusher og modstanderens combat strength er større end vores
 
 TODO:
 - Ekstra scout på 4-player map. De skal ikke gå samme vej.
+- Strategiklassen skal have en armySize variabel
 
