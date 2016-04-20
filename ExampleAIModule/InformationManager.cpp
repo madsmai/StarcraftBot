@@ -87,9 +87,6 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			}
 			if (unit->getType().isResourceDepot()
 				&& unit->getTilePosition() == enemyBase->getTilePosition()){
-				
-				// rush succesful
-				OffenseManager::getInstance().rushFinished = true;
 			}
 		}
 
@@ -312,7 +309,6 @@ InformationManager& InformationManager::getInstance(){ //Return ref to Informati
 }
 
 int InformationManager::calculateArmyStrength(BWAPI::Player player) {
-	Broodwar << "Calculating Army Strength of " << player->getName() << std::endl;
 	Unitset fighters;
 	if (player == Broodwar->self()) {
 		fighters = OffenseManager::getInstance().fighters;
@@ -329,7 +325,7 @@ int InformationManager::calculateArmyStrength(BWAPI::Player player) {
 		int effectiveHp = troop->getHitPoints() + troop->getShields();
 		int damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
 		if (troop->getType().groundWeapon().maxRange() > 100) {
-			damage = damage * 1.2;
+			damage = (damage * 6)/5;
 		}
 		int strength = effectiveHp * damage;
 		armyStrength = armyStrength + strength;

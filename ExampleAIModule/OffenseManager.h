@@ -22,7 +22,6 @@ public:
 	bool &getSingularityCharge(){ return singularity_charge; }
 
 	BWAPI::Unitset fighters;
-	bool rushFinished = false;
 	bool rushOngoing = false;
 
 private:
