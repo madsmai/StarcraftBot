@@ -1,5 +1,9 @@
 #pragma once
+#include <BWAPI.h>
 #include "Strategy.h"
+#include "OffenseManager.h"
+#include "BuildOrderManager.h"
+#include "StrategyManager.h"
 
 
 
@@ -16,6 +20,8 @@ public:
 	bool isAntiTurtle() { return antiTurtle; }
 
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
+
+	void setArmySize(){ OffenseManager::getInstance().setArmySize(3); }
 
 	// constructor
 	EarlyDarkTemplar();
@@ -49,7 +55,7 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "9/9 Gateway zealot rush";
+	std::string name = "Early dark templar";
 
 };
 

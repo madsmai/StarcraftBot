@@ -82,12 +82,12 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
 			else {
-				Broodwar << "Failed to rush, enemyBase was null" << std::endl;
+				Broodwar << "Failed to rush, enemyBase was null " << std::endl;
 			}
 		}
 	}
 	else {
-		Broodwar << "Failed to rush attackers was empty" << std::endl;
+		Broodwar << "Failed to rush attackers was empty " << std::endl;
 	}
 	return true;
 

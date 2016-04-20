@@ -3,6 +3,10 @@
 
 EarlyDarkTemplar::EarlyDarkTemplar() {
 
+	Broodwar << name << std::endl;
+
+	setArmySize();
+
 	buildOrder = { probe, probe, probe, probe, pylon, // 8 - first pylon
 		probe, probe, gateway, scoutRequest, // 10 - scout
 		probe, probe, assimilator, // 12 - assimilator
@@ -16,6 +20,11 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 		dtemplar, probe, dtemplar, // 2 dark templars
 		forge, pylon, cannon, cannon };
 
+	for (BuildOrderType order : buildOrder){
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
+	}
+
+	StrategyManager::getInstance().setOngoingStrategy(true);
 }
 
 

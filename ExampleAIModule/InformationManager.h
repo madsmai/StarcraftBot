@@ -5,8 +5,7 @@
 #include <BWTA.h>
 #include "OffenseManager.h"
 
-class InformationManager
-{
+class InformationManager {
 public:
 	static InformationManager& getInstance();
 

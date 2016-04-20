@@ -5,9 +5,8 @@
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
 
-using namespace BWAPI;
+class BaseBuild : public Strategy {
 
-class CommonZealotRush :public Strategy {
 public:
 
 	std::string getName() { return name; }
@@ -21,10 +20,10 @@ public:
 
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
 
-	void setArmySize(){ OffenseManager::getInstance().setArmySize(3); }
+	void setArmySize(){ OffenseManager::getInstance().setArmySize(999); }
 
 	// constructor
-	CommonZealotRush();
+	BaseBuild();
 
 private:
 
@@ -55,7 +54,7 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "10/12 Gateway zealot rush";
+	std::string name = "basic 4 probe 1 pylon";
 
 };
 

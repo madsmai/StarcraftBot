@@ -126,6 +126,7 @@ void ProbeManager::executeQueue(){
 				}
 			}
 		}
+		
 
 		//Do things with the next request in the buildOrder
 		if (queue.front().isRequest()){
@@ -168,6 +169,10 @@ void ProbeManager::executeQueue(){
 			}
 		}
 	} //End of !queue.empty()
+	
+	else { // if queue is empty
+		StrategyManager::getInstance().setOngoingStrategy(false);
+	}
 
 }
 
