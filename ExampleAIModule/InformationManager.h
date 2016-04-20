@@ -46,7 +46,8 @@ public:
 
 
 	//BWTA variables
-	BWTA::BaseLocation* scoutedBase;
+	BWTA::BaseLocation* nextBase;
+	BWTA::BaseLocation* currentBase = BWTA::getStartLocation(BWAPI::Broodwar->self());
 	BWTA::BaseLocation* enemyBase;
 	BWTA::BaseLocation* expansion;
 	BWTA::BaseLocation* ourBase = BWTA::getStartLocation(BWAPI::Broodwar->self());

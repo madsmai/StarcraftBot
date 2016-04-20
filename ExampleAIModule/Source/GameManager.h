@@ -34,7 +34,7 @@ public:
 	//virtual void onUnitRenegade(BWAPI::Unit unit);
 	//virtual void onSaveGame(std::string gameName);
 
-	BWTA::BaseLocation* scoutedBase;
+	BWTA::BaseLocation* nextBase;
 	BWTA::BaseLocation* enemyBase;
 	BWTA::BaseLocation* expansion;
 	BWTA::BaseLocation* ourBase;

@@ -20,7 +20,7 @@ void ProbeManager::onFrame(){
 				unit->returnCargo();
 			}
 			else if (!unit->gather(unit->getClosestUnit(Filter::IsMineralField))) {
-				//Broodwar << Broodwar->getLastError() << std::endl;
+				Broodwar << Broodwar->getLastError() << std::endl;
 			}
 		}
 	}
@@ -28,7 +28,7 @@ void ProbeManager::onFrame(){
 	//Make an idle builder do stuff
 	if (builder != NULL && builder->isIdle()) {
 		if (!builder->gather(builder->getClosestUnit(Filter::IsMineralField))) {
-			//Broodwar << Broodwar->getLastError() << std::endl;
+			Broodwar << Broodwar->getLastError() << std::endl;
 		}
 	}
 
@@ -40,7 +40,7 @@ void ProbeManager::onFrame(){
 				u->returnCargo();
 			}
 			else if (!u->gather(u->getClosestUnit(Filter::IsRefinery))){
-				//Broodwar << Broodwar->getLastError() << std::endl;
+				Broodwar << Broodwar->getLastError() << std::endl;
 			}
 		}
 	}
@@ -159,7 +159,7 @@ void ProbeManager::executeQueue(){
 							Broodwar << "Removed a gasworker request";
 						}
 						else {
-							//Broodwar << Broodwar->getLastError() << std::endl;
+							Broodwar << Broodwar->getLastError() << std::endl;
 						}
 						break;
 					}
