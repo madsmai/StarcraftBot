@@ -33,7 +33,6 @@ void ScoutManager::onFrame(){
 			}
 			else if (unit->isIdle()
 				&& BWTA::getNearestBaseLocation(unit->getPosition()) == InformationManager::getInstance().emptyMainBase){
-				Broodwar->sendText("Stuck in empty main base :'(");
 				//goScout(unit);
 
 				double minDistance = 9999999;
@@ -85,11 +84,8 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 			&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
 			&& !unit->getPlayer()->isEnemy(Broodwar->self())) {
 
-			Broodwar->sendText("Test empty start base");
-
 			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());		
 
-			Broodwar->sendText("Found Empty base");
 		}
 		else if (unit->getPlayer() != Broodwar->self()
 			&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
