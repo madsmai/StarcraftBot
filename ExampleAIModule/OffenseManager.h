@@ -2,8 +2,7 @@
 
 #include <BWAPI.h>
 
-class OffenseManager
-{
+class OffenseManager {
 public:
 
 	void onUnitDestroy(BWAPI::Unit unit);
@@ -21,15 +20,18 @@ public:
 	int &getAirArmor(){ return air_armor_count; }
 	bool &getSingularityCharge(){ return singularity_charge; }
 
-	bool rushFinished = false;
+	BWAPI::Unitset fighters;
+	bool rushOngoing = false;
+
+	void setArmySize(int size){ armySize = size; }
 
 private:
 	//Zealots
 	int zealotMax = 6;
-	unsigned int armySize = 3;
+	unsigned int armySize;
 
 	std::vector<BWAPI::Unit> zealots;
-	BWAPI::Unitset fighters;
+
 	BWAPI::Unitset squad;
 
 	//Upgrades

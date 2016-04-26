@@ -2,8 +2,7 @@
 
 #include <BWAPI.h>
 
-class BuildOrderType
-{
+class BuildOrderType {
 public:
 	BuildOrderType(int request);
 	BuildOrderType(BWAPI::UnitType unit);

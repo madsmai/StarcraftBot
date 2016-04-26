@@ -109,20 +109,24 @@ void ProbeManager::executeQueue(){
 					&& !builder->isConstructing()){
 
 					if (builder->build(type, position)){
-						Broodwar->registerEvent([position, type](Game*) {
-							Broodwar->drawBoxMap(Position(position),
-								Position(position + type.tileSize()),
-								Colors::Yellow);
-						}, nullptr, type.buildTime() + 100);
+						if (Broodwar->getLastError() != Errors::Unbuildable_Location || Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+							Broodwar->registerEvent([position, type](Game*) {
+								Broodwar->drawBoxMap(Position(position),
+									Position(position + type.tileSize()),
+									Colors::Yellow);
+							}, nullptr, type.buildTime() + 100);
 
-						Broodwar << "building " << type << std::endl;
-						ResourceManager::getInstance().reserveMinerals(type);
-						ResourceManager::getInstance().reserveGas(type);
-						queue.erase(queue.begin()); //Remove building from queue
+							Broodwar << "building " << type << std::endl;
+							ResourceManager::getInstance().reserveMinerals(type);
+							ResourceManager::getInstance().reserveGas(type);
+							queue.erase(queue.begin()); //Remove building from queue
+
+						}
 					}
 				}
 			}
 		}
+		
 
 		//Do things with the next request in the buildOrder
 		if (queue.front().isRequest()){
@@ -165,6 +169,10 @@ void ProbeManager::executeQueue(){
 			}
 		}
 	} //End of !queue.empty()
+	
+	else { // if queue is empty
+		StrategyManager::getInstance().setOngoingStrategy(false);
+	}
 
 }
 

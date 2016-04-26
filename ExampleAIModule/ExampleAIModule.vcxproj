@@ -93,9 +93,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AggressiveZealotRush.cpp" />
+    <ClCompile Include="BaseBuild.cpp" />
     <ClCompile Include="BuildingManager.cpp" />
     <ClCompile Include="BuildOrderManager.cpp" />
     <ClCompile Include="BuildOrderType.cpp" />
+    <ClCompile Include="CommonZealotRush.cpp" />
+    <ClCompile Include="EarlyDarkTemplar.cpp" />
     <ClCompile Include="InformationManager.cpp" />
     <ClCompile Include="OffenseManager.cpp" />
     <ClCompile Include="ProbeManager.cpp" />
@@ -103,12 +107,16 @@
     <ClCompile Include="ScoutManager.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\GameManager.cpp" />
-    <ClCompile Include="Strategy.cpp" />
+    <ClCompile Include="StrategyManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AggressiveZealotRush.h" />
+    <ClInclude Include="BaseBuild.h" />
     <ClInclude Include="BuildingManager.h" />
     <ClInclude Include="BuildOrderManager.h" />
     <ClInclude Include="BuildOrderType.h" />
+    <ClInclude Include="CommonZealotRush.h" />
+    <ClInclude Include="EarlyDarkTemplar.h" />
     <ClInclude Include="InformationManager.h" />
     <ClInclude Include="OffenseManager.h" />
     <ClInclude Include="ProbeManager.h" />
@@ -116,6 +124,7 @@
     <ClInclude Include="ScoutManager.h" />
     <ClInclude Include="Source\GameManager.h" />
     <ClInclude Include="Strategy.h" />
+    <ClInclude Include="StrategyManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODOs.txt" />

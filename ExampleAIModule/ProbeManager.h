@@ -7,8 +7,7 @@
 #include <vector>
 #include <queue>
 
-class ProbeManager
-{
+class ProbeManager {
 public:
 
 	//BWAPI functions

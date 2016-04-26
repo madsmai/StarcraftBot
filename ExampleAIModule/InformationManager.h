@@ -5,8 +5,7 @@
 #include <BWTA.h>
 #include "OffenseManager.h"
 
-class InformationManager
-{
+class InformationManager {
 public:
 	static InformationManager& getInstance();
 
@@ -15,6 +14,7 @@ public:
 
 	void currentStatus();
 
+	int calculateArmyStrength(BWAPI::Player);
 	void addEnemyBarracks(BWAPI::Unit);
 	void addEnemyAttackers(BWAPI::Unit);
 	void addEnemyWorkers(BWAPI::Unit);
@@ -46,10 +46,12 @@ public:
 
 
 	//BWTA variables
-	BWTA::BaseLocation* scoutedBase;
+	BWTA::BaseLocation* nextBase;
+	BWTA::BaseLocation* currentBase = BWTA::getStartLocation(BWAPI::Broodwar->self());
 	BWTA::BaseLocation* enemyBase;
 	BWTA::BaseLocation* expansion;
 	BWTA::BaseLocation* ourBase = BWTA::getStartLocation(BWAPI::Broodwar->self());
+	BWTA::BaseLocation* emptyMainBase;
 	std::set<BWTA::BaseLocation*> baseLocations;
 
 private:
