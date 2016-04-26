@@ -93,9 +93,13 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 			//Broodwar << "Nearby Enemies size = " << nearbyEnemies.size() << std::endl;
 			//Broodwar << "Range of " << attacker->getType() << " is " << attacker->getType().groundWeapon().maxRange() << std::endl;
 			if (nearbyEnemies.size() >= 2) {
-				if (attackedUnit->getShields() <= attackedUnit->getType().maxShields() / 10) {
+				/*if (attackedUnit->getShields() <= attackedUnit->getType().maxShields() / 10) {
+					Broodwar << "Time to start!" << std::endl;
 					for (Unit fighter : fighters) {
-						BWTA::RectangleArray<double> area;
+						BWTA::RectangleArray<double> area = BWTA::RectangleArray<double>(25, 25);
+						if (area.getHeight() != NULL) {
+							Broodwar << "Time to start! NOT NULL" << std::endl;
+						}
 						BWTA::getGroundDistanceMap(attackedUnit->getTilePosition(), area);
 						unsigned int i,j;
 						for (i = 0; i < area.getHeight(); i++) {
@@ -104,7 +108,7 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 							}
 						}
 					}
-				}
+				}*/
 				int maxPrio = 0;
 				Unit bestTarget;
 				for (Unit troop : nearbyEnemies) {
