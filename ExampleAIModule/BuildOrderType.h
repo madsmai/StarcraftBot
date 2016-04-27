@@ -8,7 +8,7 @@ public:
 	BuildOrderType(BWAPI::UnitType unit);
 	BuildOrderType(BWAPI::UpgradeType upgrade);
 
-	enum requests { scoutRequest, gasworkerRequest };
+	enum requests { scoutRequest, gasworkerRequest, evaluateStrategyRequest };
 
 	bool isUnit();
 	bool isUpgrade();

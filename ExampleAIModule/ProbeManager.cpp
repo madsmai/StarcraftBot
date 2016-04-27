@@ -168,11 +168,23 @@ void ProbeManager::executeQueue(){
 					it++;
 				}
 			}
+
+			// evalute the strategy
+			else if (request == BuildOrderType::evaluateStrategyRequest){
+
+
+
+
+
+				queue.erase(queue.begin()); //Remove the request from the queue
+				Broodwar << "Removed a evaluate strategy request";
+			}
 		}
 	} //End of !queue.empty()
 	
 	else { // if queue is empty
 		StrategyManager::getInstance().setOngoingStrategy(false);
+		Broodwar << "queue was empty, there is no ongoingStrategy" << std::endl;
 	}
 
 }
