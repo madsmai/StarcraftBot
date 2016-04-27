@@ -5,9 +5,9 @@ using namespace BWAPI;
 /*
 TODO:
 - Expansions bugger os, helt vildt.
-- De bevæger sig frem og tilbage
-- Dræber ikke workers i expansion først
-- Tror det er fordi de bliver sat til at bevæge sig mod hovedbasen, når den, bliver idle, laver search and destroy.
+	- De bevæger sig frem og tilbage
+	- Dræber ikke workers i expansion først
+	- Tror det er fordi de bliver sat til at bevæge sig mod hovedbasen, når den, bliver idle, laver search and destroy.
 - Abuse andre bots dårlig micro
 - Vi gør ikke noget mod et rush der er hurtigere end vores
 	-Ikke nogle metoder til at få vores zealots til at gøre noget i basen
@@ -32,7 +32,7 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
 		}
 		else {
-			unit->move(BWTA::getNearestChokepoint(unit->getPosition())->getCenter());
+			unit->move(BWTA::getNearestChokepoint(InformationManager::getInstance().ourBase->getPosition())->getCenter());
 		}
 	}
 
