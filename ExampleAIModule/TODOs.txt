@@ -10,5 +10,10 @@ Strategi-skift-design:
 
 TODO:
 - Ekstra scout på 4-player map. De skal ikke gå samme vej.
-- Strategiklassen skal have en armySize variabel
+- Strategiklassen skal have en armySize variabel.
+- Automatisk building placement er forfærdelig. Kanoner bliver sat dårligt og vores bygninger låser vores units inde.
+- Vi kan ikke finde ud af at angribe modstanderens expansions.
+- Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
+
+
 

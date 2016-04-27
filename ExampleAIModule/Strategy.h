@@ -1,5 +1,5 @@
 #pragma once
-#include "BWAPI.h"
+#include <BWAPI.h>
 #include "BuildOrderType.h"
 
 using namespace BWAPI;
@@ -19,7 +19,7 @@ public:
 	virtual std::vector<BuildOrderType> getBuildOrder() = 0;
 
 
-
+	virtual void setArmySize() = 0;
 
 };
 

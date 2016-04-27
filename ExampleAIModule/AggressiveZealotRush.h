@@ -1,5 +1,9 @@
 #pragma once
+#include <BWAPI.h>
 #include "Strategy.h"
+#include "OffenseManager.h"
+#include "BuildOrderManager.h"
+#include "StrategyManager.h"
 
 using namespace BWAPI;
 
@@ -16,6 +20,8 @@ public:
 	bool isAntiTurtle() { return antiTurtle; }
 
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
+
+	void setArmySize(){ OffenseManager::getInstance().setArmySize(3); }
 
 	// constructor
 	AggressiveZealotRush();

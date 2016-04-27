@@ -3,19 +3,40 @@ using namespace BWAPI;
 
 void BuildOrderManager::onStart(){
 
-
-	if (true){ //Insert logic for choosing this strategy over another here
-
-
-		newFixedOrderQueue = CommonZealotRush().getBuildOrder();
-
-
-	}
-
-	
+	// initializes the basic build
+	BaseBuild();
 }
 
 void BuildOrderManager::onFrame(){
+	
+	if (!StrategyManager::getInstance().hasStrategy()){
+		switch (StrategyManager::getInstance().getStrategy()){
+
+		case StrategyManager::commonZealotRush:
+			CommonZealotRush();
+			StrategyManager::getInstance().setStrategy(StrategyManager::none);
+			break;
+
+		case StrategyManager::aggressiveZealotRush:
+			AggressiveZealotRush();
+			StrategyManager::getInstance().setStrategy(StrategyManager::none);
+			break;
+
+		case StrategyManager::earlyDarkTemplar:
+			EarlyDarkTemplar();
+			StrategyManager::getInstance().setStrategy(StrategyManager::none);
+			break;
+
+		case StrategyManager::none:
+
+			break;
+
+		default:
+			CommonZealotRush();
+			break;
+		}
+	}
+	
 
 }
 

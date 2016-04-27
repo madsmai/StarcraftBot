@@ -3,6 +3,9 @@
 
 CommonZealotRush::CommonZealotRush(){
 
+	Broodwar << name << std::endl;
+
+	setArmySize();
 
 	buildOrder = { probe, probe, probe, probe, pylon, // 8
 		scoutRequest,
@@ -12,5 +15,10 @@ CommonZealotRush::CommonZealotRush(){
 		zealot, zealot, zealot, pylon, // 22
 		zealot, zealot, zealot, pylon };
 
+	for (BuildOrderType order : buildOrder){
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
+	}
+
+	StrategyManager::getInstance().setOngoingStrategy(true);
 
 }

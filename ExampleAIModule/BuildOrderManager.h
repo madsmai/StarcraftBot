@@ -5,16 +5,17 @@
 #include "BuildingManager.h"
 #include "OffenseManager.h"
 #include "BuildOrderType.h"
+#include "StrategyManager.h"
 #include <queue>
 
 // include strategies
+#include "BaseBuild.h"
 #include "CommonZealotRush.h"
 #include "AggressiveZealotRush.h"
 #include "EarlyDarkTemplar.h"
 
 using namespace BWAPI;
-class BuildOrderManager
-{
+class BuildOrderManager {
 public:
 	void onFrame();
 	void onStart();
@@ -25,6 +26,10 @@ public:
 
 	bool &getFixedOrder() { return fixedOrder; }
 	std::vector<BuildOrderType>  &getNewFixedOrderQueue() { return newFixedOrderQueue; }
+
+
+
+
 
 
 private:
@@ -49,5 +54,7 @@ private:
 	int pylonsInQueue;
 
 	std::vector<BuildOrderType> newFixedOrderQueue;
+
+
 };
 
