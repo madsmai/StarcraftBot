@@ -4,7 +4,10 @@
 using namespace BWAPI;
 /*
 TODO:
-- Expansions bugger os
+- Expansions bugger os, helt vildt.
+- De bevæger sig frem og tilbage
+- Dræber ikke workers i expansion først
+- Tror det er fordi de bliver sat til at bevæge sig mod hovedbasen, når den, bliver idle, laver search and destroy.
 - Abuse andre bots dårlig micro
 
 */
@@ -32,7 +35,7 @@ void OffenseManager::onFrame(){
 	for (Unit unit : fighters) {
 		if (unit->isUnderAttack()) {
 			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
-				&& BWTA::getNearestBaseLocation(unit->getPosition())!=InformationManager::getInstance().ourBase) {
+				&& BWTA::getNearestBaseLocation(unit->getPosition()) != InformationManager::getInstance().ourBase) {
 				Broodwar << "Their army is stronger" << std::endl;
 				rushOngoing = false;
 				fighters.move(InformationManager::getInstance().ourBase->getPosition());
@@ -42,7 +45,7 @@ void OffenseManager::onFrame(){
 			}
 		}
 		else if (InformationManager::getInstance().ourBase != BWTA::getNearestBaseLocation(unit->getPosition())
-			&& unit->isIdle()) {	
+			&& unit->isIdle()) {
 			searchAndDestroy(unit);
 		}
 
@@ -54,6 +57,15 @@ void OffenseManager::onFrame(){
 		rush(squad);
 		squad.empty();
 	}
+	if (cowards.size() > 0 && runFrames + 18 <= Broodwar->getFrameCount()) {
+		for (Unit coward : cowards) {
+			if (fighters.find(coward) == fighters.end()) {
+				fighters.insert(coward);
+			}
+		}
+		cowards.clear();
+	}
+
 }
 
 OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager object
@@ -88,26 +100,24 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 		BWAPI::Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding);
 		BWAPI::Unitset nearbyEnemies = attackedUnit->getUnitsInRadius(128, Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding && Filter::IsVisible);
 		if (attacker != NULL) {
-			calculatePriority(attacker, attackedUnit);
-			//Broodwar << "Nearby Enemies size = " << nearbyEnemies.size() << std::endl;
-			//Broodwar << "Range of " << attacker->getType() << " is " << attacker->getType().groundWeapon().maxRange() << std::endl;
-			if (nearbyEnemies.size() >= 2) {
-				/*if (attackedUnit->getShields() <= attackedUnit->getType().maxShields() / 10) {
-					Broodwar << "Time to start!" << std::endl;
-					for (Unit fighter : fighters) {
-						BWTA::RectangleArray<double> area = BWTA::RectangleArray<double>(25, 25);
-						if (area.getHeight() != NULL) {
-							Broodwar << "Time to start! NOT NULL" << std::endl;
-						}
-						BWTA::getGroundDistanceMap(attackedUnit->getTilePosition(), area);
-						unsigned int i,j;
-						for (i = 0; i < area.getHeight(); i++) {
-							for (j = 0; i < area.getWidth(); j++) {
-								Broodwar << i << j << area.getItem(i,j) << std::endl;
-							}
-						}
-					}
-				}*/
+			if (attackedUnit->getShields() < attackedUnit->getType().maxShields() / 10) {
+
+				if (cowards.find(attackedUnit) == cowards.end()) {
+					cowards.insert(attackedUnit);
+				}
+				if (fighters.find(attackedUnit) != fighters.end()) {
+					fighters.erase(fighters.find(attackedUnit));
+				}
+				runFrames = Broodwar->getFrameCount();
+
+				if (BWTA::getNearestBaseLocation(attackedUnit->getPosition()) == InformationManager::getInstance().enemyBase) {
+					attackedUnit->move(InformationManager::getInstance().ourBase->getPosition());
+				}
+				else {
+					attackedUnit->move(BWTA::getNearestChokepoint(attackedUnit->getPosition())->getCenter());
+				}
+			}
+			else if (nearbyEnemies.size() >= 2) {
 				int maxPrio = 0;
 				Unit bestTarget;
 				for (Unit troop : nearbyEnemies) {
@@ -117,22 +127,18 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 						bestTarget = troop;
 					}
 				}
-				Broodwar->drawCircleMap(bestTarget->getPosition(),15,Colors::Brown);
+				Broodwar->drawCircleMap(bestTarget->getPosition(), 15, Colors::Brown);
 				attackedUnit->attack(bestTarget);
 				getHelp(attackedUnit, bestTarget);
 				return true;
 			}
 			else {
-				if (attackedUnit->isAttacking()) {
+				if (!attackedUnit->isAttacking()) {
 					attackedUnit->attack(attacker);
 				}
 				getHelp(attackedUnit, attacker);
 				return true;
 			}
-			
-		}
-		else {
-			return false;
 		}
 	}
 	return false;
@@ -148,7 +154,8 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
 		if (helper != NULL
 			&& badGuy->isVisible()
-			&& badGuy != NULL) {
+			&& badGuy != NULL
+			&& fighters.find(helper) != fighters.end()) {
 
 			helper->attack(badGuy);
 			return true;
@@ -169,17 +176,17 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	/*while (attackers.size() > armySize) {
 		BWAPI::Unit immigrant = *attackers.begin();
 		if (immigrant != NULL) {
-			temp.insert(immigrant);
-			attackers.erase(immigrant);
+		temp.insert(immigrant);
+		attackers.erase(immigrant);
 		}
 		else {
-			Broodwar << "DEPLOY THE BRAKES!!!" << std::endl;
-			break;
+		Broodwar << "DEPLOY THE BRAKES!!!" << std::endl;
+		break;
 		}
-	}
-	if (!temp.empty()) {
+		}
+		if (!temp.empty()) {
 		searchAndDestroy(temp);
-	}*/
+		}*/
 
 	//Finds units to kill and kills them in groups of around 3.
 	std::vector<BWAPI::Unit>::iterator it;
