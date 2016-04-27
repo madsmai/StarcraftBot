@@ -5,12 +5,6 @@ void BuildOrderManager::onStart(){
 
 	// initializes the basic build
 	BaseBuild();
-
-
-
-	
-
-
 }
 
 void BuildOrderManager::onFrame(){

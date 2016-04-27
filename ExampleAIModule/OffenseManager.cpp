@@ -4,10 +4,8 @@
 using namespace BWAPI;
 /*
 TODO:
-- Sørg for at samle zealots sammen og angrib med dem sammen, det samlede antal skal varierer
-alt efter modstanderens forsvar
-- En måde at få zealots til at prioriterer hvad de angriber
--Bør search and destroy faktisk bruge et unitset, måske skal de blot bruge 1 unit
+- Expansions bugger os
+- Abuse andre bots dårlig micro
 
 */
 
@@ -33,7 +31,8 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 void OffenseManager::onFrame(){
 	for (Unit unit : fighters) {
 		if (unit->isUnderAttack()) {
-			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())) {
+			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
+				&& BWTA::getNearestBaseLocation(unit->getPosition())!=InformationManager::getInstance().ourBase) {
 				Broodwar << "Their army is stronger" << std::endl;
 				rushOngoing = false;
 				fighters.move(InformationManager::getInstance().ourBase->getPosition());
@@ -93,6 +92,22 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 			//Broodwar << "Nearby Enemies size = " << nearbyEnemies.size() << std::endl;
 			//Broodwar << "Range of " << attacker->getType() << " is " << attacker->getType().groundWeapon().maxRange() << std::endl;
 			if (nearbyEnemies.size() >= 2) {
+				/*if (attackedUnit->getShields() <= attackedUnit->getType().maxShields() / 10) {
+					Broodwar << "Time to start!" << std::endl;
+					for (Unit fighter : fighters) {
+						BWTA::RectangleArray<double> area = BWTA::RectangleArray<double>(25, 25);
+						if (area.getHeight() != NULL) {
+							Broodwar << "Time to start! NOT NULL" << std::endl;
+						}
+						BWTA::getGroundDistanceMap(attackedUnit->getTilePosition(), area);
+						unsigned int i,j;
+						for (i = 0; i < area.getHeight(); i++) {
+							for (j = 0; i < area.getWidth(); j++) {
+								Broodwar << i << j << area.getItem(i,j) << std::endl;
+							}
+						}
+					}
+				}*/
 				int maxPrio = 0;
 				Unit bestTarget;
 				for (Unit troop : nearbyEnemies) {
