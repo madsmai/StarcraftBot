@@ -9,6 +9,10 @@ TODO:
 - Dræber ikke workers i expansion først
 - Tror det er fordi de bliver sat til at bevæge sig mod hovedbasen, når den, bliver idle, laver search and destroy.
 - Abuse andre bots dårlig micro
+- Vi gør ikke noget mod et rush der er hurtigere end vores
+	-Ikke nogle metoder til at få vores zealots til at gøre noget i basen
+
+- Early dark templars strategien bugger
 
 */
 
@@ -26,6 +30,9 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 		fighters.insert(unit);
 		if (rushOngoing) {
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
+		}
+		else {
+			unit->move(BWTA::getNearestChokepoint(unit->getPosition())->getCenter());
 		}
 	}
 
@@ -61,6 +68,7 @@ void OffenseManager::onFrame(){
 		for (Unit coward : cowards) {
 			if (fighters.find(coward) == fighters.end()) {
 				fighters.insert(coward);
+				searchAndDestroy(coward);
 			}
 		}
 		cowards.clear();
@@ -99,8 +107,11 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 	if (attackedUnit != NULL) {
 		BWAPI::Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding);
 		BWAPI::Unitset nearbyEnemies = attackedUnit->getUnitsInRadius(128, Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding && Filter::IsVisible);
+		BWAPI::Unitset nearbyAllies = attackedUnit->getUnitsInRadius(128, !Filter::IsEnemy && !Filter::IsWorker && !Filter::IsBuilding);
 		if (attacker != NULL) {
-			if (attackedUnit->getShields() < attackedUnit->getType().maxShields() / 10) {
+			if (attackedUnit->getShields() < attackedUnit->getType().maxShields() / 10
+				&& nearbyAllies.size()>0
+				&& nearbyEnemies.size()>1) {
 
 				if (cowards.find(attackedUnit) == cowards.end()) {
 					cowards.insert(attackedUnit);
