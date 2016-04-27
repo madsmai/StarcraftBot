@@ -14,6 +14,9 @@ TODO:
 
 - Early dark templars strategien bugger
 
+- Fjern casen for 1 enemyAttacker i fightback
+
+
 */
 
 
@@ -26,13 +29,10 @@ void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 }
 
 void OffenseManager::onUnitComplete(BWAPI::Unit unit){
-	if (unit->canAttack() && unit->canMove() && !unit->getType().isWorker()) {
+	if (unit->canAttack() && unit->canMove() && !unit->getType().isWorker() && unit != NULL) {
 		fighters.insert(unit);
-		if (rushOngoing) {
+		if (rushOngoing && InformationManager::getInstance().enemyBase != NULL) {
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
-		}
-		else {
-			unit->move(BWTA::getNearestChokepoint(InformationManager::getInstance().ourBase->getPosition())->getCenter());
 		}
 	}
 
@@ -43,6 +43,7 @@ void OffenseManager::onFrame(){
 		if (unit->isUnderAttack()) {
 			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
 				&& BWTA::getNearestBaseLocation(unit->getPosition()) != InformationManager::getInstance().ourBase) {
+
 				Broodwar << "Their army is stronger" << std::endl;
 				rushOngoing = false;
 				fighters.move(InformationManager::getInstance().ourBase->getPosition());
@@ -51,18 +52,22 @@ void OffenseManager::onFrame(){
 				fightBack(unit);
 			}
 		}
-		else if (InformationManager::getInstance().ourBase != BWTA::getNearestBaseLocation(unit->getPosition())
+		else if (InformationManager::getInstance().enemyBase != NULL
+			&& InformationManager::getInstance().enemyBase->getRegion() == BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()) {
 			searchAndDestroy(unit);
 		}
+		else if (InformationManager::getInstance().ourBase->getRegion() == BWTA::getRegion(unit->getTilePosition())
+			&& unit->isIdle()
+			&& !rushOngoing){
 
-		if (!rushOngoing && unit->isIdle()) {
+			unit->move(BWTA::getNearestBaseLocation(InformationManager::getInstance().ourBase->getPosition())->getPosition());
 			squad.insert(unit);
 		}
 	}
 	if (squad.size() >= armySize) {
 		rush(squad);
-		squad.empty();
+		squad.clear();
 	}
 	if (cowards.size() > 0 && runFrames + 18 <= Broodwar->getFrameCount()) {
 		for (Unit coward : cowards) {
@@ -182,23 +187,6 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Called when our fighters are idle in the enemy base
 
-	//Unitset temp;
-
-	/*while (attackers.size() > armySize) {
-		BWAPI::Unit immigrant = *attackers.begin();
-		if (immigrant != NULL) {
-		temp.insert(immigrant);
-		attackers.erase(immigrant);
-		}
-		else {
-		Broodwar << "DEPLOY THE BRAKES!!!" << std::endl;
-		break;
-		}
-		}
-		if (!temp.empty()) {
-		searchAndDestroy(temp);
-		}*/
-
 	//Finds units to kill and kills them in groups of around 3.
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
@@ -214,7 +202,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		}
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
-		if (!attacker->attack(attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy))) {
+		if (!attacker->attack(attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible))) {
 			attacker->attack(InformationManager::getInstance().enemyPassiveBuildings.front()->getPosition());
 		}
 	}
@@ -228,11 +216,6 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 			attacker->attack(InformationManager::getInstance().enemyTowers.front()->getPosition());
 		}
 	}
-	else {
-		Broodwar << "Nothing to search and destroy, did we win or is information wrong?" << std::endl;
-	}
-
-
 }
 
 
@@ -302,19 +285,12 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 
 	int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
-	//Integer division round up, hopefully
+	//Integer division round up
 	int hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
 
 	int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
 
 	int priority = damage / hitsToKill;
-
-
-	//Broodwar << "Effectivehp of " << enemy->getType() << " is: " << effectiveHp << std::endl;
-	//Broodwar << "ourDamage of " << ourUnit->getType() << " is: " << ourDamage << std::endl;
-	//Broodwar << "hitsToKill of " << enemy->getType() << " is: " << hitsToKill << std::endl;
-	//Broodwar << "damage of " << enemy->getType() << " is: " << damage << std::endl;
-	//Broodwar << "Priority of " << enemy->getType() << " is: " << priority << std::endl;
 
 	return priority;
 }
