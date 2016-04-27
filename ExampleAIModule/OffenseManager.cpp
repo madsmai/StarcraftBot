@@ -1,5 +1,6 @@
 #include "OffenseManager.h"
-#include "InformationManager.h"
+
+
 
 using namespace BWAPI;
 /*
@@ -18,7 +19,6 @@ TODO:
 
 
 */
-
 
 void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 	if (unit->getPlayer() == Broodwar->self()) {
@@ -85,7 +85,9 @@ OffenseManager& OffenseManager::getInstance(){ //Return ref to OffenseManager ob
 	static OffenseManager i; //Make static instance i
 	return i;
 }
+
 bool OffenseManager::rush(BWAPI::Unitset attackers) {
+	InformationManager::getInstance().writeToLog("Started rush");
 	//Executes a rush with the given units
 	static int lastChecked = 0;
 	if (!attackers.empty()) {
@@ -109,6 +111,7 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 }
 
 bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
+	InformationManager::getInstance().writeToLog("Started fightBack");
 	if (attackedUnit != NULL) {
 		BWAPI::Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding);
 		BWAPI::Unitset nearbyEnemies = attackedUnit->getUnitsInRadius(128, Filter::IsEnemy && Filter::IsAttacking && !Filter::IsWorker && !Filter::IsBuilding && Filter::IsVisible);
@@ -159,8 +162,9 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 	}
 	return false;
 }
-bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
+bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
+	InformationManager::getInstance().writeToLog("Started getHelp");
 	if (victim != NULL) {
 		BWAPI::Unit helper = victim->getClosestUnit(Filter::IsAlly
 			&& Filter::CanAttack
@@ -186,7 +190,7 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 
 void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Called when our fighters are idle in the enemy base
-
+	InformationManager::getInstance().writeToLog("Started searchAndDestroy");
 	//Finds units to kill and kills them in groups of around 3.
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
@@ -218,8 +222,8 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	}
 }
 
-
 bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
+	InformationManager::getInstance().writeToLog("Started avoidTowers");
 	bool underTower = false;
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -277,10 +281,8 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 	return underTower;
 }
 
-
-
 int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
-
+	InformationManager::getInstance().writeToLog("Started calculatePriority");
 	int effectiveHp = enemy->getHitPoints() + enemy->getShields();
 
 	int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
