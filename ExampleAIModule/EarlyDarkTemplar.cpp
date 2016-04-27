@@ -7,7 +7,7 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 
 	setArmySize();
 
-	buildOrder = { probe, probe, probe, probe, pylon, // 8 - first pylon
+	buildOrder = { // base Build order
 		probe, probe, gateway, scoutRequest, // 10 - scout
 		probe, probe, assimilator, // 12 - assimilator
 		gasworkerRequest, gasworkerRequest,
@@ -18,13 +18,19 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 		probe, dragoon, gateway, pylon, archives, // 29 archives
 		probe, zealot, zealot, probe, pylon, // 35
 		dtemplar, probe, dtemplar, // 2 dark templars
-		forge, pylon, cannon, cannon };
+		forge, pylon, cannon, cannon, evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
 	}
+}
 
-	StrategyManager::getInstance().setOngoingStrategy(true);
+
+void EarlyDarkTemplar::evaluateStrategy(){
+
+	Broodwar << "Evaluating early dark templar" << std::endl;
+	StrategyManager::getInstance().setNextStrategy(StrategyManager::aggressiveZealotRush);
+
 }
 
 

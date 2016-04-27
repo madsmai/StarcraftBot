@@ -20,7 +20,13 @@ public:
 	int &getAirArmor(){ return air_armor_count; }
 	bool &getSingularityCharge(){ return singularity_charge; }
 
+
+	int runFrames;
+
 	BWAPI::Unitset fighters;
+	BWAPI::Unitset cowards;
+	BWAPI::Unitset squad;
+
 	bool rushOngoing = false;
 
 	void setArmySize(int size){ armySize = size; }
@@ -31,8 +37,6 @@ private:
 	unsigned int armySize;
 
 	std::vector<BWAPI::Unit> zealots;
-
-	BWAPI::Unitset squad;
 
 	//Upgrades
 	int ground_weapons_count = 0;

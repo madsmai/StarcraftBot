@@ -1,26 +1,39 @@
 #pragma once
 #include <BWAPI.h>
+
+#include "AggressiveZealotRush.h"
+#include "CommonZealotRush.h"
+#include "EarlyDarkTemplar.h"
+#include "ContinueZealotRush.h"
+
 class StrategyManager {
 public:
+
 	static StrategyManager& getInstance();
 
+	enum strategy{ none, basic, commonZealotRush, aggressiveZealotRush, earlyDarkTemplar, continueZealotRush };
 
-	bool hasStrategy() { return ongoingStrategy; }
-	void setOngoingStrategy(bool input) { ongoingStrategy = input; }
 
-	int getStrategy(){ return strategy; }
-	void setStrategy(int newStrategy){ strategy = newStrategy; }
+	int getCurrentStrategy(){ return currentStrategy; }
+	int getNextStrategy(){ return nextStrategy; }
+	void setCurrentStrategy(int strategy){ currentStrategy = strategy; }
+	void setNextStrategy(int strategy){ nextStrategy = strategy; }
 
-	enum strategy{ none, commonZealotRush, aggressiveZealotRush, earlyDarkTemplar };
+	
+	void evaluateStrategies();
+
+
+	int setInitialStrategy();
+	void evaluateInitialStrategy();
 
 
 private:
 
-	bool ongoingStrategy = true;
+	int currentStrategy;
+	int nextStrategy;
 
-	int strategy;
 
-	
+
 
 };
 

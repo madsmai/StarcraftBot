@@ -5,38 +5,50 @@ void BuildOrderManager::onStart(){
 
 	// initializes the basic build
 	BaseBuild();
+	StrategyManager::getInstance().setCurrentStrategy(StrategyManager::basic);
+
+
+	// sets the initial strategy depending on the enemy race
+	StrategyManager::getInstance().setNextStrategy(StrategyManager::getInstance().setInitialStrategy());
 }
 
 void BuildOrderManager::onFrame(){
-	
-	if (!StrategyManager::getInstance().hasStrategy()){
-		switch (StrategyManager::getInstance().getStrategy()){
+
+	if (StrategyManager::getInstance().getCurrentStrategy() == StrategyManager::none){
+
+		Broodwar << "Setting a new current strategy" << std::endl;
+
+		StrategyManager::getInstance().setCurrentStrategy(StrategyManager::getInstance().getNextStrategy());
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::none);
+
+		switch (StrategyManager::getInstance().getCurrentStrategy()){
 
 		case StrategyManager::commonZealotRush:
 			CommonZealotRush();
-			StrategyManager::getInstance().setStrategy(StrategyManager::none);
 			break;
 
 		case StrategyManager::aggressiveZealotRush:
 			AggressiveZealotRush();
-			StrategyManager::getInstance().setStrategy(StrategyManager::none);
 			break;
 
 		case StrategyManager::earlyDarkTemplar:
 			EarlyDarkTemplar();
-			StrategyManager::getInstance().setStrategy(StrategyManager::none);
 			break;
 
+		case StrategyManager::continueZealotRush:
+			ContinueZealotRush();
+			break;
+		
 		case StrategyManager::none:
-
+			Broodwar << "No strategy is set" << std::endl;
 			break;
 
-		default:
-			CommonZealotRush();
-			break;
 		}
+
+
 	}
-	
+
+
 
 }
 

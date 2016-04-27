@@ -89,6 +89,9 @@ void GameManager::onSendText(std::string text){
 	if (text == "Current Status") {
 		InformationManager::getInstance().currentStatus();
 	}
+	else if (text == "Squad Size") {
+		Broodwar << OffenseManager::getInstance().squad.size() << std::endl;
+	}
 	else if (text == "Army Strength enemy") {
 		
 		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy()) << std::endl;
@@ -112,20 +115,6 @@ void GameManager::onSendText(std::string text){
 		for (Unit attacker : InformationManager::getInstance().enemyAttackers){
 			Broodwar << "Enemy attackers: " << attacker->getType() << std::endl;
 		}
-	}
-
-	// chose strategy
-	else if (text == "czr"){
-		StrategyManager::getInstance().setStrategy(StrategyManager::commonZealotRush);
-		Broodwar << "Common zealot rush as next tactic" << std::endl;
-	}
-	else if (text == "azr"){
-		StrategyManager::getInstance().setStrategy(StrategyManager::aggressiveZealotRush);
-		Broodwar << "Aggressive zealot rush as next tactic" << std::endl;
-	}
-	else if (text == "edt"){
-		StrategyManager::getInstance().setStrategy(StrategyManager::earlyDarkTemplar);
-		Broodwar << "early Dark Templar as next tactic" << std::endl;
 	}
 
 }

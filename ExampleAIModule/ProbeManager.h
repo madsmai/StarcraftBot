@@ -4,6 +4,8 @@
 #include "ResourceManager.h"
 #include "ScoutManager.h"
 #include "BuildOrderManager.h"
+#include "StrategyManager.h"
+#include <utility>
 #include <vector>
 #include <queue>
 
@@ -21,6 +23,8 @@ public:
 
 	//Add probe to the list of mineralProbes
 	void addMineralProbe(BWAPI::Unit probe);
+
+	TilePosition getNewBuildLocation(BWAPI::UnitType type, TilePosition position);
 
 private:
 	//The lists

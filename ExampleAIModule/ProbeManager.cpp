@@ -102,8 +102,8 @@ void ProbeManager::executeQueue(){
 				int minPrice = type.mineralPrice(); //Price of building
 				int gasPrice = type.gasPrice(); //Price of building
 
+				//TilePosition position = getNewBuildLocation(type, builder->getTilePosition()); //Buildposition
 				TilePosition position = Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
-				UnitType pylon = UnitTypes::Protoss_Pylon;
 				if (Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
 					&& Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice
 					&& !builder->isConstructing()){
@@ -126,7 +126,7 @@ void ProbeManager::executeQueue(){
 				}
 			}
 		}
-		
+
 
 		//Do things with the next request in the buildOrder
 		if (queue.front().isRequest()){
@@ -143,7 +143,6 @@ void ProbeManager::executeQueue(){
 
 				mineralProbes.erase(mineralProbes.begin());
 				queue.erase(queue.begin()); //Remove the request from the queue
-				Broodwar << "Removed a scout request";
 
 			}
 
@@ -152,12 +151,12 @@ void ProbeManager::executeQueue(){
 				std::vector<Unit>::iterator it;
 				for (it = mineralProbes.begin(); it != mineralProbes.end();){
 					Unit unit = *it;
-					if (unit->isGatheringMinerals() && unit != builder){
+					if (unit->isGatheringMinerals() && unit != builder
+						&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) >= 1){
 						if (unit->gather(unit->getClosestUnit(Filter::IsRefinery))){
 							mineralProbes.erase(it); //Remove probe from list by number in array
 							gasProbes.push_back(unit); //Add unit to gasWorkerList
 							queue.erase(queue.begin()); //Remove the request from the queue
-							Broodwar << "Removed a gasworker request";
 						}
 						else {
 							Broodwar << Broodwar->getLastError() << std::endl;
@@ -167,14 +166,44 @@ void ProbeManager::executeQueue(){
 					it++;
 				}
 			}
+
+			// evalute the strategy
+			else if (request == BuildOrderType::evaluateStrategyRequest){
+
+				StrategyManager::getInstance().evaluateStrategies();
+
+				queue.erase(queue.begin()); //Remove the request from the queue
+			}
 		}
 	} //End of !queue.empty()
-	
+
 	else { // if queue is empty
-		StrategyManager::getInstance().setOngoingStrategy(false);
+
+		StrategyManager::getInstance().setCurrentStrategy(StrategyManager::none);
+
 	}
 
 }
+
+//TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition position){
+//	if (type == UnitTypes::Protoss_Photon_Cannon || type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Pylon){
+//		TilePosition ourBase = Broodwar->self()->getStartLocation();
+//		BWTA::Chokepoint* chokepoint = BWTA::getNearestChokepoint(ourBase);
+//		TilePosition firstPos = TilePosition(chokepoint->getSides().first);
+//		TilePosition secondPos = TilePosition(chokepoint->getSides().second);
+//		if (firstPos.getDistance(ourBase) < secondPos.getDistance(ourBase)){
+//			//firstPos.getDistance(ourBase) < secondPos.getDistance(ourBase)
+//			//BWTA::getGroundDistance(firstPos, ourBase) < BWTA::getGroundDistance(firstPos, ourBase)
+//			return Broodwar->getBuildLocation(type, firstPos);
+//		}
+//		else{
+//			return Broodwar->getBuildLocation(type, secondPos);
+//		}
+//	}
+//	else {
+//		return Broodwar->getBuildLocation(type, position);
+//	}
+//}
 
 void ProbeManager::addMineralProbe(Unit probe){
 	mineralProbes.push_back(probe);
