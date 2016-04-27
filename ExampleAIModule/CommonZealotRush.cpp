@@ -13,12 +13,18 @@ CommonZealotRush::CommonZealotRush(){
 		probe, probe, gateway, // 12
 		probe, zealot, probe, pylon, // 16
 		zealot, zealot, zealot, pylon, // 22
-		zealot, zealot, zealot, pylon };
+		zealot, zealot, zealot, pylon, evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
 	}
 
-	StrategyManager::getInstance().setOngoingStrategy(true);
+}
+
+
+void CommonZealotRush::evaluateStrategy(){
+
+	Broodwar << "Evaluating common zealot rush" << std::endl;
+	StrategyManager::getInstance().setNextStrategy(StrategyManager::aggressiveZealotRush);
 
 }

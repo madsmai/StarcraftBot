@@ -126,7 +126,7 @@ void ProbeManager::executeQueue(){
 				}
 			}
 		}
-		
+
 
 		//Do things with the next request in the buildOrder
 		if (queue.front().isRequest()){
@@ -143,7 +143,6 @@ void ProbeManager::executeQueue(){
 
 				mineralProbes.erase(mineralProbes.begin());
 				queue.erase(queue.begin()); //Remove the request from the queue
-				Broodwar << "Removed a scout request";
 
 			}
 
@@ -158,7 +157,6 @@ void ProbeManager::executeQueue(){
 							mineralProbes.erase(it); //Remove probe from list by number in array
 							gasProbes.push_back(unit); //Add unit to gasWorkerList
 							queue.erase(queue.begin()); //Remove the request from the queue
-							Broodwar << "Removed a gasworker request";
 						}
 						else {
 							Broodwar << Broodwar->getLastError() << std::endl;
@@ -172,19 +170,17 @@ void ProbeManager::executeQueue(){
 			// evalute the strategy
 			else if (request == BuildOrderType::evaluateStrategyRequest){
 
-
-
-
+				StrategyManager::getInstance().evaluateStrategies();
 
 				queue.erase(queue.begin()); //Remove the request from the queue
-				Broodwar << "Removed a evaluate strategy request";
 			}
 		}
 	} //End of !queue.empty()
-	
+
 	else { // if queue is empty
-		StrategyManager::getInstance().setOngoingStrategy(false);
-		Broodwar << "queue was empty, there is no ongoingStrategy" << std::endl;
+
+		StrategyManager::getInstance().setCurrentStrategy(StrategyManager::none);
+
 	}
 
 }

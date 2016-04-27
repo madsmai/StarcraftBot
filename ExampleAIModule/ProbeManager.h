@@ -4,6 +4,7 @@
 #include "ResourceManager.h"
 #include "ScoutManager.h"
 #include "BuildOrderManager.h"
+#include "StrategyManager.h"
 #include <vector>
 #include <queue>
 
