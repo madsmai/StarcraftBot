@@ -4,10 +4,8 @@
 using namespace BWAPI;
 /*
 TODO:
-- Sørg for at samle zealots sammen og angrib med dem sammen, det samlede antal skal varierer
-alt efter modstanderens forsvar
-- En måde at få zealots til at prioriterer hvad de angriber
--Bør search and destroy faktisk bruge et unitset, måske skal de blot bruge 1 unit
+- Expansions bugger os
+- Abuse andre bots dårlig micro
 
 */
 
@@ -33,7 +31,8 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 void OffenseManager::onFrame(){
 	for (Unit unit : fighters) {
 		if (unit->isUnderAttack()) {
-			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())) {
+			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
+				&& BWTA::getNearestBaseLocation(unit->getPosition())!=InformationManager::getInstance().ourBase) {
 				Broodwar << "Their army is stronger" << std::endl;
 				rushOngoing = false;
 				fighters.move(InformationManager::getInstance().ourBase->getPosition());
