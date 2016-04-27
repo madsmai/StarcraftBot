@@ -4,10 +4,11 @@
 #include "OffenseManager.h"
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
+#include "InformationManager.h"
 
-class EarlyDarkTemplar : public Strategy {
+class ContinueZealotRush : public Strategy {
 public:
-	
+
 	std::string getName() { return name; }
 
 	bool isStarter() { return starter; }
@@ -23,7 +24,7 @@ public:
 	static void evaluateStrategy();
 
 	// constructor
-	EarlyDarkTemplar();
+	ContinueZealotRush();
 
 private:
 
@@ -55,8 +56,6 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "Early dark templar";
-
+	std::string name = "Continue zealot rushing";
 };
-
 

@@ -20,7 +20,12 @@ public:
 	int &getAirArmor(){ return air_armor_count; }
 	bool &getSingularityCharge(){ return singularity_charge; }
 
+
+	int runFrames;
+
 	BWAPI::Unitset fighters;
+	BWAPI::Unitset cowards;
+
 	bool rushOngoing = false;
 
 	void setArmySize(int size){ armySize = size; }
