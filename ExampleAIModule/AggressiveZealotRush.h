@@ -4,6 +4,7 @@
 #include "OffenseManager.h"
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
+#include "InformationManager.h"
 
 using namespace BWAPI;
 
@@ -22,6 +23,7 @@ public:
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
 
 	void setArmySize(){ OffenseManager::getInstance().setArmySize(3); }
+	static void evaluateStrategy();
 
 	// constructor
 	AggressiveZealotRush();
@@ -43,6 +45,7 @@ private:
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
+	int evaluateStrategyRequest = BuildOrderType::requests::evaluateStrategyRequest;
 
 	bool starter = true;
 	bool endgame = false;

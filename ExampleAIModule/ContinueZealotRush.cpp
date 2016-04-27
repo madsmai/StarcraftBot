@@ -1,18 +1,20 @@
-#include "AggressiveZealotRush.h"
+#include "ContinueZealotRush.h"
 
-AggressiveZealotRush::AggressiveZealotRush() {
+
+ContinueZealotRush::ContinueZealotRush() {
 
 	Broodwar << name << std::endl;
 
 	setArmySize();
 
-	buildOrder = { // base Build order
-		probe, gateway, gateway, //2 gateways on 9
-		scoutRequest,
-		probe, probe, zealot, pylon, // 13/16-24
-		zealot, zealot, zealot, pylon, // 19/24-32
-		zealot, zealot, zealot, zealot, pylon, // 27/32-40
-		zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest }; // 35/40-48
+	if (Broodwar->self()->supplyTotal() / 2 - 5 <= Broodwar->self()->supplyUsed() / 2 + 8){
+
+		buildOrder = { zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest };
+
+	}
+	else {
+		buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
+	}
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
@@ -20,7 +22,7 @@ AggressiveZealotRush::AggressiveZealotRush() {
 
 }
 
-void AggressiveZealotRush::evaluateStrategy(){
+void ContinueZealotRush::evaluateStrategy(){
 
 	Broodwar << "Evaluating aggressive zealot rush" << std::endl;
 
@@ -33,11 +35,9 @@ void AggressiveZealotRush::evaluateStrategy(){
 	}
 	else {
 
-		// continue with the zealot rush
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
 
 	}
-
 
 
 }
