@@ -1,5 +1,11 @@
 #include "ScoutManager.h"
 
+/*
+TODO:
+- Scouten bevæger sig ud og scouter igen. Nok pga onDiscover
+- Scouten laver ikke noget når den kommer tilbage
+*/
+
 using namespace BWAPI;
 
 void ScoutManager::onFrame(){
@@ -35,12 +41,9 @@ void ScoutManager::onFrame(){
 					InformationManager::getInstance().nextBase = *it;
 					// Remove main base if it is empty
 					if (unit->getPosition() == InformationManager::getInstance().nextBase->getPosition()){
-						Broodwar << "BaseLocation.size  " << InformationManager::getInstance().baseLocations.size() << std::endl;
-
 						InformationManager::getInstance().currentBase = InformationManager::getInstance().nextBase;
 						InformationManager::getInstance().baseLocations.erase(*it);
 						Broodwar->sendText("Removed empty main base");
-						Broodwar << "BaseLocation.size  " << InformationManager::getInstance().baseLocations.size() << std::endl;
 					}
 					else if (InformationManager::getInstance().currentBase->getGroundDistance(InformationManager::getInstance().nextBase) < minDistance) {
 						minDistance = InformationManager::getInstance().currentBase->getGroundDistance(InformationManager::getInstance().nextBase);
