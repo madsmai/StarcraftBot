@@ -152,7 +152,8 @@ void ProbeManager::executeQueue(){
 				std::vector<Unit>::iterator it;
 				for (it = mineralProbes.begin(); it != mineralProbes.end();){
 					Unit unit = *it;
-					if (unit->isGatheringMinerals() && unit != builder){
+					if (unit->isGatheringMinerals() && unit != builder
+						&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) >= 1){
 						if (unit->gather(unit->getClosestUnit(Filter::IsRefinery))){
 							mineralProbes.erase(it); //Remove probe from list by number in array
 							gasProbes.push_back(unit); //Add unit to gasWorkerList

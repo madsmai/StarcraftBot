@@ -7,7 +7,7 @@ CommonZealotRush::CommonZealotRush(){
 
 	setArmySize();
 
-	buildOrder = { probe, probe, probe, probe, pylon, // 8
+	buildOrder = { // base Build order
 		scoutRequest,
 		probe, probe, gateway, // 10
 		probe, probe, gateway, // 12

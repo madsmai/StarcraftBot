@@ -6,7 +6,8 @@ AggressiveZealotRush::AggressiveZealotRush() {
 
 	setArmySize();
 
-	buildOrder = { probe, gateway, gateway, //2 gateways on 9
+	buildOrder = { // base Build order
+		probe, gateway, gateway, //2 gateways on 9
 		scoutRequest,
 		probe, probe, zealot, pylon, // 13
 		zealot, zealot, zealot, pylon,
