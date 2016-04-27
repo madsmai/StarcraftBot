@@ -2,6 +2,7 @@
 #include <BWAPI.h>
 class StrategyManager {
 public:
+
 	static StrategyManager& getInstance();
 
 
@@ -13,14 +14,17 @@ public:
 
 	enum strategy{ none, commonZealotRush, aggressiveZealotRush, earlyDarkTemplar };
 
+	int setInitialStrategy();
+
+	void evaluateInitialStrategy();
+
 
 private:
 
-	bool ongoingStrategy = true;
+	bool ongoingStrategy;
 
-	int strategy;
+	int strategy = none;
 
-	
 
 };
 

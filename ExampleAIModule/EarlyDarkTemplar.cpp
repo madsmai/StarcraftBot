@@ -7,7 +7,7 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 
 	setArmySize();
 
-	buildOrder = { probe, probe, probe, probe, pylon, // 8 - first pylon
+	buildOrder = { // base Build order
 		probe, probe, gateway, scoutRequest, // 10 - scout
 		probe, probe, assimilator, // 12 - assimilator
 		gasworkerRequest, gasworkerRequest,

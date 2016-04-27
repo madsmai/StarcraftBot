@@ -5,11 +5,15 @@ void BuildOrderManager::onStart(){
 
 	// initializes the basic build
 	BaseBuild();
+
+	// sets the initial strategy depending on the enemy race
+	StrategyManager::getInstance().setStrategy(StrategyManager::getInstance().setInitialStrategy());
 }
 
 void BuildOrderManager::onFrame(){
 	
 	if (!StrategyManager::getInstance().hasStrategy()){
+		Broodwar << "Selecting a new strategy" << std::endl;
 		switch (StrategyManager::getInstance().getStrategy()){
 
 		case StrategyManager::commonZealotRush:
@@ -28,12 +32,9 @@ void BuildOrderManager::onFrame(){
 			break;
 
 		case StrategyManager::none:
-
+			Broodwar << "No strategy is set" << std::endl;
 			break;
 
-		default:
-			CommonZealotRush();
-			break;
 		}
 	}
 	

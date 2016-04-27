@@ -152,7 +152,8 @@ void ProbeManager::executeQueue(){
 				std::vector<Unit>::iterator it;
 				for (it = mineralProbes.begin(); it != mineralProbes.end();){
 					Unit unit = *it;
-					if (unit->isGatheringMinerals() && unit != builder){
+					if (unit->isGatheringMinerals() && unit != builder
+						&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Assimilator) >= 1){
 						if (unit->gather(unit->getClosestUnit(Filter::IsRefinery))){
 							mineralProbes.erase(it); //Remove probe from list by number in array
 							gasProbes.push_back(unit); //Add unit to gasWorkerList
@@ -167,11 +168,23 @@ void ProbeManager::executeQueue(){
 					it++;
 				}
 			}
+
+			// evalute the strategy
+			else if (request == BuildOrderType::evaluateStrategyRequest){
+
+
+
+
+
+				queue.erase(queue.begin()); //Remove the request from the queue
+				Broodwar << "Removed a evaluate strategy request";
+			}
 		}
 	} //End of !queue.empty()
 	
 	else { // if queue is empty
 		StrategyManager::getInstance().setOngoingStrategy(false);
+		Broodwar << "queue was empty, there is no ongoingStrategy" << std::endl;
 	}
 
 }
