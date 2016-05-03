@@ -332,3 +332,11 @@ int InformationManager::calculateArmyStrength(BWAPI::Player player) {
 	}
 	return armyStrength;
 }
+
+void InformationManager::writeToLog(std::string text) {
+		std::ofstream log;
+		log.open("bwapi-data//AI/log.txt",std::ios::app);
+		log << text << "\n";
+		log.flush();
+		log.close();
+}

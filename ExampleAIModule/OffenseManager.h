@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BWAPI.h>
+#include "InformationManager.h"
 
 class OffenseManager {
 public:
