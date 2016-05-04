@@ -4,6 +4,8 @@
 #include <vector> // for std::vector
 #include <BWTA.h>
 #include "OffenseManager.h"
+#include <fstream>
+#include <iomanip>
 
 class InformationManager {
 public:
@@ -13,6 +15,7 @@ public:
 	void onUnitDestroy(BWAPI::Unit);
 
 	void currentStatus();
+	int writeToLog(std::string text);
 
 	int calculateArmyStrength(BWAPI::Player);
 	void addEnemyBarracks(BWAPI::Unit);

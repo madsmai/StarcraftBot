@@ -9,6 +9,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <Windows.h>
+#include <fstream>
 
 DWORD WINAPI AnalyzeThread();
 
@@ -41,4 +42,5 @@ public:
 	std::set<BWTA::BaseLocation*> baseLocations;
 
 	void drawTerrainData();
+
 };

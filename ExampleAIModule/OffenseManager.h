@@ -1,6 +1,7 @@
 #pragma once
 
 #include <BWAPI.h>
+#include "InformationManager.h"
 
 class OffenseManager {
 public:
@@ -25,6 +26,7 @@ public:
 
 	BWAPI::Unitset fighters;
 	BWAPI::Unitset cowards;
+	BWAPI::Unitset squad;
 
 	bool rushOngoing = false;
 
@@ -36,8 +38,6 @@ private:
 	unsigned int armySize;
 
 	std::vector<BWAPI::Unit> zealots;
-
-	BWAPI::Unitset squad;
 
 	//Upgrades
 	int ground_weapons_count = 0;
