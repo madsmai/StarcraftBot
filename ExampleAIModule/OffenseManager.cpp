@@ -66,16 +66,20 @@ void OffenseManager::onFrame(){
 			}
 		}
 		else if (InformationManager::getInstance().enemyBase != NULL
+			&& unit != NULL
 			&& InformationManager::getInstance().enemyBase->getRegion() != NULL
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
+			&& InformationManager::getInstance().writeToLog("Things were not null") == 42
 			&& InformationManager::getInstance().enemyBase->getRegion() == BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()) {
 			InformationManager::getInstance().writeToLog("If checks worked out1");
 			searchAndDestroy(unit);
 		}
 		else if (InformationManager::getInstance().ourBase != NULL
+			&& unit != NULL
 			&& InformationManager::getInstance().ourBase->getRegion() != NULL
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
+			&& InformationManager::getInstance().writeToLog("Things were not null") == 42
 			&& InformationManager::getInstance().ourBase->getRegion() == BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()
 			&& !rushOngoing){

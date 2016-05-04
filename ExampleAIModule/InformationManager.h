@@ -15,7 +15,7 @@ public:
 	void onUnitDestroy(BWAPI::Unit);
 
 	void currentStatus();
-	void writeToLog(std::string text);
+	int writeToLog(std::string text);
 
 	int calculateArmyStrength(BWAPI::Player);
 	void addEnemyBarracks(BWAPI::Unit);

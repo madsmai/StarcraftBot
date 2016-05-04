@@ -333,7 +333,7 @@ int InformationManager::calculateArmyStrength(BWAPI::Player player) {
 	return armyStrength;
 }
 
-void InformationManager::writeToLog(std::string text) {
+int InformationManager::writeToLog(std::string text) {
 		auto t = std::time(nullptr);
 		auto tm = *std::localtime(&t);
 		std::ofstream log;
@@ -341,4 +341,5 @@ void InformationManager::writeToLog(std::string text) {
 		log << std::put_time(&tm, "%d-%m-%y %H-%M-%S")<<":: " << text << "\n";
 		log.flush();
 		log.close();
+		return 42;
 }
