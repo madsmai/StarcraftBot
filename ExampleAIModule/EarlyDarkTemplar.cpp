@@ -5,7 +5,7 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 
 	Broodwar << name << std::endl;
 
-	setArmySize();
+	setSquadSize();
 
 	buildOrder = { // base Build order
 		probe, probe, gateway, scoutRequest, // 10 - scout
