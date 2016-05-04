@@ -5,6 +5,7 @@
 #include <BWTA.h>
 #include "OffenseManager.h"
 #include <fstream>
+#include <iomanip>
 
 class InformationManager {
 public:

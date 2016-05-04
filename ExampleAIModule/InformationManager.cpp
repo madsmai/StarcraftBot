@@ -334,9 +334,11 @@ int InformationManager::calculateArmyStrength(BWAPI::Player player) {
 }
 
 void InformationManager::writeToLog(std::string text) {
+		auto t = std::time(nullptr);
+		auto tm = *std::localtime(&t);
 		std::ofstream log;
 		log.open("bwapi-data//AI/log.txt",std::ios::app);
-		log << text << "\n";
+		log << std::put_time(&tm, "%d-%m-%y %H-%M-%S")<<":: " << text << "\n";
 		log.flush();
 		log.close();
 }
