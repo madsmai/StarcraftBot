@@ -65,7 +65,8 @@ void OffenseManager::onFrame(){
 				fightBack(unit);
 			}
 		}
-		else if (InformationManager::getInstance().enemyBase != NULL
+		else if (InformationManager::getInstance().writeToLog("Starting if check 1") == 42
+			&& InformationManager::getInstance().enemyBase != NULL
 			&& unit != NULL
 			&& InformationManager::getInstance().enemyBase->getRegion() != NULL
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
@@ -75,7 +76,8 @@ void OffenseManager::onFrame(){
 			InformationManager::getInstance().writeToLog("If checks worked out1");
 			searchAndDestroy(unit);
 		}
-		else if (InformationManager::getInstance().ourBase != NULL
+		else if (InformationManager::getInstance().writeToLog("Starting if check 2") == 42
+			&& InformationManager::getInstance().ourBase != NULL
 			&& unit != NULL
 			&& InformationManager::getInstance().ourBase->getRegion() != NULL
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
@@ -90,7 +92,7 @@ void OffenseManager::onFrame(){
 		}
 		InformationManager::getInstance().writeToLog("Got through it, phew");
 	}
-	if (squad.size() >= armySize) {
+	if (squad.size() >= squadSize) {
 		rush(squad);
 		squad.clear();
 	}

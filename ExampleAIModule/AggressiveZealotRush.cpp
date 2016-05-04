@@ -4,7 +4,7 @@ AggressiveZealotRush::AggressiveZealotRush() {
 
 	Broodwar << name << std::endl;
 
-	setArmySize();
+	setSquadSize();
 
 	buildOrder = { // base Build order
 		probe, gateway, gateway, //2 gateways on 9
