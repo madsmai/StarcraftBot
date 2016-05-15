@@ -45,6 +45,7 @@ public:
 	//Protoss
 	bool citadelOfAdun = false;
 	bool templarArchives = false;
+	bool logging = true;
 	std::vector<BWAPI::Unit> darkTemplars;
 
 

@@ -20,7 +20,7 @@ public:
 
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
 
-	void setArmySize(){ OffenseManager::getInstance().setArmySize(999); }
+	void setSquadSize(){ OffenseManager::getInstance().setSquadSize(999); }
 	static void evaluateStrategy();
 
 	// constructor

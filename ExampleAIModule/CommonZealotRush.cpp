@@ -5,7 +5,7 @@ CommonZealotRush::CommonZealotRush(){
 
 	Broodwar << name << std::endl;
 
-	setArmySize();
+	setSquadSize();
 
 	buildOrder = { // base Build order
 		scoutRequest,

@@ -5,7 +5,7 @@ BaseBuild::BaseBuild() {
 
 	Broodwar << name << std::endl;
 
-	setArmySize();
+	setSquadSize();
 
 	buildOrder = { probe, probe, probe, probe, pylon};
 	// ending with 8 / 16 supply

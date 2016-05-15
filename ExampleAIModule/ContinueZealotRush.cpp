@@ -5,7 +5,7 @@ ContinueZealotRush::ContinueZealotRush() {
 
 	Broodwar << name << std::endl;
 
-	setArmySize();
+	setSquadSize();
 
 	if (Broodwar->self()->supplyTotal() / 2 - 5 <= Broodwar->self()->supplyUsed() / 2 + 8){
 
