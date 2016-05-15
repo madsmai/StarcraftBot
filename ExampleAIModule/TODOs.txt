@@ -15,5 +15,12 @@ TODO:
 - Vi kan ikke finde ud af at angribe modstanderens expansions.
 - Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
 
+-When debugging don’t use the release version.
+-Threat levels, evaluate how to take range into account.
+-Make a private ladder and play many games to evaluate the strength of difference strategies against different strategies.
+	(download bots, or get it up on SSCAIT)
+-Fix avoid towers
+
+
 
 
