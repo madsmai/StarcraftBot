@@ -15,15 +15,6 @@ TODO:
 
 - Early dark templars strategien bugger
 
-- Fjern casen for 1 enemyAttacker i fightback
-
-
-- Crash forårsaget af
-
-if (fighters.find(attackedUnit) != fighters.end()) {
-fighters.erase(fighters.find(attackedUnit));
-}
-
 
 */
 
@@ -151,9 +142,6 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 
 				if (cowards.find(attackedUnit) == cowards.end()) {
 					cowards.insert(attackedUnit);
-				}
-				if (fighters.size() > 0 && fighters.find(attackedUnit) != fighters.end()) {
-					fighters.erase(fighters.find(attackedUnit));
 				}
 
 				runFrames = Broodwar->getFrameCount();
