@@ -196,49 +196,36 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	InformationManager::getInstance().writeToLog("Started searchAndDestroy");
 	Unit closest;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
-		Broodwar << "S&D Targetting Workers" << std::endl;
 		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
-		if (closest->isTargetable() && !attacker->attack(closest)) {
-			Broodwar << "S&D Targetting Workers, alternative" << std::endl;
+		if (closest != NULL && !attacker->attack(closest)) {
 			attacker->attack(InformationManager::getInstance().enemyWorkers.front()->getPosition());
 		}
 	}
 	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
-		Broodwar << "S&D Targetting Barracks" << std::endl;
 		closest = attacker->getClosestUnit((Filter::GetType == UnitTypes::Protoss_Gateway
 			|| Filter::GetType == UnitTypes::Terran_Barracks
 			|| Filter::GetType == UnitTypes::Zerg_Spawning_Pool) && Filter::IsEnemy);
-		if (closest->isTargetable() && attacker->attack(closest)) {
-			Broodwar << "S&D Targetting Barracks, alternative" << std::endl;
+		if (closest != NULL && attacker->attack(closest)) {
 			attacker->attack(InformationManager::getInstance().enemyBarracks.front()->getPosition());
 		}
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
-		Broodwar << "S&D Targetting Passives" << std::endl;
 		closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible);
-		if (closest->isTargetable() && !attacker->attack(closest)) {
-			Broodwar << "S&D Targetting Passives,, alternative" << std::endl;
+		if (closest != NULL && !attacker->attack(closest)) {
 			attacker->attack(InformationManager::getInstance().enemyPassiveBuildings.front()->getPosition());
 		}
 	}
 	else if (!InformationManager::getInstance().enemyAttackers.empty()) {
-		Broodwar << "S&D Targetting Attackers" << std::endl;
 		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy);
-		if (closest->isTargetable() && !attacker->attack(closest)) {
-			Broodwar << "S&D Targetting Attackers, alternative" << std::endl;
+		if (closest != NULL && !attacker->attack(closest)) {
 			attacker->attack(InformationManager::getInstance().enemyAttackers.front()->getPosition());
 		}
 	}
 	else if (!InformationManager::getInstance().enemyTowers.empty()) {
-		Broodwar << "S&D Targetting Towers" << std::endl;
 		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy);
-		if (closest->isTargetable() && !attacker->attack(closest)) {
-			Broodwar << "S&D Targetting Towers, alternative" << std::endl;
+		if (closest != NULL && !attacker->attack(closest)) {
 			attacker->attack(InformationManager::getInstance().enemyTowers.front()->getPosition());
 		}
-	}
-	else {
-		Broodwar << "S&D Hit nono, all empty" << std::endl;
 	}
 }
 
