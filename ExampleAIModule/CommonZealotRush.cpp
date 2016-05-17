@@ -25,6 +25,21 @@ CommonZealotRush::CommonZealotRush(){
 void CommonZealotRush::evaluateStrategy(){
 
 	Broodwar << "Evaluating common zealot rush" << std::endl;
-	StrategyManager::getInstance().setNextStrategy(StrategyManager::aggressiveZealotRush);
+
+	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
+		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
+		|| InformationManager::getInstance().enemyTowers.size() >= 2){
+
+		// something endgame
+
+	}
+	else {
+
+		// continue with the zealot rush
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+
+	}
+
+
 
 }

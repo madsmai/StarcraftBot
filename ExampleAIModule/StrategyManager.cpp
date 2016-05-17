@@ -9,7 +9,7 @@ int StrategyManager::setInitialStrategy(){
 
 	case Races::Enum::Protoss:
 		Broodwar << "Enemy race is: " << enemyRace << std::endl;
-		Broodwar << "Setting initial strategy to: 'Early Dark Templar'" << std::endl;
+		Broodwar << "Setting initial strategy to: 'Aggressive Zealot rush'" << std::endl;
 		return aggressiveZealotRush;
 		break;
 
