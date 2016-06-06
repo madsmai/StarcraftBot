@@ -201,3 +201,35 @@
 [04/05/2016 10:12:28] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 [04/05/2016 10:12:28] Injected into process "Chaoslauncher.exe"
 [04/05/2016 10:12:28] ICC module loaded
+[5/9/2016 21:40:28] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/9/2016 21:40:28] Injected into process "Chaoslauncher.exe"
+[5/9/2016 21:40:28] ICC module loaded
+[5/9/2016 21:43:03] ICC module unloaded
+[5/12/2016 11:53:39] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/12/2016 11:53:39] Injected into process "Chaoslauncher.exe"
+[5/12/2016 11:53:39] ICC module loaded
+[5/12/2016 12:32:53] ICC module unloaded
+[5/12/2016 12:33:09] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/12/2016 12:33:09] Injected into process "Chaoslauncher.exe"
+[5/12/2016 12:33:09] ICC module loaded
+[5/12/2016 12:55:13] ICC module unloaded
+[5/12/2016 14:28:57] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/12/2016 14:28:57] Injected into process "Chaoslauncher.exe"
+[5/12/2016 14:28:57] ICC module loaded
+[5/12/2016 19:40:16] ICC module unloaded
+[5/15/2016 20:06:27] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/15/2016 20:06:27] Injected into process "Chaoslauncher.exe"
+[5/15/2016 20:06:27] ICC module loaded
+[5/15/2016 22:50:57] ICC module unloaded
+[5/16/2016 15:45:09] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/16/2016 15:45:09] Injected into process "Chaoslauncher.exe"
+[5/16/2016 15:45:09] ICC module loaded
+[5/16/2016 15:48:36] ICC module unloaded
+[5/16/2016 15:48:41] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/16/2016 15:48:41] Injected into process "Chaoslauncher.exe"
+[5/16/2016 15:48:41] ICC module loaded
+[5/16/2016 16:34:48] ICC module unloaded
+[5/16/2016 16:34:51] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[5/16/2016 16:34:51] Injected into process "Chaoslauncher.exe"
+[5/16/2016 16:34:51] ICC module loaded
+[5/16/2016 22:48:12] ICC module unloaded

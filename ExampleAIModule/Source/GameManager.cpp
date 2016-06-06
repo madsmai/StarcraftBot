@@ -30,10 +30,16 @@ void GameManager::onStart(){
 }
 
 void GameManager::onEnd(bool isWinner){
-
+	std::ofstream log;
+	log.open("bwapi-data//AI/winloss.txt", std::ios::app);
 	if (isWinner){
-
+		log << "win" << "\n";
 	}
+	else {
+		log << "loss" << "\n";
+	}
+	log.flush();
+	log.close();
 
 }
 
@@ -89,8 +95,11 @@ void GameManager::onSendText(std::string text){
 	if (text == "Current Status") {
 		InformationManager::getInstance().currentStatus();
 	}
-	else if (text == "Squad Size") {
-		Broodwar << OffenseManager::getInstance().squad.size() << std::endl;
+	else if (text == "Cowards Size") {
+		Broodwar << OffenseManager::getInstance().cowards.size() << std::endl;
+	}
+	else if (text == "Fighters Size") {
+		Broodwar << OffenseManager::getInstance().fighters.size() << std::endl;
 	}
 	else if (text == "Army Strength enemy") {
 		
