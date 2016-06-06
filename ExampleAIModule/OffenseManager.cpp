@@ -9,11 +9,14 @@ TODO:
 - De bevæger sig frem og tilbage
 - Dræber ikke workers i expansion først
 - Tror det er fordi de bliver sat til at bevæge sig mod hovedbasen, når den, bliver idle, laver search and destroy.
+
 - Abuse andre bots dårlig micro
 - Vi gør ikke noget mod et rush der er hurtigere end vores
 -Ikke nogle metoder til at få vores zealots til at gøre noget i basen
 
 - Early dark templars strategien bugger
+
+- Shift queue squad til at move et sted og så move til basen så de grupper
 
 
 */
@@ -55,16 +58,17 @@ void OffenseManager::onFrame(){
 				fightBack(unit);
 			}
 		}
-		else if (InformationManager::getInstance().enemyBase != NULL
-			&& InformationManager::getInstance().enemyBase->getRegion() != NULL
+		else if (InformationManager::getInstance().ourBase != NULL
+			&& InformationManager::getInstance().ourBase->getRegion() != NULL
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
 			&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()) {
+			Broodwar << "Before search and destroy" << std::endl;
 				searchAndDestroy(unit);
 		}
-		else if (InformationManager::getInstance().ourBase != NULL
+		else if (InformationManager::getInstance().enemyBase != NULL
 			&& unit != NULL
-			&& InformationManager::getInstance().ourBase->getRegion() != NULL
+			&& InformationManager::getInstance().enemyBase->getRegion() != NULL
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
 			&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()
@@ -197,7 +201,10 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	Unit closest;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
-		if (closest != NULL && !attacker->attack(closest)) {
+		if (closest != NULL && closest->isVisible()) {
+			attacker->attack(closest);
+		}
+		else {
 			attacker->attack(InformationManager::getInstance().enemyWorkers.front()->getPosition());
 		}
 	}
@@ -205,25 +212,37 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		closest = attacker->getClosestUnit((Filter::GetType == UnitTypes::Protoss_Gateway
 			|| Filter::GetType == UnitTypes::Terran_Barracks
 			|| Filter::GetType == UnitTypes::Zerg_Spawning_Pool) && Filter::IsEnemy);
-		if (closest != NULL && attacker->attack(closest)) {
+		if (closest != NULL && closest->isVisible()) {
+			attacker->attack(closest);
+		}
+		else {
 			attacker->attack(InformationManager::getInstance().enemyBarracks.front()->getPosition());
 		}
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible);
-		if (closest != NULL && !attacker->attack(closest)) {
+		if (closest != NULL && closest->isVisible()) {
+			attacker->attack(closest);
+		}
+		else {
 			attacker->attack(InformationManager::getInstance().enemyPassiveBuildings.front()->getPosition());
 		}
 	}
 	else if (!InformationManager::getInstance().enemyAttackers.empty()) {
 		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy);
-		if (closest != NULL && !attacker->attack(closest)) {
+		if (closest != NULL && closest->isVisible()) {
+			attacker->attack(closest);
+		}
+		else {
 			attacker->attack(InformationManager::getInstance().enemyAttackers.front()->getPosition());
 		}
 	}
 	else if (!InformationManager::getInstance().enemyTowers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy);
-		if (closest != NULL && !attacker->attack(closest)) {
+		if (closest != NULL && closest->isVisible()) {
+			attacker->attack(closest);
+		}
+		else {
 			attacker->attack(InformationManager::getInstance().enemyTowers.front()->getPosition());
 		}
 	}
