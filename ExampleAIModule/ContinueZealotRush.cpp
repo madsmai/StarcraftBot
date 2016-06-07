@@ -23,7 +23,7 @@ ContinueZealotRush::ContinueZealotRush() {
 
 void ContinueZealotRush::evaluateStrategy(){
 
-	Broodwar << "Evaluating aggressive zealot rush" << std::endl;
+	Broodwar << "Evaluating the continued zealot rush" << std::endl;
 
 	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
 		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())

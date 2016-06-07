@@ -58,7 +58,7 @@ void BuildingManager::onFrame(){
 			for (it = buildings.begin(); it != buildings.end(); it++){
 				BWAPI::Unit unit = *it;
 				if (unit->isCompleted()
-					&& unit->canUpgrade(type)
+					&& unit->canResearch(type)
 					&& unit->isIdle()
 					&& Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
 					&& Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){

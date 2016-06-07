@@ -7,7 +7,7 @@ public:
 	BuildOrderType(int request);
 	BuildOrderType(BWAPI::UnitType unit);
 	BuildOrderType(BWAPI::UpgradeType upgrade);
-	BuildOrderType(BWAPI::TechType upgrade);
+	BuildOrderType(BWAPI::TechType tech);
 
 	enum requests { scoutRequest, gasworkerRequest, evaluateStrategyRequest };
 

@@ -144,9 +144,10 @@ void ProbeManager::executeQueue(){
 	//Handle next request in queue
 	if (queue.front().isRequest()){
 		int request = queue.front().getRequestType();
-
+		Broodwar << "Is builder constructing:" << builder->isConstructing() << std::endl;
 		//Make a scout
 		if (request == BuildOrderType::scoutRequest && !builder->isConstructing()){
+			Broodwar << "Handeling the scout request" << std::endl;
 			ScoutManager::getInstance().addScout(mineralProbes.front());
 
 			// sets the builder to NULL if scout is builder

@@ -8,7 +8,7 @@ Reavers::Reavers() {
 
 	buildOrder = { robotics, probe, probe, pylon, 
 		supportbay,robotics, zealot, zealot, pylon,
-		reaver, zealot, reaver, pylon, reaver_Capacity,
+		reaver, zealot, reaver, pylon, reaver_Capacity, reaver, reaver,
 		evaluateStrategyRequest }; 
 
 	for (BuildOrderType order : buildOrder){

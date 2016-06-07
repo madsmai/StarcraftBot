@@ -47,6 +47,9 @@ std::string BuildOrderType::getName(){
 	else if (type == types::MetaUpgradeType){
 		return getUpgradeType().getName();
 	}
+	else if (type == types::MetaTechType){
+		return getTechType().getName();
+	}
 	else if (type == types::MetaRequestType){
 		if (getRequestType() == 0){
 			return "scoutRequest";
