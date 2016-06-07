@@ -11,7 +11,6 @@ void ResourceManager::reserveMinerals(BWAPI::UnitType type){
 	if (type.isBuilding()){
 		reservedMinerals = reservedMinerals + type.mineralPrice();
 		int  min = getReservedMinerals();
-		BWAPI::Broodwar->sendText(std::to_string(min).c_str());
 	}
 }
 
@@ -20,7 +19,6 @@ void ResourceManager::reserveGas(BWAPI::UnitType type){
 	if (type.isBuilding()){
 		reservedGas = reservedGas + type.gasPrice();
 		int  gas = getReservedGas();
-		BWAPI::Broodwar->sendText(std::to_string(gas).c_str());
 	}
 }
 
@@ -35,8 +33,6 @@ void ResourceManager::onUnitCreate(Unit unit){
 
 		reservedMinerals = reservedMinerals - unit->getType().mineralPrice();
 		reservedGas = reservedGas - unit->getType().gasPrice();
-		Broodwar->sendText(std::to_string(reservedMinerals).c_str());
-		Broodwar->sendText(std::to_string(reservedGas).c_str());
 	}
 }
 
@@ -46,6 +42,5 @@ void ResourceManager::onUnitMorph(Unit unit){
 
 		reservedMinerals = reservedMinerals - unit->getType().mineralPrice();
 		reservedGas = reservedGas - unit->getType().gasPrice();
-		Broodwar->sendText(std::to_string(reservedMinerals).c_str());
 	}
 }
