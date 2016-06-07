@@ -33,11 +33,12 @@ private:
 
 	// auxialliary functions
 	void executeQueue();
+	void nonIdle();
 
 	Unit builder;
 
 	//Con- and destructor aren't needed since class is used as static
 	ProbeManager(){};
-	~ProbeManager(){};
+
 };
 

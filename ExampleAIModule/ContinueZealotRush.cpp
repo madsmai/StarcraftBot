@@ -4,13 +4,11 @@
 ContinueZealotRush::ContinueZealotRush() {
 
 	Broodwar << name << std::endl;
+	setSquadSize(3);
 
-	setSquadSize();
-
+	// chooses build order
 	if (Broodwar->self()->supplyTotal() / 2 - 5 <= Broodwar->self()->supplyUsed() / 2 + 8){
-
 		buildOrder = { zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest };
-
 	}
 	else {
 		buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
@@ -30,13 +28,12 @@ void ContinueZealotRush::evaluateStrategy(){
 		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
 		|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
-		// something endgame
+		// convert to midgame
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
 
 	}
 	else {
-
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
-
 	}
 
 
