@@ -33,6 +33,7 @@ private:
 
 	// auxialliary functions
 	void executeQueue();
+	void nonIdle();
 
 	Unit builder;
 

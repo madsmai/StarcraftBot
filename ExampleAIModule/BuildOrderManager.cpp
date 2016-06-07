@@ -10,6 +10,7 @@ void BuildOrderManager::onStart(){
 
 	// sets the initial strategy depending on the enemy race
 	StrategyManager::getInstance().setNextStrategy(StrategyManager::getInstance().setInitialStrategy());
+	
 }
 
 void BuildOrderManager::onFrame(){
