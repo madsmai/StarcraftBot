@@ -48,7 +48,7 @@ void OffenseManager::onFrame(){
 		if (unit != NULL && unit->isUnderAttack()) {
 			InformationManager::getInstance().writeToLog("Under attack");
 			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
-				&& BWTA::getNearestBaseLocation(unit->getPosition()) != InformationManager::getInstance().ourBase) {
+				&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())) {
 
 				Broodwar << "Their army is stronger" << std::endl;
 				rushOngoing = false;
@@ -75,6 +75,12 @@ void OffenseManager::onFrame(){
 			&& !rushOngoing){
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
 				squad.insert(unit);
+		}
+		if (unit->isMoving()
+			&& unit->getLastCommand().getType() != NULL
+			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Move || unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
+			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
+				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
 		}
 	}
 	if (squad.size() >= squadSize) {
