@@ -31,15 +31,40 @@ void GameManager::onStart(){
 
 void GameManager::onEnd(bool isWinner){
 	std::ofstream log;
-	log.open("bwapi-data//AI/winloss.txt", std::ios::app);
-	if (isWinner){
-		log << "1" << "\n";
+	if (BWAPI::Broodwar->enemy()->getRace() == Races::Protoss){
+		log.open("bwapi-data//AI/WLvsProtoss.txt", std::ios::app);
+		if (isWinner){
+			log << "1" << "\n";
+		}
+		else {
+			log << "0" << "\n";
+		}
+		log.flush();
+		log.close();
 	}
-	else {
-		log << "0" << "\n";
+	else if (BWAPI::Broodwar->enemy()->getRace() == Races::Terran){
+		log.open("bwapi-data//AI/WLvsTerran.txt", std::ios::app);
+		if (isWinner){
+			log << "1" << "\n";
+		}
+		else {
+			log << "0" << "\n";
+		}
+		log.flush();
+		log.close();
 	}
-	log.flush();
-	log.close();
+	else if (BWAPI::Broodwar->enemy()->getRace() == Races::Zerg){
+		log.open("bwapi-data//AI/WLvsZerg.txt", std::ios::app);
+		if (isWinner){
+			log << "1" << "\n";
+		}
+		else {
+			log << "0" << "\n";
+		}
+		log.flush();
+		log.close();
+	}
+	
 
 }
 
