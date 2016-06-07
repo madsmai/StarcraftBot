@@ -14,7 +14,7 @@ using namespace BWAPI;
 //Discover and destroy methods  
 
 void InformationManager::onUnitDiscover(BWAPI::Unit unit){
-	if (unit->getPlayer()->isEnemy(Broodwar->self())){
+	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
 		
 		if (unit->getType().isWorker()){
 			addEnemyWorkers(unit);
@@ -57,7 +57,7 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 }
 
 void InformationManager::onUnitDestroy(BWAPI::Unit unit){
-	if (unit->getPlayer()->isEnemy(Broodwar->self())){
+	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
 
 		if (unit->getType().isWorker()){
 			removeEnemyWorkers(unit);
