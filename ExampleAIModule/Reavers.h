@@ -5,8 +5,7 @@
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
 
-class BaseBuild : public Strategy {
-
+class Reavers : public Strategy {
 public:
 
 	std::string getName() { return name; }
@@ -24,7 +23,7 @@ public:
 	static void evaluateStrategy();
 
 	// constructor
-	BaseBuild();
+	Reavers();
 
 private:
 
@@ -41,6 +40,11 @@ private:
 	UnitType archives = UnitTypes::Protoss_Templar_Archives;
 	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
+	UnitType robotics = UnitTypes::Protoss_Robotics_Facility;
+	UnitType supportbay = UnitTypes::Protoss_Robotics_Support_Bay;
+	UnitType reaver = UnitTypes::Protoss_Reaver;
+	UnitType scarab = UnitTypes::Protoss_Scarab;
+
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
 	int evaluateStrategyRequest = BuildOrderType::requests::evaluateStrategyRequest;
@@ -56,7 +60,8 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "basic 4 probe 1 pylon";
+	std::string name = "Reaver strategy";
 
 };
+
 

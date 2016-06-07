@@ -39,6 +39,14 @@ void BuildOrderManager::onFrame(){
 			ContinueZealotRush();
 			break;
 		
+		case StrategyManager::transitionMidGame:
+			TransitionMidGame();
+			break;
+
+		case StrategyManager::reavers:
+			Reavers();
+			break;
+
 		case StrategyManager::none:
 			Broodwar << "No strategy is set" << std::endl;
 			break;
