@@ -39,6 +39,6 @@ private:
 
 	//Con- and destructor aren't needed since class is used as static
 	ProbeManager(){};
-	~ProbeManager(){};
+
 };
 
