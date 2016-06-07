@@ -35,6 +35,7 @@ private:
 	void searchAndDestroy(BWAPI::Unit);
 	bool avoidTowers(BWAPI::Unit);
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
+	bool isFighter(BWAPI::Unit);
 
 	OffenseManager(){};
 	~OffenseManager(){};
