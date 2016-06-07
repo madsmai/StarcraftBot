@@ -34,7 +34,8 @@ void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 }
 
 void OffenseManager::onUnitComplete(BWAPI::Unit unit){
-	if (unit->canAttack() && unit->canMove() && !unit->getType().isWorker() && unit != NULL) {
+
+	if (isFighter(unit)){
 		fighters.insert(unit);
 		if (rushOngoing && InformationManager::getInstance().enemyBase != NULL) {
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
@@ -45,6 +46,12 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 
 void OffenseManager::onFrame(){
 	for (Unit unit : fighters) {
+
+		if (unit->getType() == UnitTypes::Protoss_Reaver
+			&& unit->getScarabCount() < 5){
+			unit->train(UnitTypes::Protoss_Scarab);
+		}
+
 		if (unit != NULL && unit->isUnderAttack()) {
 			InformationManager::getInstance().writeToLog("Under attack");
 			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
@@ -64,7 +71,7 @@ void OffenseManager::onFrame(){
 			&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()) {
 			Broodwar << "Before search and destroy" << std::endl;
-				searchAndDestroy(unit);
+			searchAndDestroy(unit);
 		}
 		else if (InformationManager::getInstance().enemyBase != NULL
 			&& unit != NULL
@@ -73,8 +80,8 @@ void OffenseManager::onFrame(){
 			&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()
 			&& !rushOngoing){
-				unit->move(InformationManager::getInstance().ourBase->getPosition());
-				squad.insert(unit);
+			unit->move(InformationManager::getInstance().ourBase->getPosition());
+			squad.insert(unit);
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
@@ -327,4 +334,23 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	int priority = damage / hitsToKill;
 
 	return priority;
+}
+
+bool OffenseManager::isFighter(Unit unit){
+
+
+	if (unit->getType() == UnitTypes::Protoss_Zealot
+		|| unit->getType() == UnitTypes::Protoss_Dragoon
+		|| unit->getType() == UnitTypes::Protoss_Dark_Templar
+		|| unit->getType() == UnitTypes::Protoss_High_Templar
+		|| unit->getType() == UnitTypes::Protoss_Dark_Archon
+		|| unit->getType() == UnitTypes::Protoss_Archon
+		|| unit->getType() == UnitTypes::Protoss_Reaver){
+
+		return true;
+
+	}
+	return false;
+
+
 }
