@@ -41,8 +41,8 @@ void BuildingManager::onFrame(){
 				if (unit->isCompleted()
 					&& unit->canUpgrade(type)
 					&& unit->isIdle()
-					&& BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
-					&& BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
+					&& Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice
+					&& Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice){
 
 					unit->upgrade(type);
 					queue.erase(queue.begin());

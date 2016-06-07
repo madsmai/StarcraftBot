@@ -10,6 +10,11 @@ ContinueZealotRush::ContinueZealotRush() {
 	if (Broodwar->self()->supplyTotal() / 2 - 5 <= Broodwar->self()->supplyUsed() / 2 + 8){
 		buildOrder = { zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest };
 	}
+	
+	else if (Broodwar->self()->minerals() > 2000) {
+		buildOrder = { nexus, evaluateStrategyRequest };
+	}
+
 	else {
 		buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
 	}
