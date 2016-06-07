@@ -10,6 +10,7 @@ void BuildOrderManager::onStart(){
 
 	// sets the initial strategy depending on the enemy race
 	StrategyManager::getInstance().setNextStrategy(StrategyManager::getInstance().setInitialStrategy());
+	
 }
 
 void BuildOrderManager::onFrame(){
@@ -39,6 +40,14 @@ void BuildOrderManager::onFrame(){
 			ContinueZealotRush();
 			break;
 		
+		case StrategyManager::transitionMidGame:
+			TransitionMidGame();
+			break;
+
+		case StrategyManager::reavers:
+			Reavers();
+			break;
+
 		case StrategyManager::none:
 			Broodwar << "No strategy is set" << std::endl;
 			break;

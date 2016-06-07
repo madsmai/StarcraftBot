@@ -1,19 +1,15 @@
-#include "CommonZealotRush.h"
+#include "Reavers.h"
 
-
-CommonZealotRush::CommonZealotRush(){
+Reavers::Reavers() {
 
 	Broodwar << name << std::endl;
 
 	setSquadSize(3);
 
-	buildOrder = { // base Build order
-		scoutRequest,
-		probe, probe, gateway, // 10
-		probe, probe, gateway, // 12
-		probe, zealot, probe, pylon, // 16
-		zealot, zealot, zealot, pylon, // 22
-		zealot, zealot, zealot, pylon, evaluateStrategyRequest };
+	buildOrder = { robotics, probe, probe, pylon, 
+		supportbay,robotics, zealot, zealot, pylon,
+		reaver, zealot, reaver, pylon,
+		evaluateStrategyRequest }; 
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
@@ -21,10 +17,9 @@ CommonZealotRush::CommonZealotRush(){
 
 }
 
+void Reavers::evaluateStrategy(){
 
-void CommonZealotRush::evaluateStrategy(){
-
-	Broodwar << "Evaluating common zealot rush" << std::endl;
+	Broodwar << "Evaluating reaver strategy" << std::endl;
 
 	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
 		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
@@ -44,3 +39,6 @@ void CommonZealotRush::evaluateStrategy(){
 
 
 }
+
+
+

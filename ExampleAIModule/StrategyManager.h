@@ -5,13 +5,17 @@
 #include "CommonZealotRush.h"
 #include "EarlyDarkTemplar.h"
 #include "ContinueZealotRush.h"
+#include "TransitionMidGame.h"
+#include "Reavers.h"
 
 class StrategyManager {
 public:
 
 	static StrategyManager& getInstance();
 
-	enum strategy{ none, basic, commonZealotRush, aggressiveZealotRush, earlyDarkTemplar, continueZealotRush };
+	enum strategy{ none, basic, commonZealotRush, aggressiveZealotRush, 
+		earlyDarkTemplar, continueZealotRush, transitionMidGame,
+		reavers};
 
 
 	int getCurrentStrategy(){ return currentStrategy; }
@@ -31,9 +35,6 @@ private:
 
 	int currentStrategy;
 	int nextStrategy;
-
-
-
 
 };
 

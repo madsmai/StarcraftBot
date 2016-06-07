@@ -20,7 +20,7 @@ public:
 
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
 
-	void setSquadSize(){ OffenseManager::getInstance().setSquadSize(3); }
+	void setSquadSize(int size){ OffenseManager::getInstance().setSquadSize(size); }
 	static void evaluateStrategy();
 
 	// constructor
@@ -41,6 +41,7 @@ private:
 	UnitType archives = UnitTypes::Protoss_Templar_Archives;
 	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
+	UnitType nexus = UnitTypes::Protoss_Nexus;
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
 	int evaluateStrategyRequest = BuildOrderType::requests::evaluateStrategyRequest;

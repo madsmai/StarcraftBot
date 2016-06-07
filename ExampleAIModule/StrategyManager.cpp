@@ -55,6 +55,14 @@ void StrategyManager::evaluateStrategies(){
 	case continueZealotRush:
 		ContinueZealotRush::evaluateStrategy();
 		break;
+
+	case transitionMidGame:
+		TransitionMidGame::evaluateStrategy();
+		break;
+
+	case reavers:
+		Reavers::evaluateStrategy();
+		break;
 	}
 }
 
