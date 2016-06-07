@@ -11,7 +11,7 @@ ContinueZealotRush::ContinueZealotRush() {
 		buildOrder = { zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest };
 	}
 	
-	else if (Broodwar->self()->minerals() > 2000) {
+	else if (Broodwar->self()->minerals() > 800) {
 		buildOrder = { nexus, evaluateStrategyRequest };
 	}
 
