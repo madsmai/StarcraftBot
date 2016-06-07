@@ -22,7 +22,7 @@ int StrategyManager::setInitialStrategy(){
 	case Races::Enum::Terran:
 		Broodwar << "Enemy race is: " << enemyRace << std::endl;
 		Broodwar << "Setting initial strategy to: 'Common Zealot rush'" << std::endl;
-		return earlyDarkTemplar;
+		return commonZealotRush;
 		break;
 
 	case Races::Enum::Unknown:
