@@ -33,10 +33,10 @@ void GameManager::onEnd(bool isWinner){
 	std::ofstream log;
 	log.open("bwapi-data//AI/winloss.txt", std::ios::app);
 	if (isWinner){
-		log << "win" << "\n";
+		log << "1" << "\n";
 	}
 	else {
-		log << "loss" << "\n";
+		log << "0" << "\n";
 	}
 	log.flush();
 	log.close();
