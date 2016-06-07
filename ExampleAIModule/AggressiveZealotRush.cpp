@@ -4,7 +4,7 @@ AggressiveZealotRush::AggressiveZealotRush() {
 
 	Broodwar << name << std::endl;
 
-	setSquadSize();
+	setSquadSize(3);
 
 	buildOrder = { // base Build order
 		probe, gateway, gateway, //2 gateways on 9
@@ -28,7 +28,8 @@ void AggressiveZealotRush::evaluateStrategy(){
 		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
 		|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
-		// something endgame
+		// convert to midgame
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
 
 	}
 	else {

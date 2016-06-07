@@ -129,7 +129,7 @@ void ProbeManager::executeQueue(){
 					Broodwar->getLastError() != Errors::Invalid_Tile_Position){
 
 					Broodwar->registerEvent([position, type](Game*)
-					{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow);}
+					{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow); }
 					, nullptr, type.buildTime() + 100);
 
 					ResourceManager::getInstance().reserveMinerals(type);
@@ -169,7 +169,8 @@ void ProbeManager::executeQueue(){
 						mineralProbes.erase(it); //Remove probe from list by number in array
 						gasProbes.push_back(unit); //Add unit to gasWorkerList
 						queue.erase(queue.begin()); //Remove the request from the queue
-					} else {
+					}
+					else {
 						Broodwar << Broodwar->getLastError() << std::endl;
 					}
 					break;
