@@ -44,6 +44,7 @@ private:
 	UnitType supportbay = UnitTypes::Protoss_Robotics_Support_Bay;
 	UnitType reaver = UnitTypes::Protoss_Reaver;
 	UnitType scarab = UnitTypes::Protoss_Scarab;
+	UpgradeType reaver_Capacity = UpgradeTypes::Reaver_Capacity;
 
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
@@ -63,5 +64,3 @@ private:
 	std::string name = "Reaver strategy";
 
 };
-
-
