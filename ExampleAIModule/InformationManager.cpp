@@ -321,16 +321,46 @@ int InformationManager::calculateArmyStrength(BWAPI::Player player) {
 		}
 	}
 	int armyStrength = 0;
+	int damage = 0;
+	int strength = 0;
+	int effectiveHp = 0;
+	int totalDamage = 0;
+	int totalStrength = 0;
+	int totalHp = 0;
+
 	for (Unit troop : fighters) {
-		int effectiveHp = troop->getHitPoints() + troop->getShields();
-		int damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
-		if (troop->getType().groundWeapon().maxRange() > 100) {
-			damage = (damage * 6)/5;
+		if (troop->isVisible()){
+
+			effectiveHp = troop->getHitPoints() + troop->getShields();
+			totalHp += effectiveHp;
+
+			damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
+			if (troop->getType().groundWeapon().maxRange() > 100) {
+				damage = (damage * 6) / 5;
+			}
+			totalDamage += damage;
+
+			strength = effectiveHp * damage;
+			totalStrength += strength;
+
+			armyStrength = armyStrength + strength;
 		}
-		int strength = effectiveHp * damage;
-		armyStrength = armyStrength + strength;
-	}
-	return armyStrength;
+		else {
+			effectiveHp = troop->getType().maxHitPoints() + troop->getType().maxShields();
+			totalHp += effectiveHp;
+
+			damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
+			if (troop->getType().groundWeapon().maxRange() > 100) {
+				damage = (damage * 6) / 5;
+			}
+			totalDamage += damage;
+
+			strength = effectiveHp * damage;
+			totalStrength += strength;
+
+			armyStrength = armyStrength + strength;
+		}
+	} return armyStrength;
 }
 
 void InformationManager::enemyArmyStatus(){
@@ -346,20 +376,51 @@ void InformationManager::enemyArmyStatus(){
 	int damage = 0;
 	int strength = 0;
 	int effectiveHp = 0;
+
+	int totalDamage = 0;
+	int totalStrength = 0;
+	int totalHp = 0;
+
 	for (Unit troop : fighters) {
-		int effectiveHp = troop->getHitPoints() + troop->getShields();
-		int damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
-		if (troop->getType().groundWeapon().maxRange() > 100) {
-			damage = (damage * 6) / 5;
+		if (troop->isVisible()){
+
+			effectiveHp = troop->getHitPoints() + troop->getShields();
+			totalHp += effectiveHp;
+
+			damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
+			if (troop->getType().groundWeapon().maxRange() > 100) {
+				damage = (damage * 6) / 5;
+			}
+			totalDamage += damage;
+
+			strength = effectiveHp * damage;
+			totalStrength += strength;
+
+			armyStrength = armyStrength + strength;
 		}
-		int strength = effectiveHp * damage;
-		armyStrength = armyStrength + strength;
+		else {
+			effectiveHp = troop->getType().maxHitPoints() + troop->getType().maxShields();
+			totalHp += effectiveHp;
+
+			damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
+			if (troop->getType().groundWeapon().maxRange() > 100) {
+				damage = (damage * 6) / 5;
+			}
+			totalDamage += damage;
+
+			strength = effectiveHp * damage;
+			totalStrength += strength;
+
+			armyStrength = armyStrength + strength;
+		}
+		
 	}
 
-	Broodwar << "Enemy Army Status: \n" << armyStrength << "  = Enemy Army Strenght \n"
-		<< damage << "  Enemy damage \n"
-		<< strength << "  Enemy strength \n"
-		<< effectiveHp << "  Enemy effective hp" << std::endl;
+	Broodwar << "Enemy Army Status: \n" << armyStrength << "  Enemy Army Strenght \n"
+		<< totalDamage << "  Enemy damage in total \n"
+		<< totalStrength << "  Enemy strength in total \n"
+		<< totalHp << "  Enemy effective hp in total" 
+		<< fighters.size() << "  number of fighters" << std::endl;
 
 }
 
@@ -372,20 +433,31 @@ void InformationManager::ourArmyStatus(){
 	int damage = 0;
 	int strength = 0;
 	int effectiveHp = 0;
+	
+	int totalDamage = 0;
+	int totalStrength = 0;
+	int totalHp = 0;
+
 	for (Unit troop : fighters) {
-		int effectiveHp = troop->getHitPoints() + troop->getShields();
-		int damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
+		effectiveHp = troop->getHitPoints() + troop->getShields();
+		totalHp += effectiveHp;
+
+		damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
 		if (troop->getType().groundWeapon().maxRange() > 100) {
 			damage = (damage * 6) / 5;
 		}
-		int strength = effectiveHp * damage;
+		totalDamage += damage;
+
+		strength = effectiveHp * damage;
+		totalStrength += strength;
+
 		armyStrength = armyStrength + strength;
 	}
 
-	Broodwar << "Our Army Status: \n" << armyStrength << "  = Our Army Strenght \n"
-		<< damage << "  Our damage \n"
-		<< strength << "  Our strength \n"
-		<< effectiveHp << "  Our effective hp" << std::endl;
+	Broodwar << "Our Army Status: \n" << armyStrength << "  Our Army Strenght \n"
+		<< totalDamage << "  Our damage in total \n"
+		<< totalStrength << "  Our strength in total \n"
+		<< totalHp << "  Our effective hp in total" << std::endl;
 }
 
 int InformationManager::writeToLog(std::string text) {
