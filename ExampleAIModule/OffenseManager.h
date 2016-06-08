@@ -16,7 +16,7 @@ public:
 	int runFrames;
 
 	BWAPI::Unitset fighters;
-	BWAPI::Unitset cowards;
+	BWAPI::Unit coward;
 	BWAPI::Unitset squad;
 
 	bool rushOngoing = false;

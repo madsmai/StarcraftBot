@@ -126,8 +126,12 @@ void GameManager::onSendText(std::string text){
 	else if (text == "OAS") {
 		InformationManager::getInstance().ourArmyStatus();
 	}
-	else if (text == "Cowards Size") {
-		Broodwar << OffenseManager::getInstance().cowards.size() << std::endl;
+	else if (text == "Passives") {
+		std::vector<BWAPI::Unit>::iterator it;
+		for (it = InformationManager::getInstance().enemyPassiveBuildings.begin(); it != InformationManager::getInstance().enemyPassiveBuildings.end(); it++) {
+			Unit u = *it;
+			Broodwar << "Element in passives:" << u->getType() << std::endl;
+		}
 	}
 	else if (text == "Fighters Size") {
 		Broodwar << OffenseManager::getInstance().fighters.size() << std::endl;
