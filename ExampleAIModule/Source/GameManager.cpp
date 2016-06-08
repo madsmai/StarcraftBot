@@ -120,6 +120,12 @@ void GameManager::onSendText(std::string text){
 	if (text == "Current Status") {
 		InformationManager::getInstance().currentStatus();
 	}
+	else if (text == "EAS") {
+		InformationManager::getInstance().enemyArmyStatus();
+	}
+	else if (text == "OAS") {
+		InformationManager::getInstance().ourArmyStatus();
+	}
 	else if (text == "Cowards Size") {
 		Broodwar << OffenseManager::getInstance().cowards.size() << std::endl;
 	}

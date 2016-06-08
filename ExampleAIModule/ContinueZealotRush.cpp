@@ -10,6 +10,7 @@ ContinueZealotRush::ContinueZealotRush() {
 	if (Broodwar->self()->supplyTotal() / 2 - 5 <= Broodwar->self()->supplyUsed() / 2 + 8){
 		buildOrder = { zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest };
 	}
+
 	else {
 		buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
 	}
@@ -22,7 +23,7 @@ ContinueZealotRush::ContinueZealotRush() {
 
 void ContinueZealotRush::evaluateStrategy(){
 
-	Broodwar << "Evaluating aggressive zealot rush" << std::endl;
+	Broodwar << "Evaluating the continued zealot rush" << std::endl;
 
 	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
 		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())

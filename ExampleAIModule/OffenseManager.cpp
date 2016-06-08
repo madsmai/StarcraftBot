@@ -47,9 +47,22 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 void OffenseManager::onFrame(){
 	for (Unit unit : fighters) {
 
-		if (unit->getType() == UnitTypes::Protoss_Reaver
-			&& unit->getScarabCount() < 5){
-			unit->train(UnitTypes::Protoss_Scarab);
+		if (unit->getType() == UnitTypes::Protoss_Reaver){
+			Broodwar << "Reaver selected:" << std::endl;
+			Broodwar << Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity) << std::endl;
+			Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity);
+			if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+				== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+				&& unit->getScarabCount() < 10){
+
+				unit->train(UnitTypes::Protoss_Scarab);
+			}
+			else if (unit->getScarabCount() < 5){
+				
+				Broodwar << "training scarabs" << std::endl;
+				unit->train(UnitTypes::Protoss_Scarab);
+			}
+
 		}
 
 		if (unit != NULL && unit->isUnderAttack()) {

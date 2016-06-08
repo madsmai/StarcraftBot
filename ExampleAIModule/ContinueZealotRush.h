@@ -41,6 +41,7 @@ private:
 	UnitType archives = UnitTypes::Protoss_Templar_Archives;
 	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
+
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
 	int evaluateStrategyRequest = BuildOrderType::requests::evaluateStrategyRequest;
