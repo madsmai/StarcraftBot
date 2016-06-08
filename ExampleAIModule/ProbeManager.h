@@ -34,6 +34,7 @@ private:
 	// auxialliary functions
 	void executeQueue();
 	void nonIdle();
+	void moveCloserTo(TilePosition& moving, const TilePosition& stationary, int dist);
 
 	Unit builder;
 

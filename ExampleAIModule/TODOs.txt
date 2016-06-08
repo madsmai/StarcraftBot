@@ -19,7 +19,7 @@ TODO:
 -Make a private ladder and play many games to evaluate the strength of difference strategies against different strategies.
 	(download bots, or get it up on SSCAIT)
 - Fix avoid towers
-- Fix Calculate Army strenght
+- Calculate Army Strength doesn't work when the enemy is behind the fog. Use InformationManager instead.
 
 
 
