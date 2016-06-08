@@ -48,6 +48,10 @@ void BuildOrderManager::onFrame(){
 			Reavers();
 			break;
 
+		case StrategyManager::carriers:
+			Carriers();
+			break;
+
 		case StrategyManager::none:
 			Broodwar << "No strategy is set" << std::endl;
 			break;

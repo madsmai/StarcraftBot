@@ -99,6 +99,7 @@
     <ClCompile Include="BuildingManager.cpp" />
     <ClCompile Include="BuildOrderManager.cpp" />
     <ClCompile Include="BuildOrderType.cpp" />
+    <ClCompile Include="Carriers.cpp" />
     <ClCompile Include="CommonZealotRush.cpp" />
     <ClCompile Include="ContinueZealotRush.cpp" />
     <ClCompile Include="EarlyDarkTemplar.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="BuildingManager.h" />
     <ClInclude Include="BuildOrderManager.h" />
     <ClInclude Include="BuildOrderType.h" />
+    <ClInclude Include="Carriers.h" />
     <ClInclude Include="CommonZealotRush.h" />
     <ClInclude Include="ContinueZealotRush.h" />
     <ClInclude Include="EarlyDarkTemplar.h" />

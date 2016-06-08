@@ -8,7 +8,7 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 	setSquadSize(3);
 
 	buildOrder = { // base build
-		probe, gateway, probe, scoutRequest, assimilator, probe, 
+		probe, gateway, probe, scoutRequest, assimilator, probe,
 		gasworkerRequest, gasworkerRequest, cybercore, probe,
 		citadel, probe, gasworkerRequest, archives,
 		gateway, dtemplar, dtemplar, pylon,

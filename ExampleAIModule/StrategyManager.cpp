@@ -10,7 +10,7 @@ int StrategyManager::setInitialStrategy(){
 	case Races::Enum::Protoss:
 		Broodwar << "Enemy race is: " << enemyRace << std::endl;
 		Broodwar << "Setting initial strategy to: 'Aggressive Zealot rush'" << std::endl;
-		return aggressiveZealotRush;
+		return earlyDarkTemplar;
 		break;
 
 	case Races::Enum::Zerg:
@@ -22,7 +22,7 @@ int StrategyManager::setInitialStrategy(){
 	case Races::Enum::Terran:
 		Broodwar << "Enemy race is: " << enemyRace << std::endl;
 		Broodwar << "Setting initial strategy to: 'Common Zealot rush'" << std::endl;
-		return commonZealotRush;
+		return earlyDarkTemplar;
 		break;
 
 	case Races::Enum::Unknown:
@@ -62,6 +62,10 @@ void StrategyManager::evaluateStrategies(){
 
 	case reavers:
 		Reavers::evaluateStrategy();
+		break;
+
+	case carriers:
+		Carriers::evaluateStrategy();
 		break;
 	}
 }

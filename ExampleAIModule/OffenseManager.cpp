@@ -1,7 +1,5 @@
 #include "OffenseManager.h"
 
-
-
 using namespace BWAPI;
 /*
 TODO:
@@ -21,7 +19,7 @@ TODO:
 
 */
 
-void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
+void OffenseManager::onUnitDestroy(Unit unit){
 	if (unit->getPlayer() == Broodwar->self()) {
 		InformationManager::getInstance().writeToLog("One of our dudes died");
 		if (fighters.find(unit) != fighters.end()) {
@@ -33,7 +31,7 @@ void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
 	}
 }
 
-void OffenseManager::onUnitComplete(BWAPI::Unit unit){
+void OffenseManager::onUnitComplete(Unit unit){
 
 	if (isFighter(unit)){
 		fighters.insert(unit);
@@ -45,29 +43,18 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 }
 
 void OffenseManager::onFrame(){
+
 	for (Unit unit : fighters) {
 
-		if (unit->getType() == UnitTypes::Protoss_Reaver){
-			Broodwar << "Reaver selected:" << std::endl;
-			Broodwar << Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity) << std::endl;
-			Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity);
-			if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
-				== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
-				&& unit->getScarabCount() < 10){
-
-				unit->train(UnitTypes::Protoss_Scarab);
-			}
-			else if (unit->getScarabCount() < 5){
-				
-				Broodwar << "training scarabs" << std::endl;
-				unit->train(UnitTypes::Protoss_Scarab);
-			}
-
+		if (unit->getType() == UnitTypes::Protoss_Reaver || unit->getType() == UnitTypes::Protoss_Carrier){
+			fillReaverOrCarrier(unit);
 		}
+
 
 		if (unit != NULL && unit->isUnderAttack()) {
 			InformationManager::getInstance().writeToLog("Under attack");
-			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
+			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
+				< InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
 				&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())) {
 
 				Broodwar << "Their army is stronger" << std::endl;
@@ -366,19 +353,45 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 
 bool OffenseManager::isFighter(Unit unit){
 
-
 	if (unit->getType() == UnitTypes::Protoss_Zealot
 		|| unit->getType() == UnitTypes::Protoss_Dragoon
 		|| unit->getType() == UnitTypes::Protoss_Dark_Templar
 		|| unit->getType() == UnitTypes::Protoss_High_Templar
 		|| unit->getType() == UnitTypes::Protoss_Dark_Archon
 		|| unit->getType() == UnitTypes::Protoss_Archon
-		|| unit->getType() == UnitTypes::Protoss_Reaver){
+		|| unit->getType() == UnitTypes::Protoss_Reaver
+		|| unit->getType() == UnitTypes::Protoss_Carrier){
 
 		return true;
-
 	}
 	return false;
+}
 
+void OffenseManager::fillReaverOrCarrier(Unit unit){
+
+	// if it is a reaver
+	if (unit->getType() == UnitTypes::Protoss_Reaver){
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+			&& unit->getScarabCount() < 10){
+			unit->train(UnitTypes::Protoss_Scarab);
+		}
+		else if (unit->getScarabCount() < 5){
+			unit->train(UnitTypes::Protoss_Scarab);
+		}
+
+	}
+
+	// if it is a carrier
+	else if (unit->getType() == UnitTypes::Protoss_Carrier){
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Carrier_Capacity)
+			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Carrier_Capacity)
+			&& unit->getScarabCount() < 8){
+			unit->train(UnitTypes::Protoss_Interceptor);
+		}
+		else if (unit->getInterceptorCount() < 4){
+			unit->train(UnitTypes::Protoss_Interceptor);
+		}
+	}
 
 }

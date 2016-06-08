@@ -1,14 +1,14 @@
-#include "Reavers.h"
+#include "Carriers.h"
 
-Reavers::Reavers() {
+Carriers::Carriers() {
 
 	Broodwar << name << std::endl;
 
 	setSquadSize(3);
 
-	buildOrder = { robotics, probe, probe, pylon,
-		supportbay, robotics, zealot, zealot, pylon,
-		reaver, zealot, reaver, pylon, reaver_capacity, reaver, reaver,
+	buildOrder = { stargate, probe, probe, pylon,
+		fleet_beacon, stargate, zealot, zealot, pylon,
+		carrier, zealot, carrier, pylon, carrier_capacity, carrier,
 		evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
@@ -17,7 +17,7 @@ Reavers::Reavers() {
 
 }
 
-void Reavers::evaluateStrategy(){
+void Carriers::evaluateStrategy(){
 
 	Broodwar << "Evaluating reaver strategy" << std::endl;
 
