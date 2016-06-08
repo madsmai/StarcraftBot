@@ -83,7 +83,6 @@ void OffenseManager::onFrame(){
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
 			&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()) {
-			Broodwar << "Before search and destroy" << std::endl;
 			searchAndDestroy(unit);
 		}
 		else if (InformationManager::getInstance().enemyBase != NULL
@@ -223,55 +222,71 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Called when our fighters are idle in the enemy base
 	//Finds units to kill and kills them
-	InformationManager::getInstance().writeToLog("Started searchAndDestroy");
 	Unit closest;
 	if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
 		if (closest != NULL && closest->isVisible()) {
 			attacker->attack(closest);
+			Broodwar << "Attacking closest" << std::endl;
+			return;
 		}
 		else {
-			attacker->attack(InformationManager::getInstance().enemyWorkers.front()->getPosition());
+			attacker->attack(InformationManager::getInstance().enemyWorkers.front());
+			return;
 		}
 	}
-	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
+	if (!InformationManager::getInstance().enemyBarracks.empty()) {
 		closest = attacker->getClosestUnit((Filter::GetType == UnitTypes::Protoss_Gateway
 			|| Filter::GetType == UnitTypes::Terran_Barracks
 			|| Filter::GetType == UnitTypes::Zerg_Spawning_Pool) && Filter::IsEnemy);
 		if (closest != NULL && closest->isVisible()) {
 			attacker->attack(closest);
+			Broodwar << "Attacking closest" << std::endl;
+			return;
 		}
 		else {
-			attacker->attack(InformationManager::getInstance().enemyBarracks.front()->getPosition());
+			attacker->attack(InformationManager::getInstance().enemyBarracks.front());
+			return;
 		}
 	}
-	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
+	if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible);
 		if (closest != NULL && closest->isVisible()) {
 			attacker->attack(closest);
+			Broodwar << "Attacking closest" << std::endl;
+			return;
 		}
 		else {
-			attacker->attack(InformationManager::getInstance().enemyPassiveBuildings.front()->getPosition());
+			/*attacker->attack(InformationManager::getInstance().enemyPassiveBuildings.front());*/
+			attacker->attack(InformationManager::getInstance().enemyPassiveBuildings[rand() % InformationManager::getInstance().enemyPassiveBuildings.size()]);
+			return;
 		}
 	}
-	else if (!InformationManager::getInstance().enemyAttackers.empty()) {
+	if (!InformationManager::getInstance().enemyAttackers.empty()) {
 		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy);
 		if (closest != NULL && closest->isVisible()) {
 			attacker->attack(closest);
+			Broodwar << "Attacking closest" << std::endl;
+			return;
 		}
 		else {
-			attacker->attack(InformationManager::getInstance().enemyAttackers.front()->getPosition());
+			attacker->attack(InformationManager::getInstance().enemyAttackers.front());
+			return;
 		}
 	}
-	else if (!InformationManager::getInstance().enemyTowers.empty()) {
+	if (!InformationManager::getInstance().enemyTowers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy);
 		if (closest != NULL && closest->isVisible()) {
 			attacker->attack(closest);
+			Broodwar << "Attacking closest" << std::endl;
+			return;
 		}
 		else {
-			attacker->attack(InformationManager::getInstance().enemyTowers.front()->getPosition());
+			attacker->attack(InformationManager::getInstance().enemyTowers.front());
+			return;
 		}
 	}
+
 }
 
 bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
