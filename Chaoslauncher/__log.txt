@@ -259,3 +259,4 @@
 [07-06-2016 14:40:33] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 [07-06-2016 14:40:33] Injected into process "Chaoslauncher - MultiInstance.exe"
 [07-06-2016 14:40:33] ICC module loaded
+[07-06-2016 15:22:47] ICC module unloaded
