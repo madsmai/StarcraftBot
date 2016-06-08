@@ -139,29 +139,32 @@ void ProbeManager::executeQueue(){
 
 		//// TESTING ENDED ////
 
-		if (builder->build(type, position)){
-			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
-				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+			if (builder->build(type, position)){
+				if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
+					Broodwar->getLastError() != Errors::Invalid_Tile_Position){
 
-				Broodwar->registerEvent([position, type](Game*)
-				{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow);}
-				, nullptr, type.buildTime() + 100);
+					Broodwar->registerEvent([position, type](Game*)
+					{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow); }
+					, nullptr, type.buildTime() + 100);
 
-				ResourceManager::getInstance().reserveMinerals(type);
-				ResourceManager::getInstance().reserveGas(type);
-				queue.erase(queue.begin()); //Remove building from queue
+					ResourceManager::getInstance().reserveMinerals(type);
+					ResourceManager::getInstance().reserveGas(type);
+					queue.erase(queue.begin()); //Remove building from queue
 
+				}
 			}
-		}
 		
 	}
 
 	//Handle next request in queue
-	if (queue.front().isRequest()){
+	else if (queue.front().isRequest()){
 		int request = queue.front().getRequestType();
-
+		Broodwar << "Is builder constructing:" << builder->isConstructing() << std::endl;
+		Broodwar << "Is builder moving:" << builder->isMoving() << std::endl;
+		Broodwar << "Is builder idle:" << builder->isIdle() << std::endl;
 		//Make a scout
-		if (request == BuildOrderType::scoutRequest && !builder->isConstructing()){
+		if (request == BuildOrderType::scoutRequest 
+			&& !builder->isConstructing() && builder->isIdle()){
 			ScoutManager::getInstance().addScout(mineralProbes.front());
 
 			// sets the builder to NULL if scout is builder
@@ -184,7 +187,8 @@ void ProbeManager::executeQueue(){
 						mineralProbes.erase(it); //Remove probe from list by number in array
 						gasProbes.push_back(unit); //Add unit to gasWorkerList
 						queue.erase(queue.begin()); //Remove the request from the queue
-					} else {
+					}
+					else {
 						Broodwar << Broodwar->getLastError() << std::endl;
 					}
 					break;
@@ -217,7 +221,7 @@ TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition posit
 			//NOTE: We move in a straight line and might not be on the playing field after an iteration
 
 			moveCloserTo(newPos, ourBase, 1);
-		}
+}
 
 		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
 		moveCloserTo(newPos, ourBase, 2);

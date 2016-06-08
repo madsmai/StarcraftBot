@@ -5,9 +5,9 @@
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
 
-class EarlyDarkTemplar : public Strategy {
+class TransitionMidGame : public Strategy {
 public:
-	
+
 	std::string getName() { return name; }
 
 	bool isStarter() { return starter; }
@@ -23,7 +23,7 @@ public:
 	static void evaluateStrategy();
 
 	// constructor
-	EarlyDarkTemplar();
+	TransitionMidGame();
 
 private:
 
@@ -55,8 +55,6 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "Early dark templar";
+	std::string name = "Transition to midgame";
 
 };
-
-

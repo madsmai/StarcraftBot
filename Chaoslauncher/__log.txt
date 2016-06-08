@@ -255,8 +255,8 @@
 [07-06-2016 10:02:49] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 [07-06-2016 10:02:49] Injected into process "Chaoslauncher.exe"
 [07-06-2016 10:02:49] ICC module loaded
-[07-06-2016 14:40:18] ICC module unloaded
-[07-06-2016 14:40:33] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-[07-06-2016 14:40:33] Injected into process "Chaoslauncher - MultiInstance.exe"
-[07-06-2016 14:40:33] ICC module loaded
-[07-06-2016 15:22:47] ICC module unloaded
+[6/7/2016 13:23:25] ICC module unloaded
+[6/7/2016 15:05:03] ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[6/7/2016 15:05:03] Injected into process "Chaoslauncher.exe"
+[6/7/2016 15:05:03] ICC module loaded
+[6/7/2016 17:30:12] ICC module unloaded

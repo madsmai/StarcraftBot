@@ -31,15 +31,40 @@ void GameManager::onStart(){
 
 void GameManager::onEnd(bool isWinner){
 	std::ofstream log;
-	log.open("bwapi-data//AI/winloss.txt", std::ios::app);
-	if (isWinner){
-		log << "win" << "\n";
+	if (BWAPI::Broodwar->enemy()->getRace() == Races::Protoss){
+		log.open("bwapi-data//AI/WLvsProtoss.txt", std::ios::app);
+		if (isWinner){
+			log << "1" << "\n";
+		}
+		else {
+			log << "0" << "\n";
+		}
+		log.flush();
+		log.close();
 	}
-	else {
-		log << "loss" << "\n";
+	else if (BWAPI::Broodwar->enemy()->getRace() == Races::Terran){
+		log.open("bwapi-data//AI/WLvsTerran.txt", std::ios::app);
+		if (isWinner){
+			log << "1" << "\n";
+		}
+		else {
+			log << "0" << "\n";
+		}
+		log.flush();
+		log.close();
 	}
-	log.flush();
-	log.close();
+	else if (BWAPI::Broodwar->enemy()->getRace() == Races::Zerg){
+		log.open("bwapi-data//AI/WLvsZerg.txt", std::ios::app);
+		if (isWinner){
+			log << "1" << "\n";
+		}
+		else {
+			log << "0" << "\n";
+		}
+		log.flush();
+		log.close();
+	}
+	
 
 }
 
@@ -94,6 +119,12 @@ void GameManager::onSendText(std::string text){
 	BWAPI::Broodwar->sendText(text.c_str());
 	if (text == "Current Status") {
 		InformationManager::getInstance().currentStatus();
+	}
+	else if (text == "EAS") {
+		InformationManager::getInstance().enemyArmyStatus();
+	}
+	else if (text == "OAS") {
+		InformationManager::getInstance().ourArmyStatus();
 	}
 	else if (text == "Cowards Size") {
 		Broodwar << OffenseManager::getInstance().cowards.size() << std::endl;

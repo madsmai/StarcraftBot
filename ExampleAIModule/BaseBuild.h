@@ -20,7 +20,7 @@ public:
 
 	std::vector<BuildOrderType> getBuildOrder() { return buildOrder; }
 
-	void setSquadSize(){ OffenseManager::getInstance().setSquadSize(999); }
+	void setSquadSize(int size){ OffenseManager::getInstance().setSquadSize(size); }
 	static void evaluateStrategy();
 
 	// constructor
@@ -31,19 +31,6 @@ private:
 	//Unit Types, Upgrade types, Request Types
 	UnitType probe = UnitTypes::Protoss_Probe;
 	UnitType pylon = UnitTypes::Protoss_Pylon;
-	UnitType gateway = UnitTypes::Protoss_Gateway;
-	UnitType zealot = UnitTypes::Protoss_Zealot;
-	UnitType forge = UnitTypes::Protoss_Forge;
-	UnitType assimilator = UnitTypes::Protoss_Assimilator;
-	UnitType cybercore = UnitTypes::Protoss_Cybernetics_Core;
-	UnitType dragoon = UnitTypes::Protoss_Dragoon;
-	UnitType citadel = UnitTypes::Protoss_Citadel_of_Adun;
-	UnitType archives = UnitTypes::Protoss_Templar_Archives;
-	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
-	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
-	int scoutRequest = BuildOrderType::requests::scoutRequest;
-	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
-	int evaluateStrategyRequest = BuildOrderType::requests::evaluateStrategyRequest;
 
 	bool starter = true;
 	bool endgame = false;

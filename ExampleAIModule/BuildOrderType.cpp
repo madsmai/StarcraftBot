@@ -18,7 +18,7 @@ BuildOrderType::BuildOrderType(int request){
 		requestType = requests::evaluateStrategyRequest;
 		break;
 
-	default :
+	default:
 		BWAPI::Broodwar << "Error. No such request";
 		break;
 
@@ -35,12 +35,20 @@ BuildOrderType::BuildOrderType(BWAPI::UpgradeType upgrade){
 	upgradeType = upgrade;
 }
 
+BuildOrderType::BuildOrderType(BWAPI::TechType tech){
+	type = types::MetaTechType;
+	techType = tech;
+}
+
 std::string BuildOrderType::getName(){
 	if (type == types::MetaUnitType){
 		return getUnitType().getName();
 	}
 	else if (type == types::MetaUpgradeType){
 		return getUpgradeType().getName();
+	}
+	else if (type == types::MetaTechType){
+		return getTechType().getName();
 	}
 	else if (type == types::MetaRequestType){
 		if (getRequestType() == 0){
@@ -66,6 +74,10 @@ bool BuildOrderType::isUpgrade(){
 	return type == types::MetaUpgradeType;
 }
 
+bool BuildOrderType::isTech(){
+	return type == types::MetaTechType;
+}
+
 bool BuildOrderType::isRequest(){
 	return type == types::MetaRequestType;
 }
@@ -80,4 +92,8 @@ BWAPI::UnitType BuildOrderType::getUnitType(){
 
 BWAPI::UpgradeType BuildOrderType::getUpgradeType(){
 	return upgradeType;
+}
+
+BWAPI::TechType BuildOrderType::getTechType(){
+	return techType;
 }
