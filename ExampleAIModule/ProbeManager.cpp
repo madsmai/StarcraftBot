@@ -32,7 +32,7 @@ void ProbeManager::nonIdle(){
 	}
 
 	//Make an idle builder do stuff
-	if (builder != NULL && builder->isIdle()) {
+	if (builder != NULL && builder->isIdle() && !builder->isMoving()) {
 		if (!builder->gather(builder->getClosestUnit(Filter::IsMineralField))) {
 			Broodwar << Broodwar->getLastError() << std::endl;
 		}
@@ -127,33 +127,29 @@ void ProbeManager::executeQueue(){
 			return; //If we dont have the resources to build the building
 		}
 
-		//// TESTING STARTED ////
+		//// Debugging STARTED ////
 
-		//const char* check = "False";
-		//if (Broodwar->isVisible(position) && Broodwar->isBuildable(position)){
-		//	check = "True";
-		//}
-
-		//Broodwar->drawTextMap(Position(position), check, Colors::Green);
 		Broodwar->drawCircleMap(Position(position), 30, Colors::Purple, true);
 
-		//// TESTING ENDED ////
+		//// Debugging ENDED ////
 
-			if (builder->build(type, position)){
-				if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
-					Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+		if (!Broodwar->isVisible(position)){
+			//builder->move(Position(position));
+		}
+		else if (builder->build(type, position)){
+			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
+				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
 
-					Broodwar->registerEvent([position, type](Game*)
-					{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow); }
-					, nullptr, type.buildTime() + 100);
+				Broodwar->registerEvent([position, type](Game*)
+				{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow); }
+				, nullptr, type.buildTime() + 100);
 
-					ResourceManager::getInstance().reserveMinerals(type);
-					ResourceManager::getInstance().reserveGas(type);
-					queue.erase(queue.begin()); //Remove building from queue
+				ResourceManager::getInstance().reserveMinerals(type);
+				ResourceManager::getInstance().reserveGas(type);
+				queue.erase(queue.begin()); //Remove building from queue
 
-				}
 			}
-		
+		}
 	}
 
 	//Handle next request in queue
@@ -221,12 +217,13 @@ TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition posit
 			//NOTE: We move in a straight line and might not be on the playing field after an iteration
 
 			moveCloserTo(newPos, ourBase, 1);
-}
+			Broodwar->drawCircleMap(Position(newPos), 30, Colors::Green, false);
+		}
 
 		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
 		moveCloserTo(newPos, ourBase, 2);
 
-		return Broodwar->getBuildLocation(type, newPos);
+		return Broodwar->getBuildLocation(type, newPos, 3); //dist of 3 is really good
 	} else {
 		return Broodwar->getBuildLocation(type, position);
 	}
