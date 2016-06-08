@@ -70,6 +70,7 @@ void OffenseManager::onFrame(){
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
 			&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& (unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit )) {
+
 			searchAndDestroy(unit);
 		}
 		else if (InformationManager::getInstance().enemyBase != NULL
@@ -79,12 +80,14 @@ void OffenseManager::onFrame(){
 			&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()
 			&& !rushOngoing){
+
 			unit->move(InformationManager::getInstance().ourBase->getPosition());
 			squad.insert(unit);
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
 			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Move || unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
+
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
 		}
@@ -210,16 +213,14 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Finds units to kill and kills them
 	Unit closest;
 	if (!InformationManager::getInstance().enemyAttackers.empty()) {
-			closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy, 1240);
-			if (closest != NULL && closest->isVisible() && BWTA::isConnected(attacker->getTilePosition(), closest->getTilePosition())
-				&& closest->exists() && closest->getPosition().isValid()) {
-				attacker->attack(closest);
-			}
+		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy, 1240);
+		if (properClosestTarget(closest, attacker)) {
+			attacker->attack(closest);
+		}
 	}
 	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy,1240);
-		if (closest != NULL && closest->isVisible() && BWTA::isConnected(attacker->getTilePosition(), closest->getTilePosition())
-			&& closest->exists() && closest->getPosition().isValid()) {
+		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
 	}
@@ -227,22 +228,19 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		closest = attacker->getClosestUnit((Filter::GetType == UnitTypes::Protoss_Gateway
 			|| Filter::GetType == UnitTypes::Terran_Barracks
 			|| Filter::GetType == UnitTypes::Zerg_Spawning_Pool) && Filter::IsEnemy, 1240);
-		if (closest != NULL && closest->isVisible() && BWTA::isConnected(attacker->getTilePosition(), closest->getTilePosition())
-			&& closest->exists() && closest->getPosition().isValid()) {
+		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible, 1240);
-		if (closest != NULL && closest->isVisible() && BWTA::isConnected(attacker->getTilePosition(),closest->getTilePosition()) 
-			&& closest->exists() && closest->getPosition().isValid()) {
+		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyTowers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy, 1240);
-		if (closest != NULL && closest->isVisible() && BWTA::isConnected(attacker->getTilePosition(), closest->getTilePosition())
-			&& closest->exists() && closest->getPosition().isValid()) {
+		if (properClosestTarget(closest,attacker)) {
 			attacker->attack(closest);
 		}
 	}
@@ -256,11 +254,13 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 			&& !u->isUnderAttack()
 			&& u->getLastCommand().getTarget()->getType().canAttack()
 			&& u->getLastCommand().getTarget()->getType().canMove()){
+
 				u->attack(closest);
 		}
 		else if (u->getLastCommand().getType() != NULL 
 			&& closest != NULL
 			&& u->getLastCommand().getType() != UnitCommandTypes::Attack_Unit) {
+
 			u->attack(closest);
 		}
 	}
@@ -388,4 +388,9 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 		}
 	}
 
+}
+
+bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
+	return target != NULL && target->isVisible() && BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
+		&& target->exists() && target->getPosition().isValid();
 }

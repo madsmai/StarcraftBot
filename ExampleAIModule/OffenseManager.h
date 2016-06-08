@@ -19,6 +19,8 @@ public:
 	BWAPI::Unit coward;
 	BWAPI::Unitset squad;
 
+	
+
 	bool rushOngoing = false;
 
 	void setSquadSize(int size){ squadSize = size; }
@@ -37,6 +39,7 @@ private:
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
 	bool isFighter(BWAPI::Unit);
 	void fillReaverOrCarrier(BWAPI::Unit);
+	bool properClosestTarget(BWAPI::Unit, BWAPI::Unit);
 
 	OffenseManager(){};
 	~OffenseManager(){};
