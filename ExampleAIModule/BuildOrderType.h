@@ -24,7 +24,7 @@ public:
 	BWAPI::TechType getTechType();
 
 private:
-	enum types { MetaUnitType, MetaUpgradeType, MetaTechType, MetaRequestType };
+	enum types { MetaUnitType, MetaUpgradeType, MetaRequestType, MetaTechType };
 
 	int type = -1;
 
