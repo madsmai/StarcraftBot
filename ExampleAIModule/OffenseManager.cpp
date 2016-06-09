@@ -10,11 +10,7 @@ TODO:
 
 - Abuse andre bots dårlig micro
 - Vi gør ikke noget mod et rush der er hurtigere end vores
--Ikke nogle metoder til at få vores zealots til at gøre noget i basen
-
-- Early dark templars strategien bugger
-
-- Shift queue squad til at move et sted og så move til basen så de grupper
+- Ikke nogle metoder til at få vores zealots til at gøre noget i basen
 
 
 */
@@ -38,6 +34,10 @@ void OffenseManager::onUnitComplete(Unit unit){
 		if (rushOngoing && InformationManager::getInstance().enemyBase != NULL) {
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
 		}
+		else {
+			unit->move(InformationManager::getInstance().ourBase->getPosition());
+			squad.insert(unit);
+		}
 	}
 
 }
@@ -58,35 +58,20 @@ void OffenseManager::onFrame(){
 				&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())) {
 
 				Broodwar << "Their army is stronger" << std::endl;
-				rushOngoing = false;
 				fighters.move(InformationManager::getInstance().ourBase->getPosition());
 			}
 			else {
 				fightBack(unit);
 			}
 		}
-		else if (InformationManager::getInstance().ourBase != NULL
-			&& InformationManager::getInstance().ourBase->getRegion() != NULL
-			&& BWTA::getRegion(unit->getTilePosition()) != NULL
-			&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
-			&& (unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit )) {
-
+		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
+			&& (unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit) ) {
+			
 			searchAndDestroy(unit);
-		}
-		else if (InformationManager::getInstance().enemyBase != NULL
-			&& unit != NULL
-			&& InformationManager::getInstance().enemyBase->getRegion() != NULL
-			&& BWTA::getRegion(unit->getTilePosition()) != NULL
-			&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
-			&& unit->isIdle()
-			&& !rushOngoing){
-
-			unit->move(InformationManager::getInstance().ourBase->getPosition());
-			squad.insert(unit);
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
-			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Move || unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
+			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
 
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
@@ -255,17 +240,19 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 			&& u->getLastCommand().getTarget()->getType().canAttack()
 			&& u->getLastCommand().getTarget()->getType().canMove()){
 
-				u->attack(closest);
+			u->attack(closest);
 		}
-		else if (u->getLastCommand().getType() != NULL 
+		else if (u->getLastCommand().getType() != NULL
 			&& closest != NULL
 			&& u->getLastCommand().getType() != UnitCommandTypes::Attack_Unit) {
 
 			u->attack(closest);
 		}
 	}
-	if (!attacker->isMoving() && !attacker->isAttacking() ) {
-		attacker->move(InformationManager::getInstance().enemyBase->getPosition());
+	if (attacker->isIdle() 
+		&& InformationManager::getInstance().enemyBase != NULL
+		&& BWTA::getRegion(attacker->getTilePosition())!=InformationManager::getInstance().ourBase->getRegion()) {
+		attacker->attack(InformationManager::getInstance().enemyBase->getPosition());
 	}
 
 }

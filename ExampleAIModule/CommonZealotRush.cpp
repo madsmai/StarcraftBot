@@ -6,6 +6,8 @@ CommonZealotRush::CommonZealotRush(){
 	Broodwar << name << std::endl;
 
 	setSquadSize(3);
+	setStrategyVariables();
+	OffenseManager::getInstance().rushOngoing = true;
 
 	buildOrder = { // base Build order
 		scoutRequest,
@@ -40,7 +42,45 @@ void CommonZealotRush::evaluateStrategy(){
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
 
 	}
+}
 
+void CommonZealotRush::setStrategyVariables(){
+	if (starter){
+		InformationManager::getInstance().starter = true;
+		InformationManager::getInstance().endgame = false;
+	}
+	else {
+		InformationManager::getInstance().starter = false;
+		InformationManager::getInstance().endgame = true;
+	}
 
+	if (antiAir){
+		InformationManager::getInstance().antiAir = true;
+	}
+	else {
+		InformationManager::getInstance().antiAir = false;
+	}
+
+	if (antiInvis){
+		InformationManager::getInstance().antiInvis = true;
+	}
+	else {
+		InformationManager::getInstance().antiInvis = false;
+	}
+
+	if (antiRush){
+		InformationManager::getInstance().antiRush = true;
+	}
+	else {
+		InformationManager::getInstance().antiRush = false;
+	}
+
+	if (antiTurtle){
+		InformationManager::getInstance().antiTurtle = true;
+	}
+	else {
+		InformationManager::getInstance().antiTurtle = false;
+	}
 
 }
+

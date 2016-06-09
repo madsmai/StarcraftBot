@@ -5,10 +5,11 @@ Carriers::Carriers() {
 	Broodwar << name << std::endl;
 
 	setSquadSize(3);
+	setStrategyVariables();
 
-	buildOrder = { stargate, probe, probe, pylon,
-		fleet_beacon, stargate, zealot, zealot, pylon,
-		carrier, zealot, carrier, pylon, carrier_capacity, carrier,
+	buildOrder = { stargate, probe, probe,
+		fleet_beacon, stargate, zealot, zealot,
+		carrier, zealot, carrier, carrier_capacity, carrier,
 		evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
@@ -35,10 +36,48 @@ void Carriers::evaluateStrategy(){
 		//StrategyManager::getInstance().setNextStrategy(StrategyManager::none);
 
 	}
+}
 
+void Carriers::setStrategyVariables(){
+	if (starter){
+		InformationManager::getInstance().starter = true;
+		InformationManager::getInstance().endgame = false;
+	}
+	else {
+		InformationManager::getInstance().starter = false;
+		InformationManager::getInstance().endgame = true;
+	}
 
+	if (antiAir){
+		InformationManager::getInstance().antiAir = true;
+	}
+	else {
+		InformationManager::getInstance().antiAir = false;
+	}
+
+	if (antiInvis){
+		InformationManager::getInstance().antiInvis = true;
+	}
+	else {
+		InformationManager::getInstance().antiInvis = false;
+	}
+
+	if (antiRush){
+		InformationManager::getInstance().antiRush = true;
+	}
+	else {
+		InformationManager::getInstance().antiRush = false;
+	}
+
+	if (antiTurtle){
+		InformationManager::getInstance().antiTurtle = true;
+	}
+	else {
+		InformationManager::getInstance().antiTurtle = false;
+	}
 
 }
+
 
 
 

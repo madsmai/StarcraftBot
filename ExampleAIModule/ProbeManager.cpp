@@ -25,6 +25,7 @@ void ProbeManager::onFrame(){
 	Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 	////DEBUGGING////
 
+	checkAndAddSupply();
 	executeQueue();
 	nonIdle();
 
@@ -276,8 +277,30 @@ void ProbeManager::addMineralProbe(Unit probe){
 	mineralProbes.push_back(probe);
 }
 
+
+bool ProbeManager::checkAndAddSupply(){
+	UnitType pylon = UnitTypes::Protoss_Pylon;
+
+	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
+		<= Broodwar->self()->supplyUsed() / 2
+		&& !InformationManager::getInstance().starter
+		&& !builder->isConstructing()){
+
+		std::vector<BuildOrderType>::iterator it;
+		it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, pylon);
+
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
 //Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
 }
+
