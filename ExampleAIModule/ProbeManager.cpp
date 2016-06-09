@@ -10,6 +10,8 @@ using namespace BWAPI;
 
 void ProbeManager::onFrame(){
 
+	checkAndAddSupply();
+
 	executeQueue();
 	nonIdle();
 
@@ -145,22 +147,22 @@ void ProbeManager::executeQueue(){
 			builderMoving = true;
 		}
 		else if (builder->build(type, buildingPosition)){
-			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
-				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
-				
+				if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
+					Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+
 				/*
 				Broodwar->registerEvent([buildingPosition, type](Game*)
 				{Broodwar->drawBoxMap(Position(buildingPosition), Position(buildingPosition + type.tileSize()), Colors::Yellow); }
-				, nullptr, type.buildTime() + 100);
+					, nullptr, type.buildTime() + 100);
 				*/
 
 				builderMoving = false;
-				ResourceManager::getInstance().reserveMinerals(type);
-				ResourceManager::getInstance().reserveGas(type);
-				queue.erase(queue.begin()); //Remove building from queue
+					ResourceManager::getInstance().reserveMinerals(type);
+					ResourceManager::getInstance().reserveGas(type);
+					queue.erase(queue.begin()); //Remove building from queue
 
+				}
 			}
-		}
 	}
 
 	//Handle next request in queue
@@ -227,7 +229,7 @@ TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition posit
 
 			moveCloserTo(newPos, ourBase, 1);
 			Broodwar->drawCircleMap(Position(newPos), 30, Colors::Green, false);
-		}
+}
 
 		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
 		moveCloserTo(newPos, ourBase, 2);
@@ -259,8 +261,30 @@ void ProbeManager::addMineralProbe(Unit probe){
 	mineralProbes.push_back(probe);
 }
 
+
+bool ProbeManager::checkAndAddSupply(){
+	UnitType pylon = UnitTypes::Protoss_Pylon;
+
+	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
+		<= Broodwar->self()->supplyUsed() / 2
+		&& !InformationManager::getInstance().starter
+		&& !builder->isConstructing()){
+
+		std::vector<BuildOrderType>::iterator it;
+		it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, pylon);
+
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
 //Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
 }
+

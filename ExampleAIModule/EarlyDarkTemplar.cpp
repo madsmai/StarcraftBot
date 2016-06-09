@@ -5,14 +5,16 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 
 	Broodwar << name << std::endl;
 
-	setSquadSize(3);
+	setSquadSize(1);
+	setStrategyVariables();
+	OffenseManager::getInstance().rushOngoing = true;
 
 	buildOrder = { // base build
 		probe, gateway, probe, scoutRequest, assimilator, probe,
-		gasworkerRequest, gasworkerRequest, cybercore, probe,
+		cybercore, gasworkerRequest, gasworkerRequest, probe, forge,
 		citadel, probe, gasworkerRequest, archives,
-		gateway, dtemplar, dtemplar, pylon,
-		dtemplar, probe, pylon, probe,
+		gateway, dtemplar, dtemplar,cannon, pylon,
+		dtemplar, probe, probe,
 		evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
@@ -27,6 +29,47 @@ void EarlyDarkTemplar::evaluateStrategy(){
 	StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
 
 }
+
+void EarlyDarkTemplar::setStrategyVariables(){
+	if (starter){
+		InformationManager::getInstance().starter = true;
+		InformationManager::getInstance().endgame = false;
+	}
+	else {
+		InformationManager::getInstance().starter = false;
+		InformationManager::getInstance().endgame = true;
+	}
+
+	if (antiAir){
+		InformationManager::getInstance().antiAir = true;
+	}
+	else {
+		InformationManager::getInstance().antiAir = false;
+	}
+
+	if (antiInvis){
+		InformationManager::getInstance().antiInvis = true;
+	}
+	else {
+		InformationManager::getInstance().antiInvis = false;
+	}
+
+	if (antiRush){
+		InformationManager::getInstance().antiRush = true;
+	}
+	else {
+		InformationManager::getInstance().antiRush = false;
+	}
+
+	if (antiTurtle){
+		InformationManager::getInstance().antiTurtle = true;
+	}
+	else {
+		InformationManager::getInstance().antiTurtle = false;
+	}
+
+}
+
 
 
 

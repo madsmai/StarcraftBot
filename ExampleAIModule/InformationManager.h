@@ -9,6 +9,15 @@
 
 class InformationManager {
 public:
+
+	// strategy variables
+	bool starter = false;
+	bool endgame = false;
+	bool antiAir = false;
+	bool antiInvis = false;
+	bool antiRush = false;
+	bool antiTurtle = false;
+
 	static InformationManager& getInstance();
 
 	void onUnitDiscover(BWAPI::Unit);

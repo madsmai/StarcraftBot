@@ -22,7 +22,7 @@ public:
 
 	void setSquadSize(int size){ OffenseManager::getInstance().setSquadSize(size); }
 	static void evaluateStrategy();
-
+	void setStrategyVariables();
 	// constructor
 	ContinueZealotRush();
 
@@ -46,8 +46,8 @@ private:
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
 	int evaluateStrategyRequest = BuildOrderType::requests::evaluateStrategyRequest;
 
-	bool starter = true;
-	bool endgame = false;
+	bool starter = false;
+	bool endgame = true;
 	bool antiAir = false;
 	bool antiInvis = false;
 	bool antiRush = false;

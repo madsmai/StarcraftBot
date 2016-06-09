@@ -5,6 +5,8 @@ AggressiveZealotRush::AggressiveZealotRush() {
 	Broodwar << name << std::endl;
 
 	setSquadSize(3);
+	setStrategyVariables();
+	OffenseManager::getInstance().rushOngoing = true;
 
 	buildOrder = { // base Build order
 		probe, gateway, gateway, //2 gateways on 9
@@ -39,9 +41,48 @@ void AggressiveZealotRush::evaluateStrategy(){
 
 	}
 
+}
 
+void AggressiveZealotRush::setStrategyVariables(){
+	if (starter){
+		InformationManager::getInstance().starter = true;
+		InformationManager::getInstance().endgame = false;
+	}
+	else {
+		InformationManager::getInstance().starter = false;
+		InformationManager::getInstance().endgame = true;
+	}
+
+	if (antiAir){
+		InformationManager::getInstance().antiAir = true;
+	}
+	else {
+		InformationManager::getInstance().antiAir = false;
+	}
+
+	if (antiInvis){
+		InformationManager::getInstance().antiInvis = true;
+	}
+	else {
+		InformationManager::getInstance().antiInvis = false;
+	}
+
+	if (antiRush){
+		InformationManager::getInstance().antiRush = true;
+	}
+	else {
+		InformationManager::getInstance().antiRush = false;
+	}
+
+	if (antiTurtle){
+		InformationManager::getInstance().antiTurtle = true;
+	}
+	else {
+		InformationManager::getInstance().antiTurtle = false;
+	}
 
 }
+
 
 
 

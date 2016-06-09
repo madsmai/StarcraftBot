@@ -21,7 +21,7 @@ public:
 
 	void setSquadSize(int size){ OffenseManager::getInstance().setSquadSize(size); }
 	static void evaluateStrategy();
-
+	void setStrategyVariables();
 	// constructor
 	EarlyDarkTemplar();
 

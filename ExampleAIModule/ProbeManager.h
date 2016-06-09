@@ -35,6 +35,8 @@ private:
 	void executeQueue();
 	void nonIdle();
 	void moveCloserTo(TilePosition& moving, const TilePosition& stationary, int dist);
+	bool checkAndAddSupply();
+
 
 	Unit builder;
 	bool builderMoving = false;
