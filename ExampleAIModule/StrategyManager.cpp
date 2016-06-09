@@ -5,29 +5,22 @@ using namespace BWAPI;
 int StrategyManager::setInitialStrategy(){
 
 	Race enemyRace = Broodwar->enemy()->getRace();
+	Broodwar << "Enemy race is: " << enemyRace << std::endl;
 	switch (enemyRace){
 
 	case Races::Enum::Protoss:
-		Broodwar << "Enemy race is: " << enemyRace << std::endl;
-		Broodwar << "Setting initial strategy to: 'Aggressive Zealot rush'" << std::endl;
 		return earlyDarkTemplar;
 		break;
 
 	case Races::Enum::Zerg:
-		Broodwar << "Enemy race is: " << enemyRace << std::endl;
-		Broodwar << "Setting initial strategy to: 'Aggressive Zealot rush'" << std::endl;
 		return aggressiveZealotRush;
 		break;
 
 	case Races::Enum::Terran:
-		Broodwar << "Enemy race is: " << enemyRace << std::endl;
-		Broodwar << "Setting initial strategy to: 'Common Zealot rush'" << std::endl;
 		return earlyDarkTemplar;
 		break;
 
 	case Races::Enum::Unknown:
-		Broodwar << "Enemy race is unknown" << std::endl;
-		Broodwar << "Setting initial strategy to: 'Common Zealot rush'" << std::endl;
 		return commonZealotRush;
 		break;
 

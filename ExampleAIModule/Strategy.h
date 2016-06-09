@@ -18,6 +18,7 @@ public:
 
 	virtual std::vector<BuildOrderType> getBuildOrder() = 0;
 
+	virtual void setStrategyVariables() = 0;
 
 	virtual void setSquadSize(int size) = 0;
 

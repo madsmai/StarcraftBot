@@ -5,15 +5,10 @@ ContinueZealotRush::ContinueZealotRush() {
 
 	Broodwar << name << std::endl;
 	setSquadSize(3);
+	setStrategyVariables();
+	OffenseManager::getInstance().rushOngoing = true;
 
-	// chooses build order
-	if (Broodwar->self()->supplyTotal() / 2 - 5 <= Broodwar->self()->supplyUsed() / 2 + 8){
-		buildOrder = { zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest };
-	}
-
-	else {
-		buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
-	}
+	buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
@@ -39,6 +34,47 @@ void ContinueZealotRush::evaluateStrategy(){
 
 
 }
+
+void ContinueZealotRush::setStrategyVariables(){
+	if (starter){
+		InformationManager::getInstance().starter = true;
+		InformationManager::getInstance().endgame = false;
+	}
+	else {
+		InformationManager::getInstance().starter = false;
+		InformationManager::getInstance().endgame = true;
+	}
+
+	if (antiAir){
+		InformationManager::getInstance().antiAir = true;
+	}
+	else {
+		InformationManager::getInstance().antiAir = false;
+	}
+
+	if (antiInvis){
+		InformationManager::getInstance().antiInvis = true;
+	}
+	else {
+		InformationManager::getInstance().antiInvis = false;
+	}
+
+	if (antiRush){
+		InformationManager::getInstance().antiRush = true;
+	}
+	else {
+		InformationManager::getInstance().antiRush = false;
+	}
+
+	if (antiTurtle){
+		InformationManager::getInstance().antiTurtle = true;
+	}
+	else {
+		InformationManager::getInstance().antiTurtle = false;
+	}
+
+}
+
 
 
 

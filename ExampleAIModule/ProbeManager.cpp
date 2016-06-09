@@ -9,6 +9,8 @@ using namespace BWAPI;
 
 void ProbeManager::onFrame(){
 
+	checkAndAddSupply();
+
 	executeQueue();
 	nonIdle();
 
@@ -139,28 +141,28 @@ void ProbeManager::executeQueue(){
 
 		//// TESTING ENDED ////
 
-			if (builder->build(type, position)){
-				if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
-					Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+		if (builder->build(type, position)){
+			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
+				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
 
-					Broodwar->registerEvent([position, type](Game*)
-					{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow); }
-					, nullptr, type.buildTime() + 100);
+				Broodwar->registerEvent([position, type](Game*)
+				{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow); }
+				, nullptr, type.buildTime() + 100);
 
-					ResourceManager::getInstance().reserveMinerals(type);
-					ResourceManager::getInstance().reserveGas(type);
-					queue.erase(queue.begin()); //Remove building from queue
+				ResourceManager::getInstance().reserveMinerals(type);
+				ResourceManager::getInstance().reserveGas(type);
+				queue.erase(queue.begin()); //Remove building from queue
 
-				}
 			}
-		
+		}
+
 	}
 
 	//Handle next request in queue
 	else if (queue.front().isRequest()){
 		int request = queue.front().getRequestType();
 		//Make a scout
-		if (request == BuildOrderType::scoutRequest 
+		if (request == BuildOrderType::scoutRequest
 			&& !builder->isConstructing() && (builder->isIdle() || builder->isGatheringMinerals())){
 			ScoutManager::getInstance().addScout(mineralProbes.front());
 
@@ -205,8 +207,8 @@ void ProbeManager::executeQueue(){
 }
 
 TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition position){
-	if (type == UnitTypes::Protoss_Photon_Cannon || 
-		type == UnitTypes::Protoss_Gateway || 
+	if (type == UnitTypes::Protoss_Photon_Cannon ||
+		type == UnitTypes::Protoss_Gateway ||
 		type == UnitTypes::Protoss_Pylon){
 
 		//Cannons, Gateways and pylons are placed near the nearest chokepoint
@@ -218,13 +220,14 @@ TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition posit
 			//NOTE: We move in a straight line and might not be on the playing field after an iteration
 
 			moveCloserTo(newPos, ourBase, 1);
-}
+		}
 
 		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
 		moveCloserTo(newPos, ourBase, 2);
 
 		return Broodwar->getBuildLocation(type, newPos);
-	} else {
+	}
+	else {
 		return Broodwar->getBuildLocation(type, position);
 	}
 }
@@ -250,8 +253,30 @@ void ProbeManager::addMineralProbe(Unit probe){
 	mineralProbes.push_back(probe);
 }
 
+
+bool ProbeManager::checkAndAddSupply(){
+	UnitType pylon = UnitTypes::Protoss_Pylon;
+
+	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
+		<= Broodwar->self()->supplyUsed() / 2
+		&& !InformationManager::getInstance().starter
+		&& !builder->isConstructing()){
+
+		std::vector<BuildOrderType>::iterator it;
+		it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, pylon);
+
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
 //Get a static instance of class
 ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	static ProbeManager i; //Make static instance i
 	return i;
 }
+
