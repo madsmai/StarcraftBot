@@ -7,7 +7,7 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 
 	setSquadSize(1);
 	setStrategyVariables();
-	OffenseManager::getInstance().rushOngoing = true;
+	OffenseManager::getInstance().rushOngoing = false;
 
 	buildOrder = { // base build
 		probe, gateway, probe, scoutRequest, assimilator, probe,

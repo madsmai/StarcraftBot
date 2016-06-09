@@ -6,7 +6,7 @@ ContinueZealotRush::ContinueZealotRush() {
 	Broodwar << name << std::endl;
 	setSquadSize(3);
 	setStrategyVariables();
-	OffenseManager::getInstance().rushOngoing = true;
+	OffenseManager::getInstance().rushOngoing = false;
 
 	buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
 

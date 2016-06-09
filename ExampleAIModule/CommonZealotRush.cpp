@@ -7,7 +7,7 @@ CommonZealotRush::CommonZealotRush(){
 
 	setSquadSize(3);
 	setStrategyVariables();
-	OffenseManager::getInstance().rushOngoing = true;
+	OffenseManager::getInstance().rushOngoing = false;
 
 	buildOrder = { // base Build order
 		scoutRequest,

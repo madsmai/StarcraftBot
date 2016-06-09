@@ -41,6 +41,9 @@ private:
 	void fillReaverOrCarrier(BWAPI::Unit);
 	bool properClosestTarget(BWAPI::Unit, BWAPI::Unit);
 
+	//Rename me
+	void FixWrongPriority(BWAPI::Unit);
+
 	OffenseManager(){};
 	~OffenseManager(){};
 };

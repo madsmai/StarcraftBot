@@ -6,7 +6,7 @@ AggressiveZealotRush::AggressiveZealotRush() {
 
 	setSquadSize(3);
 	setStrategyVariables();
-	OffenseManager::getInstance().rushOngoing = true;
+	OffenseManager::getInstance().rushOngoing = false;
 
 	buildOrder = { // base Build order
 		probe, gateway, gateway, //2 gateways on 9
