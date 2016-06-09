@@ -3,6 +3,7 @@
 /*
 TODO:
 - FIX: building two things in a row produces an error where the buildings want to be placed on same spot
+- There might be null pointer on line 127 (where we get a new buildPosition), since we only sometimes get one
 */
 
 using namespace BWAPI;
@@ -32,7 +33,7 @@ void ProbeManager::nonIdle(){
 	}
 
 	//Make an idle builder do stuff
-	if (builder != NULL && builder->isIdle()) {
+	if (builder != NULL && builder->isIdle() && !builder->isMoving()) {
 		if (!builder->gather(builder->getClosestUnit(Filter::IsMineralField))) {
 			Broodwar << Broodwar->getLastError() << std::endl;
 		}
@@ -114,46 +115,52 @@ void ProbeManager::executeQueue(){
 			builder = mineralProbes.front(); //Assign a probe as designated builder
 		}
 
+		if (builder->isConstructing()){
+			return;
+		}
+
 		int minPrice = type.mineralPrice(); //Price of building
 		int gasPrice = type.gasPrice(); //Price of building
 
-		TilePosition position = getNewBuildLocation(type, builder->getTilePosition()); //Buildposition
-		//TilePosition position = Broodwar->getBuildLocation(type, builder->getTilePosition()); //Buildposition
-
 		if (!(Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice) &&
-			!(Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) &&
-			!builder->isConstructing()){
+			!(Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice)){
 
 			return; //If we dont have the resources to build the building
 		}
 
-		//// TESTING STARTED ////
+		static TilePosition buildingPosition;
+		//Find new building position
+		if(builderMoving == false){
+			buildingPosition = getNewBuildLocation(type, builder->getTilePosition());
+		}
 
-		//const char* check = "False";
-		//if (Broodwar->isVisible(position) && Broodwar->isBuildable(position)){
-		//	check = "True";
-		//}
+		//// Debugging STARTED ////
 
-		//Broodwar->drawTextMap(Position(position), check, Colors::Green);
-		Broodwar->drawCircleMap(Position(position), 30, Colors::Purple, true);
+		Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 
-		//// TESTING ENDED ////
+		//// Debugging ENDED ////
 
-			if (builder->build(type, position)){
-				if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
-					Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+		if (!Broodwar->isVisible(buildingPosition)){
+			builder->move(Position(buildingPosition));
+			builderMoving = true;
+		}
+		else if (builder->build(type, buildingPosition)){
+			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
+				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+				
+				/*
+				Broodwar->registerEvent([buildingPosition, type](Game*)
+				{Broodwar->drawBoxMap(Position(buildingPosition), Position(buildingPosition + type.tileSize()), Colors::Yellow); }
+				, nullptr, type.buildTime() + 100);
+				*/
 
-					Broodwar->registerEvent([position, type](Game*)
-					{Broodwar->drawBoxMap(Position(position), Position(position + type.tileSize()), Colors::Yellow); }
-					, nullptr, type.buildTime() + 100);
+				builderMoving = false;
+				ResourceManager::getInstance().reserveMinerals(type);
+				ResourceManager::getInstance().reserveGas(type);
+				queue.erase(queue.begin()); //Remove building from queue
 
-					ResourceManager::getInstance().reserveMinerals(type);
-					ResourceManager::getInstance().reserveGas(type);
-					queue.erase(queue.begin()); //Remove building from queue
-
-				}
 			}
-		
+		}
 	}
 
 	//Handle next request in queue
@@ -205,25 +212,27 @@ void ProbeManager::executeQueue(){
 }
 
 TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition position){
-	if (type == UnitTypes::Protoss_Photon_Cannon || 
+	if (/*type == UnitTypes::Protoss_Photon_Cannon || 
 		type == UnitTypes::Protoss_Gateway || 
-		type == UnitTypes::Protoss_Pylon){
+		type == UnitTypes::Protoss_Pylon*/ false){ //BE SURE TO COMMENT THIS BACK IN
 
 		//Cannons, Gateways and pylons are placed near the nearest chokepoint
 		BWTA::Chokepoint* chokepoint = BWTA::getNearestChokepoint(position);
 		TilePosition newPos = Broodwar->getBuildLocation(type, TilePosition(chokepoint->getCenter()));
 
+		
 		TilePosition ourBase = Broodwar->self()->getStartLocation();
 		while (!(Broodwar->isVisible(newPos) && Broodwar->isBuildable(newPos))){
 			//NOTE: We move in a straight line and might not be on the playing field after an iteration
 
 			moveCloserTo(newPos, ourBase, 1);
-}
+			Broodwar->drawCircleMap(Position(newPos), 30, Colors::Green, false);
+		}
 
 		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
 		moveCloserTo(newPos, ourBase, 2);
 
-		return Broodwar->getBuildLocation(type, newPos);
+		return Broodwar->getBuildLocation(type, newPos, 3); //dist of 3 is really good
 	} else {
 		return Broodwar->getBuildLocation(type, position);
 	}
