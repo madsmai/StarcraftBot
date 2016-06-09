@@ -20,6 +20,7 @@ TODO:
 	(download bots, or get it up on SSCAIT)
 - Fix avoid towers
 - Fix Calculate Army strenght
+- Attack probes med scout i stedet for at angribe main base, og forsvar mod samme
 
 
 
