@@ -11,7 +11,6 @@ using namespace BWAPI;
 void ProbeManager::onFrame(){
 
 	checkAndAddSupply();
-
 	executeQueue();
 	nonIdle();
 
@@ -132,13 +131,17 @@ void ProbeManager::executeQueue(){
 
 		static TilePosition buildingPosition;
 		//Find new building position
-		if(builderMoving == false){
+		if (builderMoving == false){
 			buildingPosition = getNewBuildLocation(type, builder->getTilePosition());
 		}
 
 		//// Debugging STARTED ////
 
 		Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
+
+		if (!Broodwar->canBuildHere(buildingPosition, type, builder)){
+			buildingPosition = getNewBuildLocation(type, builder->getTilePosition());
+		}
 
 		//// Debugging ENDED ////
 
@@ -147,29 +150,32 @@ void ProbeManager::executeQueue(){
 			builderMoving = true;
 		}
 		else if (builder->build(type, buildingPosition)){
-				if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
-					Broodwar->getLastError() != Errors::Invalid_Tile_Position){
+			if (Broodwar->getLastError() != Errors::Unbuildable_Location
+				|| Broodwar->getLastError() != Errors::Invalid_Tile_Position
+				|| !Broodwar->canBuildHere(buildingPosition,type,builder)){
+				
+
 
 				/*
 				Broodwar->registerEvent([buildingPosition, type](Game*)
 				{Broodwar->drawBoxMap(Position(buildingPosition), Position(buildingPosition + type.tileSize()), Colors::Yellow); }
-					, nullptr, type.buildTime() + 100);
+				, nullptr, type.buildTime() + 100);
 				*/
 
 				builderMoving = false;
-					ResourceManager::getInstance().reserveMinerals(type);
-					ResourceManager::getInstance().reserveGas(type);
-					queue.erase(queue.begin()); //Remove building from queue
+				ResourceManager::getInstance().reserveMinerals(type);
+				ResourceManager::getInstance().reserveGas(type);
+				queue.erase(queue.begin()); //Remove building from queue
 
-				}
 			}
+		}
 	}
 
 	//Handle next request in queue
 	else if (queue.front().isRequest()){
 		int request = queue.front().getRequestType();
 		//Make a scout
-		if (request == BuildOrderType::scoutRequest 
+		if (request == BuildOrderType::scoutRequest
 			&& !builder->isConstructing() && (builder->isIdle() || builder->isGatheringMinerals())){
 			ScoutManager::getInstance().addScout(mineralProbes.front());
 
@@ -214,28 +220,29 @@ void ProbeManager::executeQueue(){
 }
 
 TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition position){
-	if (/*type == UnitTypes::Protoss_Photon_Cannon || 
-		type == UnitTypes::Protoss_Gateway || 
+	if (/*type == UnitTypes::Protoss_Photon_Cannon ||
+		type == UnitTypes::Protoss_Gateway ||
 		type == UnitTypes::Protoss_Pylon*/ false){ //BE SURE TO COMMENT THIS BACK IN
 
 		//Cannons, Gateways and pylons are placed near the nearest chokepoint
 		BWTA::Chokepoint* chokepoint = BWTA::getNearestChokepoint(position);
 		TilePosition newPos = Broodwar->getBuildLocation(type, TilePosition(chokepoint->getCenter()));
 
-		
+
 		TilePosition ourBase = Broodwar->self()->getStartLocation();
 		while (!(Broodwar->isVisible(newPos) && Broodwar->isBuildable(newPos))){
 			//NOTE: We move in a straight line and might not be on the playing field after an iteration
 
 			moveCloserTo(newPos, ourBase, 1);
 			Broodwar->drawCircleMap(Position(newPos), 30, Colors::Green, false);
-}
+		}
 
 		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
 		moveCloserTo(newPos, ourBase, 2);
 
 		return Broodwar->getBuildLocation(type, newPos, 3); //dist of 3 is really good
-	} else {
+	}
+	else {
 		return Broodwar->getBuildLocation(type, position);
 	}
 }
@@ -267,7 +274,7 @@ bool ProbeManager::checkAndAddSupply(){
 
 	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
 		<= Broodwar->self()->supplyUsed() / 2
-		&& !InformationManager::getInstance().starter
+		&& !InformationManager::getInstance().starter 
 		&& !builder->isConstructing()){
 
 		std::vector<BuildOrderType>::iterator it;

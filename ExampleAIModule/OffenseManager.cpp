@@ -65,8 +65,8 @@ void OffenseManager::onFrame(){
 			}
 		}
 		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
-			&& (unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit) ) {
-			
+			&& (unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit)) {
+
 			searchAndDestroy(unit);
 		}
 		if (unit->isMoving()
@@ -77,7 +77,12 @@ void OffenseManager::onFrame(){
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
 		}
 	}
-	if (squad.size() >= squadSize) {
+
+	if (enemiesInOurRegion()){
+		defendOurBase();
+	}
+
+	else if (squad.size() >= squadSize) {
 		rush(squad);
 		squad.clear();
 	}
@@ -103,7 +108,7 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 			if (InformationManager::getInstance().enemyBase != NULL) {
 				//Trying to use move instead of attack, hoping SearchAndDestroy will take over
 				attackers.move(attackers.getPosition());
-				attackers.move(InformationManager::getInstance().enemyBase->getPosition(),true);
+				attackers.move(InformationManager::getInstance().enemyBase->getPosition(), true);
 				rushOngoing = true;
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
@@ -204,7 +209,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		}
 	}
 	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
-		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy,1240);
+		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
@@ -225,7 +230,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	}
 	else if (!InformationManager::getInstance().enemyTowers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy, 1240);
-		if (properClosestTarget(closest,attacker)) {
+		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
 	}
@@ -249,9 +254,9 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 			u->attack(closest);
 		}
 	}
-	if (attacker->isIdle() 
+	if (attacker->isIdle()
 		&& InformationManager::getInstance().enemyBase != NULL
-		&& BWTA::getRegion(attacker->getTilePosition())!=InformationManager::getInstance().ourBase->getRegion()) {
+		&& BWTA::getRegion(attacker->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
 		attacker->attack(InformationManager::getInstance().enemyBase->getPosition());
 	}
 
@@ -380,4 +385,16 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
 	return target != NULL && target->isVisible() && BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
 		&& target->exists() && target->getPosition().isValid();
+}
+
+bool OffenseManager::enemiesInOurRegion(){
+	for (Unit enemy : InformationManager::getInstance().enemyAttackers){
+		if (InformationManager::getInstance().ourBase->getRegion() == BWTA::getRegion(enemy->getPosition())){
+			return true;
+		}
+	} return false;
+}
+
+void OffenseManager::defendOurBase(){
+
 }
