@@ -10,6 +10,21 @@ using namespace BWAPI;
 
 void ProbeManager::onFrame(){
 
+	////DEBUGGING////
+	const char* isConstr;
+	if (builder != NULL){
+		if (builder->isConstructing()){
+			isConstr = "Constructing";
+		}
+		else{
+			isConstr = "Mining/Moving";
+		}
+		Broodwar->drawTextMap(builder->getPosition(), isConstr);
+	}
+
+	Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
+	////DEBUGGING////
+
 	executeQueue();
 	nonIdle();
 
@@ -122,21 +137,24 @@ void ProbeManager::executeQueue(){
 		int minPrice = type.mineralPrice(); //Price of building
 		int gasPrice = type.gasPrice(); //Price of building
 
-		if (!(Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice) &&
-			!(Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice)){
+		if (!(Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
+			Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice)){
 
 			return; //If we dont have the resources to build the building
 		}
 
-		static TilePosition buildingPosition;
 		//Find new building position
 		if(builderMoving == false){
-			buildingPosition = getNewBuildLocation(type, builder->getTilePosition());
+			buildingPosition = Broodwar->getBuildLocation(type, builder->getTilePosition());
+			const char* mess = "NEW LOCATION";
+			Broodwar->drawTextMap(InformationManager::getInstance().ourBase->getPosition(),mess);
+			//buildingPosition = getNewBuildLocation(type, builder->getTilePosition());
+			//buildingPosition = PlacementManager::getInstance().getBuildingPlacement(type, builder->getTilePosition());
 		}
 
 		//// Debugging STARTED ////
 
-		Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
+		//Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 
 		//// Debugging ENDED ////
 
@@ -145,6 +163,7 @@ void ProbeManager::executeQueue(){
 			builderMoving = true;
 		}
 		else if (builder->build(type, buildingPosition)){
+			builderMoving = false;
 			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
 				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
 				
@@ -154,11 +173,9 @@ void ProbeManager::executeQueue(){
 				, nullptr, type.buildTime() + 100);
 				*/
 
-				builderMoving = false;
 				ResourceManager::getInstance().reserveMinerals(type);
 				ResourceManager::getInstance().reserveGas(type);
 				queue.erase(queue.begin()); //Remove building from queue
-
 			}
 		}
 	}
@@ -211,10 +228,10 @@ void ProbeManager::executeQueue(){
 	}
 }
 
-TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition position){
-	if (/*type == UnitTypes::Protoss_Photon_Cannon || 
+/*TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition position){
+	if (type == UnitTypes::Protoss_Photon_Cannon || 
 		type == UnitTypes::Protoss_Gateway || 
-		type == UnitTypes::Protoss_Pylon*/ false){ //BE SURE TO COMMENT THIS BACK IN
+		type == UnitTypes::Protoss_Pylon){
 
 		//Cannons, Gateways and pylons are placed near the nearest chokepoint
 		BWTA::Chokepoint* chokepoint = BWTA::getNearestChokepoint(position);
@@ -236,7 +253,7 @@ TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition posit
 	} else {
 		return Broodwar->getBuildLocation(type, position);
 	}
-}
+}*/
 
 //Function moves the first tileposition closer to the second one
 void ProbeManager::moveCloserTo(TilePosition& moving, const TilePosition& stationary, int dist){

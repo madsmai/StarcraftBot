@@ -5,6 +5,7 @@
 #include "ScoutManager.h"
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
+#include "PlacementManager.h"
 #include <utility>
 #include <vector>
 #include <queue>
@@ -38,6 +39,7 @@ private:
 
 	Unit builder;
 	bool builderMoving = false;
+	TilePosition buildingPosition;
 
 	//Con- and destructor aren't needed since class is used as static
 	ProbeManager(){};

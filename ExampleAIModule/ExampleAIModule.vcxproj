@@ -105,6 +105,7 @@
     <ClCompile Include="EarlyDarkTemplar.cpp" />
     <ClCompile Include="InformationManager.cpp" />
     <ClCompile Include="OffenseManager.cpp" />
+    <ClCompile Include="PlacementManager.cpp" />
     <ClCompile Include="ProbeManager.cpp" />
     <ClCompile Include="Reavers.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="EarlyDarkTemplar.h" />
     <ClInclude Include="InformationManager.h" />
     <ClInclude Include="OffenseManager.h" />
+    <ClInclude Include="PlacementManager.h" />
     <ClInclude Include="ProbeManager.h" />
     <ClInclude Include="Reavers.h" />
     <ClInclude Include="ResourceManager.h" />
