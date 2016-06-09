@@ -7,6 +7,7 @@
 #include "ContinueZealotRush.h"
 #include "TransitionMidGame.h"
 #include "Reavers.h"
+#include "Carriers.h"
 
 class StrategyManager {
 public:
@@ -15,7 +16,7 @@ public:
 
 	enum strategy{ none, basic, commonZealotRush, aggressiveZealotRush, 
 		earlyDarkTemplar, continueZealotRush, transitionMidGame,
-		reavers};
+		reavers, carriers};
 
 
 	int getCurrentStrategy(){ return currentStrategy; }

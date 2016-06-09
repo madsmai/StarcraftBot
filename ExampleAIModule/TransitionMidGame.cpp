@@ -7,8 +7,6 @@ TransitionMidGame::TransitionMidGame() {
 
 	setSquadSize(3);
 
-	
-
 	if (Broodwar->self()->allUnitCount(assimilator) == 0
 		&& Broodwar->self()->allUnitCount(forge) == 0
 		&& Broodwar->self()->allUnitCount(cybercore) == 0){
@@ -47,7 +45,7 @@ TransitionMidGame::TransitionMidGame() {
 void TransitionMidGame::evaluateStrategy(){
 
 	Broodwar << "Evaluating mid game strategy" << std::endl;
-	StrategyManager::getInstance().setNextStrategy(StrategyManager::reavers);
-
+	StrategyManager::getInstance().setNextStrategy(StrategyManager::carriers);
+	OffenseManager::getInstance().rushOngoing = false;
 
 }

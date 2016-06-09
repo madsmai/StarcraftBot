@@ -16,8 +16,10 @@ public:
 	int runFrames;
 
 	BWAPI::Unitset fighters;
-	BWAPI::Unitset cowards;
+	BWAPI::Unit coward;
 	BWAPI::Unitset squad;
+
+	
 
 	bool rushOngoing = false;
 
@@ -36,6 +38,8 @@ private:
 	bool avoidTowers(BWAPI::Unit);
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
 	bool isFighter(BWAPI::Unit);
+	void fillReaverOrCarrier(BWAPI::Unit);
+	bool properClosestTarget(BWAPI::Unit, BWAPI::Unit);
 
 	OffenseManager(){};
 	~OffenseManager(){};

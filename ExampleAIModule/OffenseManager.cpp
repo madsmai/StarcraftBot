@@ -1,7 +1,5 @@
 #include "OffenseManager.h"
 
-
-
 using namespace BWAPI;
 /*
 TODO:
@@ -21,19 +19,19 @@ TODO:
 
 */
 
-void OffenseManager::onUnitDestroy(BWAPI::Unit unit){
+void OffenseManager::onUnitDestroy(Unit unit){
 	if (unit->getPlayer() == Broodwar->self()) {
 		InformationManager::getInstance().writeToLog("One of our dudes died");
 		if (fighters.find(unit) != fighters.end()) {
 			fighters.erase(fighters.find(unit));
 		}
-		else if (cowards.find(unit) != cowards.end()) {
-			cowards.erase(cowards.find(unit));
+		else if (unit = coward) {
+			coward = NULL;
 		}
 	}
 }
 
-void OffenseManager::onUnitComplete(BWAPI::Unit unit){
+void OffenseManager::onUnitComplete(Unit unit){
 
 	if (isFighter(unit)){
 		fighters.insert(unit);
@@ -45,29 +43,18 @@ void OffenseManager::onUnitComplete(BWAPI::Unit unit){
 }
 
 void OffenseManager::onFrame(){
+
 	for (Unit unit : fighters) {
 
-		if (unit->getType() == UnitTypes::Protoss_Reaver){
-			Broodwar << "Reaver selected:" << std::endl;
-			Broodwar << Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity) << std::endl;
-			Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity);
-			if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
-				== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
-				&& unit->getScarabCount() < 10){
-
-				unit->train(UnitTypes::Protoss_Scarab);
-			}
-			else if (unit->getScarabCount() < 5){
-				
-				Broodwar << "training scarabs" << std::endl;
-				unit->train(UnitTypes::Protoss_Scarab);
-			}
-
+		if (unit->getType() == UnitTypes::Protoss_Reaver || unit->getType() == UnitTypes::Protoss_Carrier){
+			fillReaverOrCarrier(unit);
 		}
+
 
 		if (unit != NULL && unit->isUnderAttack()) {
 			InformationManager::getInstance().writeToLog("Under attack");
-			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) < InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
+			if (InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
+				< InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
 				&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())) {
 
 				Broodwar << "Their army is stronger" << std::endl;
@@ -82,7 +69,8 @@ void OffenseManager::onFrame(){
 			&& InformationManager::getInstance().ourBase->getRegion() != NULL
 			&& BWTA::getRegion(unit->getTilePosition()) != NULL
 			&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
-			&& unit->isIdle()) {
+			&& (unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit )) {
+
 			searchAndDestroy(unit);
 		}
 		else if (InformationManager::getInstance().enemyBase != NULL
@@ -92,12 +80,14 @@ void OffenseManager::onFrame(){
 			&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
 			&& unit->isIdle()
 			&& !rushOngoing){
+
 			unit->move(InformationManager::getInstance().ourBase->getPosition());
 			squad.insert(unit);
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
 			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Move || unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
+
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
 		}
@@ -106,12 +96,10 @@ void OffenseManager::onFrame(){
 		rush(squad);
 		squad.clear();
 	}
-	if (cowards.size() > 0 && runFrames + 18 <= Broodwar->getFrameCount()) {
+	if (runFrames + 18 <= Broodwar->getFrameCount() && coward != NULL) {
 		InformationManager::getInstance().writeToLog("Started Coward purging");
-		for (Unit coward : cowards) {
-			searchAndDestroy(coward);
-		}
-		cowards.clear();
+		searchAndDestroy(coward);
+		coward = NULL;
 	}
 
 }
@@ -129,7 +117,8 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 		if (lastChecked + 400 < BWAPI::Broodwar->getFrameCount()) {
 			if (InformationManager::getInstance().enemyBase != NULL) {
 				//Trying to use move instead of attack, hoping SearchAndDestroy will take over
-				attackers.move(InformationManager::getInstance().enemyBase->getPosition());
+				attackers.move(attackers.getPosition());
+				attackers.move(InformationManager::getInstance().enemyBase->getPosition(),true);
 				rushOngoing = true;
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
@@ -155,8 +144,8 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 			if (attackedUnit->getShields() < attackedUnit->getType().maxShields() / 10
 				&& nearbyAllies.size() > 0
 				&& nearbyEnemies.size() > 1) {
-				if (cowards.find(attackedUnit) == cowards.end()) {
-					cowards.insert(attackedUnit);
+				if (coward = NULL) {
+					coward = attackedUnit;
 				}
 				runFrames = Broodwar->getFrameCount();
 				if (InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(attackedUnit->getTilePosition())) {
@@ -223,68 +212,60 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Called when our fighters are idle in the enemy base
 	//Finds units to kill and kills them
 	Unit closest;
-	if (!InformationManager::getInstance().enemyWorkers.empty()) {
-		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
-		if (closest != NULL && closest->isVisible()) {
+	if (!InformationManager::getInstance().enemyAttackers.empty()) {
+		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy, 1240);
+		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
-			Broodwar << "Attacking closest" << std::endl;
-			return;
-		}
-		else {
-			attacker->attack(InformationManager::getInstance().enemyWorkers.front());
-			return;
 		}
 	}
-	if (!InformationManager::getInstance().enemyBarracks.empty()) {
+	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
+		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy,1240);
+		if (properClosestTarget(closest, attacker)) {
+			attacker->attack(closest);
+		}
+	}
+	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
 		closest = attacker->getClosestUnit((Filter::GetType == UnitTypes::Protoss_Gateway
 			|| Filter::GetType == UnitTypes::Terran_Barracks
-			|| Filter::GetType == UnitTypes::Zerg_Spawning_Pool) && Filter::IsEnemy);
-		if (closest != NULL && closest->isVisible()) {
+			|| Filter::GetType == UnitTypes::Zerg_Spawning_Pool) && Filter::IsEnemy, 1240);
+		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
-			Broodwar << "Attacking closest" << std::endl;
-			return;
-		}
-		else {
-			attacker->attack(InformationManager::getInstance().enemyBarracks.front());
-			return;
 		}
 	}
-	if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
-		closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible);
-		if (closest != NULL && closest->isVisible()) {
+	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
+		closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible, 1240);
+		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
-			Broodwar << "Attacking closest" << std::endl;
-			return;
-		}
-		else {
-			/*attacker->attack(InformationManager::getInstance().enemyPassiveBuildings.front());*/
-			attacker->attack(InformationManager::getInstance().enemyPassiveBuildings[rand() % InformationManager::getInstance().enemyPassiveBuildings.size()]);
-			return;
 		}
 	}
-	if (!InformationManager::getInstance().enemyAttackers.empty()) {
-		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy);
-		if (closest != NULL && closest->isVisible()) {
+	else if (!InformationManager::getInstance().enemyTowers.empty()) {
+		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy, 1240);
+		if (properClosestTarget(closest,attacker)) {
 			attacker->attack(closest);
-			Broodwar << "Attacking closest" << std::endl;
-			return;
-		}
-		else {
-			attacker->attack(InformationManager::getInstance().enemyAttackers.front());
-			return;
 		}
 	}
-	if (!InformationManager::getInstance().enemyTowers.empty()) {
-		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy);
-		if (closest != NULL && closest->isVisible()) {
-			attacker->attack(closest);
-			Broodwar << "Attacking closest" << std::endl;
-			return;
+	//Finding other units that should also attack this
+	for (Unit u : fighters) {
+		if (u->getLastCommand().getType() != NULL
+			&& u->getLastCommand().getTarget() != NULL
+			&& closest != NULL
+			&& u->getLastCommand().getType() == UnitCommandTypes::Attack_Unit
+			&& u->getLastCommand().getTarget()->getType() != closest->getType()
+			&& !u->isUnderAttack()
+			&& u->getLastCommand().getTarget()->getType().canAttack()
+			&& u->getLastCommand().getTarget()->getType().canMove()){
+
+				u->attack(closest);
 		}
-		else {
-			attacker->attack(InformationManager::getInstance().enemyTowers.front());
-			return;
+		else if (u->getLastCommand().getType() != NULL 
+			&& closest != NULL
+			&& u->getLastCommand().getType() != UnitCommandTypes::Attack_Unit) {
+
+			u->attack(closest);
 		}
+	}
+	if (!attacker->isMoving() && !attacker->isAttacking() ) {
+		attacker->move(InformationManager::getInstance().enemyBase->getPosition());
 	}
 
 }
@@ -366,19 +347,50 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 
 bool OffenseManager::isFighter(Unit unit){
 
-
 	if (unit->getType() == UnitTypes::Protoss_Zealot
 		|| unit->getType() == UnitTypes::Protoss_Dragoon
 		|| unit->getType() == UnitTypes::Protoss_Dark_Templar
 		|| unit->getType() == UnitTypes::Protoss_High_Templar
 		|| unit->getType() == UnitTypes::Protoss_Dark_Archon
 		|| unit->getType() == UnitTypes::Protoss_Archon
-		|| unit->getType() == UnitTypes::Protoss_Reaver){
+		|| unit->getType() == UnitTypes::Protoss_Reaver
+		|| unit->getType() == UnitTypes::Protoss_Carrier){
 
 		return true;
-
 	}
 	return false;
+}
 
+void OffenseManager::fillReaverOrCarrier(Unit unit){
 
+	// if it is a reaver
+	if (unit->getType() == UnitTypes::Protoss_Reaver){
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+			&& unit->getScarabCount() < 10){
+			unit->train(UnitTypes::Protoss_Scarab);
+		}
+		else if (unit->getScarabCount() < 5){
+			unit->train(UnitTypes::Protoss_Scarab);
+		}
+
+	}
+
+	// if it is a carrier
+	else if (unit->getType() == UnitTypes::Protoss_Carrier){
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Carrier_Capacity)
+			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Carrier_Capacity)
+			&& unit->getScarabCount() < 8){
+			unit->train(UnitTypes::Protoss_Interceptor);
+		}
+		else if (unit->getInterceptorCount() < 4){
+			unit->train(UnitTypes::Protoss_Interceptor);
+		}
+	}
+
+}
+
+bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
+	return target != NULL && target->isVisible() && BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
+		&& target->exists() && target->getPosition().isValid();
 }

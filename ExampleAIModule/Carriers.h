@@ -5,7 +5,7 @@
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
 
-class Reavers : public Strategy {
+class Carriers : public Strategy {
 public:
 
 	std::string getName() { return name; }
@@ -23,7 +23,7 @@ public:
 	static void evaluateStrategy();
 
 	// constructor
-	Reavers();
+	Carriers();
 
 private:
 
@@ -44,6 +44,12 @@ private:
 	UnitType supportbay = UnitTypes::Protoss_Robotics_Support_Bay;
 	UnitType reaver = UnitTypes::Protoss_Reaver;
 	UnitType scarab = UnitTypes::Protoss_Scarab;
+	UnitType stargate = UnitTypes::Protoss_Stargate;
+	UnitType fleet_beacon = UnitTypes::Protoss_Fleet_Beacon;
+	UnitType carrier = UnitTypes::Protoss_Carrier;
+	UnitType interceptor = UnitTypes::Protoss_Interceptor;
+
+	UpgradeType carrier_capacity = UpgradeTypes::Carrier_Capacity;
 	UpgradeType reaver_capacity = UpgradeTypes::Reaver_Capacity;
 
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
@@ -61,6 +67,6 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "Reaver strategy";
+	std::string name = "Carrier strategy";
 
 };
