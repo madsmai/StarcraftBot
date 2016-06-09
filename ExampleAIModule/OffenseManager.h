@@ -41,6 +41,10 @@ private:
 	void fillReaverOrCarrier(BWAPI::Unit);
 	bool properClosestTarget(BWAPI::Unit, BWAPI::Unit);
 
+	bool enemiesInOurRegion();
+	void defendOurBase();
+
+
 	//Rename me
 	void FixWrongPriority(BWAPI::Unit);
 

@@ -74,7 +74,12 @@ void OffenseManager::onFrame(){
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
 		}
 	}
-	if (squad.size() >= squadSize) {
+
+	if (enemiesInOurRegion()){
+		defendOurBase();
+	}
+
+	else if (squad.size() >= squadSize) {
 		rush(squad);
 		squad.clear();
 	}
@@ -101,7 +106,7 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 			if (InformationManager::getInstance().enemyBase != NULL) {
 				//Trying to use move instead of attack, hoping SearchAndDestroy will take over
 				attackers.move(attackers.getPosition());
-				attackers.move(InformationManager::getInstance().enemyBase->getPosition(),true);
+				attackers.move(InformationManager::getInstance().enemyBase->getPosition(), true);
 				rushOngoing = true;
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
@@ -203,7 +208,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		}
 	}
 	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
-		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy,1240);
+		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
@@ -231,7 +236,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 
 	if (attacker->isIdle() 
 		&& InformationManager::getInstance().enemyBase != NULL
-		&& BWTA::getRegion(attacker->getTilePosition())!=InformationManager::getInstance().ourBase->getRegion()) {
+		&& BWTA::getRegion(attacker->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
 		attacker->attack(InformationManager::getInstance().enemyBase->getPosition());
 	}
 
@@ -255,30 +260,30 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 		int priority = damage / hitsToKill;
 
 		return priority + 100;
-	}
+					}
 	else if (enemy->getType().isWorker()) {
 		return 90;
-	}
+					}
 	else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
 		//Its a tower
 		return 80;
-	}
+				}
 	else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
 		//Its a factory
 		return 70;
-	}
+					}
 	else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
 		//Passivebuilding
 		return 2;
-	}
-	else {
+					}
+			else {
 		//Unknown
 		return 1;
-	}
+}
 
-			
 
-	
+
+
 }
 
 bool OffenseManager::isFighter(Unit unit){
@@ -403,4 +408,16 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 	//}
 
 	return underTower;
+}
+
+bool OffenseManager::enemiesInOurRegion(){
+	for (Unit enemy : InformationManager::getInstance().enemyAttackers){
+		if (InformationManager::getInstance().ourBase->getRegion() == BWTA::getRegion(enemy->getPosition())){
+			return true;
+		}
+	} return false;
+}
+
+void OffenseManager::defendOurBase(){
+
 }

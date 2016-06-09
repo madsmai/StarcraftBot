@@ -5,7 +5,6 @@ TransitionMidGame::TransitionMidGame() {
 
 	Broodwar << name << std::endl;
 
-	OffenseManager::getInstance().rushOngoing = false;
 	setSquadSize(3);
 	setStrategyVariables();
 

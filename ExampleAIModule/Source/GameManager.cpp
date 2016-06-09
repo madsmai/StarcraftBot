@@ -89,6 +89,7 @@ void GameManager::onFrame(){
 	if (BWAPI::Broodwar->getFrameCount() % BWAPI::Broodwar->getLatencyFrames() != 0) { return; }
 
 	//Call onFrames
+	PlacementManager::getInstance().onFrame();
 	ProbeManager::getInstance().onFrame();
 	BuildingManager::getInstance().onFrame();
 	BuildOrderManager::getInstance().onFrame();
@@ -164,6 +165,7 @@ void GameManager::onSendText(std::string text){
 }
 
 void GameManager::onUnitDestroy(BWAPI::Unit unit) {
+	PlacementManager::getInstance().onUnitDestroy(unit);
 	InformationManager::getInstance().onUnitDestroy(unit);
 	BuildingManager::getInstance().onUnitDestroy(unit);
 	OffenseManager::getInstance().onUnitDestroy(unit);
