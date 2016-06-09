@@ -6,6 +6,7 @@
 #include "../InformationManager.h"
 #include "../OffenseManager.h"
 #include "../ScoutManager.h"
+#include "../PlacementManager.h"
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <Windows.h>
