@@ -34,6 +34,10 @@ void OffenseManager::onUnitComplete(Unit unit){
 		if (rushOngoing && InformationManager::getInstance().enemyBase != NULL) {
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
 		}
+		else {
+			unit->move(InformationManager::getInstance().ourBase->getPosition());
+			squad.insert(unit);
+		}
 	}
 
 }
@@ -60,25 +64,14 @@ void OffenseManager::onFrame(){
 				fightBack(unit);
 			}
 		}
-		else if (InformationManager::getInstance().enemyBase != NULL
-			&& unit != NULL
-			&& InformationManager::getInstance().enemyBase->getRegion() != NULL
-			&& BWTA::getRegion(unit->getTilePosition()) != NULL
-			&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(unit->getTilePosition())
-			&& unit->isIdle()
-			&& !rushOngoing){
-
-			unit->move(InformationManager::getInstance().ourBase->getPosition());
-			squad.insert(unit);
-		}
-		else if (unit->getLastCommand().getType() != NULL && unit != NULL
-			&& unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit ) {
-
+		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
+			&& (unit->isIdle() || unit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit) ) {
+			
 			searchAndDestroy(unit);
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
-			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Move || unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
+			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
 
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
@@ -256,7 +249,9 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 			u->attack(closest);
 		}
 	}
-	if (attacker->isIdle()) {
+	if (attacker->isIdle() 
+		&& InformationManager::getInstance().enemyBase != NULL
+		&& BWTA::getRegion(attacker->getTilePosition())!=InformationManager::getInstance().ourBase->getRegion()) {
 		attacker->attack(InformationManager::getInstance().enemyBase->getPosition());
 	}
 
