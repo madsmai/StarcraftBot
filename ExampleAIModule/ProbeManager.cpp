@@ -167,18 +167,18 @@ void ProbeManager::executeQueue(){
 			builderMoving = false;
 			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
 				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
-				
+
 				/*
 				Broodwar->registerEvent([buildingPosition, type](Game*)
 				{Broodwar->drawBoxMap(Position(buildingPosition), Position(buildingPosition + type.tileSize()), Colors::Yellow); }
-				, nullptr, type.buildTime() + 100);
+					, nullptr, type.buildTime() + 100);
 				*/
 
-				ResourceManager::getInstance().reserveMinerals(type);
-				ResourceManager::getInstance().reserveGas(type);
-				queue.erase(queue.begin()); //Remove building from queue
+					ResourceManager::getInstance().reserveMinerals(type);
+					ResourceManager::getInstance().reserveGas(type);
+					queue.erase(queue.begin()); //Remove building from queue
+				}
 			}
-		}
 	}
 
 	//Handle next request in queue
@@ -245,13 +245,14 @@ void ProbeManager::executeQueue(){
 
 			moveCloserTo(newPos, ourBase, 1);
 			Broodwar->drawCircleMap(Position(newPos), 30, Colors::Green, false);
-		}
+}
 
 		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
 		moveCloserTo(newPos, ourBase, 2);
 
 		return Broodwar->getBuildLocation(type, newPos, 3); //dist of 3 is really good
-	} else {
+	}
+	else {
 		return Broodwar->getBuildLocation(type, position);
 	}
 }*/
