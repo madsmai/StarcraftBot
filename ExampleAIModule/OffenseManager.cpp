@@ -63,7 +63,7 @@ void OffenseManager::onFrame(){
 		}
 		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
 			&& (unit->isIdle() || unit->getLastCommand().getType() == UnitCommandTypes::Move)) {
-			
+
 			searchAndDestroy(unit);
 		}
 		if (unit->isMoving()
@@ -136,7 +136,7 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 					coward = attackedUnit;
 				}
 				runFrames = Broodwar->getFrameCount();
-				if (InformationManager::getInstance().enemyBase != NULL 
+				if (InformationManager::getInstance().enemyBase != NULL
 					&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(attackedUnit->getTilePosition())) {
 					attackedUnit->move(InformationManager::getInstance().ourBase->getPosition());
 				}
@@ -202,19 +202,19 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Finds units to kill and kills them
 	Unit closest;
 	if (!InformationManager::getInstance().enemyAttackers.empty()) {
-		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy, 1240);
+		closest = attacker->getClosestUnit((Filter::CanAttack || Filter::IsSpellcaster) && Filter::CanMove && Filter::IsEnemy, 1240);
+		if (properClosestTarget(closest, attacker)) {
+			attacker->attack(closest);
+		}
+	}
+	else if (!InformationManager::getInstance().enemyTowers.empty()) {
+		closest = attacker->getClosestUnit(Filter::IsBuilding && (Filter::CanAttack || Filter::GetType == UnitTypes::Terran_Bunker) && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 1240);
-		if (properClosestTarget(closest, attacker)) {
-			attacker->attack(closest);
-		}
-	}
-	else if (!InformationManager::getInstance().enemyTowers.empty()) {
-		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
@@ -232,12 +232,16 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		}
 	}
 	//Finding other units that should also attack this
-	FixWrongPriority(closest);
-
-	if (attacker->isIdle() 
+	if (properClosestTarget(closest, attacker)) {
+		FixWrongPriority(closest);
+	}
+	if (attacker->isIdle()
 		&& InformationManager::getInstance().enemyBase != NULL
 		&& BWTA::getRegion(attacker->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
-		attacker->attack(InformationManager::getInstance().enemyBase->getPosition());
+		std::vector<Position> edgeOfBase = InformationManager::getInstance().enemyBase->getRegion()->getPolygon();
+
+		Position randomEdge = edgeOfBase[rand() % edgeOfBase.size()];
+		attacker->move(edgeOfBase[rand() % edgeOfBase.size()]);
 	}
 
 }
@@ -260,26 +264,26 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 		int priority = damage / hitsToKill;
 
 		return priority + 100;
-					}
-	else if (enemy->getType().isWorker()) {
-		return 90;
-					}
+	}
 	else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
 		//Its a tower
+		return 90;
+	}
+	else if (enemy->getType().isWorker()) {
 		return 80;
-				}
+	}
 	else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
 		//Its a factory
 		return 70;
-					}
+	}
 	else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
 		//Passivebuilding
 		return 2;
-					}
-			else {
+	}
+	else {
 		//Unknown
 		return 1;
-}
+	}
 
 
 
@@ -332,10 +336,10 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 }
 
 bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
-	return target != NULL 
-		&& target->isVisible() 
+	return target != NULL
+		&& target->isVisible()
 		&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
-		&& target->exists() 
+		&& target->exists()
 		&& target->getPosition().isValid();
 }
 
