@@ -31,7 +31,6 @@ TransitionMidGame::TransitionMidGame() {
 			probe, probe, probe, pylon,
 			cannon,
 			evaluateStrategyRequest };
-
 	}
 	else {
 		Broodwar << "Add more cases to midGame transition strategy" << std::endl;
