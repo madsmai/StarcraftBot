@@ -94,6 +94,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AddGoons.cpp" />
     <ClCompile Include="AggressiveZealotRush.cpp" />
     <ClCompile Include="BaseBuild.cpp" />
     <ClCompile Include="BuildingManager.cpp" />
@@ -116,6 +117,7 @@
     <ClCompile Include="TransitionMidGame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddGoons.h" />
     <ClInclude Include="AggressiveZealotRush.h" />
     <ClInclude Include="BaseBuild.h" />
     <ClInclude Include="BuildingManager.h" />

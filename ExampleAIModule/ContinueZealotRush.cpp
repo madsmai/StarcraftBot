@@ -4,10 +4,15 @@
 ContinueZealotRush::ContinueZealotRush() {
 
 	Broodwar << name << std::endl;
-	setSquadSize(3);
+	setSquadSize(6);
 	setStrategyVariables();
 
-	buildOrder = { zealot, zealot, zealot, zealot, evaluateStrategyRequest };
+	if (Broodwar->self()->allUnitCount(cybercore) >= 1){
+		buildOrder = { zealot, dragoon, dragoon, zealot,probe, zealot, evaluateStrategyRequest };
+	}
+	else {
+		buildOrder = { zealot, zealot,probe, zealot, zealot, evaluateStrategyRequest };
+	}
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
@@ -28,9 +33,17 @@ void ContinueZealotRush::evaluateStrategy(){
 
 	}
 	else {
-		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+		if (rand() % 2 > 0.5
+			&& Broodwar->self()->allUnitCount(UnitTypes::Protoss_Cybernetics_Core) == 0
+			&& Broodwar->self()->allUnitCount(UnitTypes::Protoss_Assimilator) == 0){
+			Broodwar << "going goons from continue" << std::endl;
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::addGoons);
+		}
+		else {
+			// continue with the zealot rush
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+		}
 	}
-
 
 }
 
