@@ -45,6 +45,9 @@ private:
 	void defendOurBase();
 
 
+	//Rename me
+	void FixWrongPriority(BWAPI::Unit);
+
 	OffenseManager(){};
 	~OffenseManager(){};
 };

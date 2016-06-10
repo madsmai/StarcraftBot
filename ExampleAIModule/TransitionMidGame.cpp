@@ -45,7 +45,7 @@ TransitionMidGame::TransitionMidGame() {
 void TransitionMidGame::evaluateStrategy(){
 
 	Broodwar << "Evaluating mid game strategy" << std::endl;
-	StrategyManager::getInstance().setNextStrategy(StrategyManager::carriers);
+	StrategyManager::getInstance().setNextStrategy(StrategyManager::reavers);
 
 }
 
