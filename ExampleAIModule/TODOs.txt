@@ -11,14 +11,10 @@ Strategi-skift-design:
 
 TODO:
 - Ekstra scout på 4-player map. De skal ikke gå samme vej.
-- Vi kan ikke finde ud af at angribe modstanderens expansions.
 - Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
 
 -Debugging skal ikke ske i release versionen
 -Threat levels, evaluer hvordan "range" har betydning
--Make a private ladder and play many games to evaluate the strength of difference strategies against different strategies.
-	(download bots, or get it up on SSCAIT)
-- Fix avoid towers
 - Calculate Army Strength doesn't work when the enemy is behind the fog. Use InformationManager instead.
 
 
