@@ -20,7 +20,7 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 			addEnemyWorkers(unit);
 		}
 
-		else if (unit->getType().canAttack() && unit->getType().canMove()){
+		else if ((unit->getType().canAttack || unit->getType().isSpellcaster) && unit->getType().canMove){
 			addEnemyAttackers(unit);
 		}
 		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar ){
@@ -28,14 +28,12 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 
 		}
 
-		else if (unit->getType() == UnitTypes::Protoss_Gateway || 
-			unit->getType() == UnitTypes::Zerg_Spawning_Pool || 
-			unit->getType() == UnitTypes::Terran_Barracks){
+		else if (unit->getType().canProduce && unit->getType().isBuilding && !unit->getType().isResourceDepot){
 
 			addEnemyBarracks(unit);
 		}
 
-		else if (unit->getType().isBuilding() && unit->getType().canAttack()){
+		else if (unit->getType().isBuilding && (unit->getType().canAttack || unit->getType() == UnitTypes::Terran_Bunker)){
 			addEnemyTowers(unit);
 		}
 
