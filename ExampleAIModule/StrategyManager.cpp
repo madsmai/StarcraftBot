@@ -60,6 +60,10 @@ void StrategyManager::evaluateStrategies(){
 	case carriers:
 		Carriers::evaluateStrategy();
 		break;
+
+	case addGoons:
+		AddGoons::evaluateStrategy();
+		break;
 	}
 }
 

@@ -63,7 +63,7 @@ void OffenseManager::onFrame(){
 		}
 		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
 			&& (unit->isIdle() || unit->getLastCommand().getType() == UnitCommandTypes::Move)) {
-			
+
 			searchAndDestroy(unit);
 		}
 		if (unit->isMoving()
@@ -136,7 +136,7 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 					coward = attackedUnit;
 				}
 				runFrames = Broodwar->getFrameCount();
-				if (InformationManager::getInstance().enemyBase != NULL 
+				if (InformationManager::getInstance().enemyBase != NULL
 					&& InformationManager::getInstance().enemyBase->getRegion() != BWTA::getRegion(attackedUnit->getTilePosition())) {
 					attackedUnit->move(InformationManager::getInstance().ourBase->getPosition());
 				}
@@ -234,7 +234,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Finding other units that should also attack this
 	FixWrongPriority(closest);
 
-	if (attacker->isIdle() 
+	if (attacker->isIdle()
 		&& InformationManager::getInstance().enemyBase != NULL
 		&& BWTA::getRegion(attacker->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
 		attacker->attack(InformationManager::getInstance().enemyBase->getPosition());
@@ -260,26 +260,26 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 		int priority = damage / hitsToKill;
 
 		return priority + 100;
-					}
+	}
 	else if (enemy->getType().isWorker()) {
 		return 90;
-					}
+	}
 	else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
 		//Its a tower
 		return 80;
-				}
+	}
 	else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
 		//Its a factory
 		return 70;
-					}
+	}
 	else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
 		//Passivebuilding
 		return 2;
-					}
-			else {
+	}
+	else {
 		//Unknown
 		return 1;
-}
+	}
 
 
 
@@ -304,38 +304,39 @@ bool OffenseManager::isFighter(Unit unit){
 
 void OffenseManager::fillReaverOrCarrier(Unit unit){
 
-	// if it is a reaver
-	if (unit->getType() == UnitTypes::Protoss_Reaver){
-		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
-			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
-			&& unit->getScarabCount() < 10){
-			unit->train(UnitTypes::Protoss_Scarab);
-		}
-		else if (unit->getScarabCount() < 5){
-			unit->train(UnitTypes::Protoss_Scarab);
+	if (!unit->isConstructing()){
+		// Unit is a reaver
+		if (unit->getType() == UnitTypes::Protoss_Reaver){
+			if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+				== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
+				&& unit->getScarabCount() < 10){
+				unit->train(UnitTypes::Protoss_Scarab);
+			}
+			else if (unit->getScarabCount() < 5){
+				unit->train(UnitTypes::Protoss_Scarab);
+			}
+
 		}
 
+		// Unit is a carrier
+		else if (unit->getType() == UnitTypes::Protoss_Carrier){
+			if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Carrier_Capacity)
+				== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Carrier_Capacity)
+				&& unit->getScarabCount() < 8){
+				unit->train(UnitTypes::Protoss_Interceptor);
+			}
+			else if (unit->getInterceptorCount() < 4){
+				unit->train(UnitTypes::Protoss_Interceptor);
+			}
+		}
 	}
-
-	// if it is a carrier
-	else if (unit->getType() == UnitTypes::Protoss_Carrier){
-		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Carrier_Capacity)
-			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Carrier_Capacity)
-			&& unit->getScarabCount() < 8){
-			unit->train(UnitTypes::Protoss_Interceptor);
-		}
-		else if (unit->getInterceptorCount() < 4){
-			unit->train(UnitTypes::Protoss_Interceptor);
-		}
-	}
-
 }
 
 bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
-	return target != NULL 
-		&& target->isVisible() 
+	return target != NULL
+		&& target->isVisible()
 		&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
-		&& target->exists() 
+		&& target->exists()
 		&& target->getPosition().isValid();
 }
 

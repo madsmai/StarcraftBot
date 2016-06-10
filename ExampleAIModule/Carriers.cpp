@@ -4,7 +4,7 @@ Carriers::Carriers() {
 
 	Broodwar << name << std::endl;
 
-	setSquadSize(3);
+	setSquadSize(6);
 	setStrategyVariables();
 
 	buildOrder = { stargate, probe, probe,

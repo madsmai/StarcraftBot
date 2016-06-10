@@ -38,7 +38,7 @@ void ProbeManager::onFrame(){
 		}
 	}
 	std::vector<Unit>::iterator itt;
-	for (it = gasProbes.begin(); itt != gasProbes.end(); itt++){
+	for (itt = gasProbes.begin(); itt != gasProbes.end(); itt++){
 		Unit unit = *itt;
 		if (unit->isUnderAttack() && AttackingProbes.size() < 2) {
 			probeFightBack(unit);

@@ -52,6 +52,10 @@ void BuildOrderManager::onFrame(){
 			Carriers();
 			break;
 
+		case StrategyManager::addGoons:
+			AddGoons();
+			break;
+
 		case StrategyManager::none:
 			Broodwar << "No strategy is set" << std::endl;
 			break;
