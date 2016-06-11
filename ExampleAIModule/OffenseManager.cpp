@@ -248,46 +248,47 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 
 int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	InformationManager::getInstance().writeToLog("Started calculatePriority");
-	if (ourUnit != NULL && enemy->getType().canAttack() && enemy->getType().canMove() && ourUnit->getType().canAttack() && ourUnit->getType().canMove()) {
+	if (enemy != NULL)  {
+		if (ourUnit != NULL && enemy->getType().canAttack() && enemy->getType().canMove() && ourUnit->getType().canAttack() && ourUnit->getType().canMove()) {
 
-		//Is a fighter
+			//Is a fighter
 
-		int effectiveHp = enemy->getHitPoints() + enemy->getShields();
+			int effectiveHp = enemy->getHitPoints() + enemy->getShields();
 
-		int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
+			int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
-		//Integer division round up
-		int hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
+			//Integer division round up
+			int hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
 
-		int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
+			/*int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();*/
 
-		int priority = damage / hitsToKill;
+			int damage = (enemy->getType().groundWeapon().damageAmount - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
 
-		return priority + 100;
-					}
-	else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
-		//Its a tower
-		return 90;
+			int priority = damage / hitsToKill;
+
+			return priority + 100;
+		}
+		else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
+			//Its a tower
+			return 90;
+		}
+		else if (enemy->getType().isWorker()) {
+			return 80;
+		}
+		else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
+			//Its a factory
+			return 70;
+		}
+		else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
+			//Passivebuilding
+			return 2;
+		}
+		else {
+			//Unknown
+			return 1;
+		}
 	}
-	else if (enemy->getType().isWorker()) {
-		return 80;
-				}
-	else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
-		//Its a factory
-		return 70;
-					}
-	else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
-		//Passivebuilding
-		return 2;
-					}
-			else {
-		//Unknown
-		return 1;
-}
-
-
-
-
+	return 0;
 }
 
 bool OffenseManager::isFighter(Unit unit){
