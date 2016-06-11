@@ -1,16 +1,27 @@
-#include "Reavers.h"
+#include "AddGoons.h"
 
-Reavers::Reavers() {
+AddGoons::AddGoons() {
 
 	Broodwar << name << std::endl;
 
 	setSquadSize(6);
 	setStrategyVariables();
 
-	buildOrder = { robotics, probe, probe,
-		supportbay, robotics, zealot, zealot,
-		reaver, zealot, reaver, pylon, reaver_capacity, reaver, reaver,
-		evaluateStrategyRequest };
+
+	if (Broodwar->self()->allUnitCount(cybercore) >= 1
+		&& Broodwar -> self() ->allUnitCount(assimilator) >= 1){
+
+		buildOrder = { probe, probe, gateway,
+			zealot,probe, zealot, dragoon, dragoon,probe, dragoon, 
+			evaluateStrategyRequest };
+	}
+	else {
+		buildOrder = { assimilator, probe, cybercore,
+			gasworkerRequest, gasworkerRequest,
+			probe, probe, gateway, zealot, zealot, 
+			dragoon, dragoon, dragoon, goon_range,
+			evaluateStrategyRequest };
+	}
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
@@ -18,7 +29,7 @@ Reavers::Reavers() {
 
 }
 
-void Reavers::evaluateStrategy(){
+void AddGoons::evaluateStrategy(){
 
 	Broodwar << "Evaluating reaver strategy" << std::endl;
 
@@ -27,18 +38,17 @@ void Reavers::evaluateStrategy(){
 		|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
 		// convert to midgame
-		//StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
 
 	}
 	else {
-
 		// continue with the zealot rush
-		//StrategyManager::getInstance().setNextStrategy(StrategyManager::none);
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
 
 	}
 }
 
-void Reavers::setStrategyVariables(){
+void AddGoons::setStrategyVariables(){
 	if (starter){
 		InformationManager::getInstance().starter = true;
 		InformationManager::getInstance().endgame = false;

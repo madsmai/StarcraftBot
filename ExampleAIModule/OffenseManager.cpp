@@ -202,19 +202,19 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Finds units to kill and kills them
 	Unit closest;
 	if (!InformationManager::getInstance().enemyAttackers.empty()) {
-		closest = attacker->getClosestUnit(Filter::CanAttack && Filter::CanMove && Filter::IsEnemy, 1240);
+		closest = attacker->getClosestUnit((Filter::CanAttack || Filter::IsSpellcaster) && Filter::CanMove && Filter::IsEnemy, 1240);
+		if (properClosestTarget(closest, attacker)) {
+			attacker->attack(closest);
+		}
+	}
+	else if (!InformationManager::getInstance().enemyTowers.empty()) {
+		closest = attacker->getClosestUnit(Filter::IsBuilding && (Filter::CanAttack || Filter::GetType == UnitTypes::Terran_Bunker) && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 1240);
-		if (properClosestTarget(closest, attacker)) {
-			attacker->attack(closest);
-		}
-	}
-	else if (!InformationManager::getInstance().enemyTowers.empty()) {
-		closest = attacker->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
 		}
@@ -232,12 +232,16 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		}
 	}
 	//Finding other units that should also attack this
+	if (properClosestTarget(closest, attacker)) {
 	FixWrongPriority(closest);
-
+	}
 	if (attacker->isIdle() 
 		&& InformationManager::getInstance().enemyBase != NULL
 		&& BWTA::getRegion(attacker->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
-		attacker->attack(InformationManager::getInstance().enemyBase->getPosition());
+		std::vector<Position> edgeOfBase = InformationManager::getInstance().enemyBase->getRegion()->getPolygon();
+
+		Position randomEdge = edgeOfBase[rand() % edgeOfBase.size()];
+		attacker->move(edgeOfBase[rand() % edgeOfBase.size()]);
 	}
 
 }
@@ -261,11 +265,11 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 
 		return priority + 100;
 					}
-	else if (enemy->getType().isWorker()) {
-		return 90;
-					}
 	else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
 		//Its a tower
+		return 90;
+	}
+	else if (enemy->getType().isWorker()) {
 		return 80;
 				}
 	else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
@@ -304,7 +308,8 @@ bool OffenseManager::isFighter(Unit unit){
 
 void OffenseManager::fillReaverOrCarrier(Unit unit){
 
-	// if it is a reaver
+	if (!unit->isConstructing()){
+		// Unit is a reaver
 	if (unit->getType() == UnitTypes::Protoss_Reaver){
 		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Reaver_Capacity)
 			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Reaver_Capacity)
@@ -317,7 +322,7 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 
 	}
 
-	// if it is a carrier
+		// Unit is a carrier
 	else if (unit->getType() == UnitTypes::Protoss_Carrier){
 		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Carrier_Capacity)
 			== Broodwar->self()->getMaxUpgradeLevel(UpgradeTypes::Carrier_Capacity)
@@ -328,7 +333,7 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 			unit->train(UnitTypes::Protoss_Interceptor);
 		}
 	}
-
+	}
 }
 
 bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {

@@ -38,7 +38,7 @@ void ProbeManager::onFrame(){
 		}
 	}
 	std::vector<Unit>::iterator itt;
-	for (it = gasProbes.begin(); itt != gasProbes.end(); itt++){
+	for (itt = gasProbes.begin(); itt != gasProbes.end(); itt++){
 		Unit unit = *itt;
 		if (unit->isUnderAttack() && AttackingProbes.size() < 2) {
 			probeFightBack(unit);
@@ -191,7 +191,7 @@ void ProbeManager::executeQueue(){
 			builderMoving = false;
 			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
 				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
-
+				
 				/*
 				Broodwar->registerEvent([buildingPosition, type](Game*)
 				{Broodwar->drawBoxMap(Position(buildingPosition), Position(buildingPosition + type.tileSize()), Colors::Yellow); }
@@ -209,7 +209,7 @@ void ProbeManager::executeQueue(){
 	else if (queue.front().isRequest()){
 		int request = queue.front().getRequestType();
 		//Make a scout
-		if (request == BuildOrderType::scoutRequest
+		if (request == BuildOrderType::scoutRequest 
 			&& !builder->isConstructing() && (builder->isIdle() || builder->isGatheringMinerals())){
 			ScoutManager::getInstance().addScout(mineralProbes.front());
 
@@ -235,7 +235,7 @@ void ProbeManager::executeQueue(){
 						queue.erase(queue.begin()); //Remove the request from the queue
 					}
 					else {
-Broodwar << Broodwar->getLastError() << std::endl;
+						Broodwar << Broodwar->getLastError() << std::endl;
 					}
 					break;
 				}
@@ -254,31 +254,32 @@ Broodwar << Broodwar->getLastError() << std::endl;
 }
 
 /*TilePosition ProbeManager::getNewBuildLocation(UnitType type, TilePosition position){
-	if (type == UnitTypes::Protoss_Photon_Cannon ||
-	type == UnitTypes::Protoss_Gateway ||
-	type == UnitTypes::Protoss_Pylon){
+	if (type == UnitTypes::Protoss_Photon_Cannon || 
+		type == UnitTypes::Protoss_Gateway || 
+		type == UnitTypes::Protoss_Pylon){
 
-	//Cannons, Gateways and pylons are placed near the nearest chokepoint
-	BWTA::Chokepoint* chokepoint = BWTA::getNearestChokepoint(position);
-	TilePosition newPos = Broodwar->getBuildLocation(type, TilePosition(chokepoint->getCenter()));
+		//Cannons, Gateways and pylons are placed near the nearest chokepoint
+		BWTA::Chokepoint* chokepoint = BWTA::getNearestChokepoint(position);
+		TilePosition newPos = Broodwar->getBuildLocation(type, TilePosition(chokepoint->getCenter()));
 
+		
+		TilePosition ourBase = Broodwar->self()->getStartLocation();
+		while (!(Broodwar->isVisible(newPos) && Broodwar->isBuildable(newPos))){
+			//NOTE: We move in a straight line and might not be on the playing field after an iteration
 
-	TilePosition ourBase = Broodwar->self()->getStartLocation();
-	while (!(Broodwar->isVisible(newPos) && Broodwar->isBuildable(newPos))){
-	//NOTE: We move in a straight line and might not be on the playing field after an iteration
+			moveCloserTo(newPos, ourBase, 1);
+			Broodwar->drawCircleMap(Position(newPos), 30, Colors::Green, false);
+		}
 
-	moveCloserTo(newPos, ourBase, 1);
-	Broodwar->drawCircleMap(Position(newPos), 30, Colors::Green, false);
+		// Fencepost problem: we need to not be on the edge of vision, but fully in it.
+		moveCloserTo(newPos, ourBase, 2);
+
+		return Broodwar->getBuildLocation(type, newPos, 3); //dist of 3 is really good
 	}
-
-	// Fencepost problem: we need to not be on the edge of vision, but fully in it.
-	moveCloserTo(newPos, ourBase, 2);
-
-	return Broodwar->getBuildLocation(type, newPos, 3); //dist of 3 is really good
-	} else {
-	return Broodwar->getBuildLocation(type, position);
+	else {
+		return Broodwar->getBuildLocation(type, position);
 	}
-	}*/
+}*/
 
 //Function moves the first tileposition closer to the second one
 void ProbeManager::moveCloserTo(TilePosition& moving, const TilePosition& stationary, int dist){
