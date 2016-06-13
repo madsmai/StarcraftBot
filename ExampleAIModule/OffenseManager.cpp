@@ -6,9 +6,12 @@ TODO:
 
 - Abuse andre bots dårlig micro
 
-- Avoid towers virker ikke ordentligt, den mener alt er under tower
 
 - Troops skal ikke bevæge sig ud af basen med mindre der ikke er nogle enemies i basen.
+
+- Hvis vores scout dør kan vi ikke angribe
+
+-
 
 */
 
@@ -68,6 +71,7 @@ void OffenseManager::onFrame(){
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
+			&& unit->getLastCommand().getTarget() != NULL
 			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
 
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
@@ -205,36 +209,46 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		closest = attacker->getClosestUnit((Filter::CanAttack || Filter::IsSpellcaster) && Filter::CanMove && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
+
+			FixWrongPriority(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyTowers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && (Filter::CanAttack || Filter::GetType == UnitTypes::Terran_Bunker) && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
+
+			FixWrongPriority(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
+
+			FixWrongPriority(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
 		closest = attacker->getClosestUnit(Filter::CanProduce && Filter::IsBuilding && !Filter::IsResourceDepot && Filter::IsEnemy, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
+
+			FixWrongPriority(closest);
 		}
 	}
 	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
 		closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible, 1240);
 		if (properClosestTarget(closest, attacker)) {
 			attacker->attack(closest);
+
+			FixWrongPriority(closest);
 		}
 	}
 	//Finding other units that should also attack this
-	if (properClosestTarget(closest, attacker)) {
+	/*if (properClosestTarget(closest, attacker)) {
 	FixWrongPriority(closest);
-	}
+	}*/
 	if (attacker->isIdle() 
 		&& InformationManager::getInstance().enemyBase != NULL
 		&& BWTA::getRegion(attacker->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
@@ -248,7 +262,8 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 
 int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	InformationManager::getInstance().writeToLog("Started calculatePriority");
-	if (ourUnit != NULL && enemy->getType().canAttack() && enemy->getType().canMove() && ourUnit->getType().canAttack() && ourUnit->getType().canMove()) {
+	if (enemy != NULL)  {
+		if (ourUnit != NULL && enemy->getType().canAttack() && enemy->getType().canMove() && ourUnit->getType().canAttack() && ourUnit->getType().canMove()) {
 
 		//Is a fighter
 
@@ -257,15 +272,24 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 		int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
 		//Integer division round up
-		int hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
+			int hitsToKill;
+			if (ourDamage != 0) {
+				hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
+			}
+			else {
+				hitsToKill = effectiveHp + (ourDamage - 1);
+			}
+			
 
-		int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
+			/*int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();*/
+
+			int damage = (enemy->getType().groundWeapon().damageAmount() - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
 
 		int priority = damage / hitsToKill;
 
 		return priority + 100;
 					}
-	else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
+		else if (enemy->getType().isBuilding() && (enemy->getType().canAttack() || enemy->getType() == UnitTypes::Terran_Bunker)) {
 		//Its a tower
 		return 90;
 	}
@@ -284,10 +308,8 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 		//Unknown
 		return 1;
 }
-
-
-
-
+	}
+	return 0;
 }
 
 bool OffenseManager::isFighter(Unit unit){
@@ -337,7 +359,7 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 }
 
 bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
-	return target != NULL 
+	return target != NULL && attacker != NULL
 		&& target->isVisible() 
 		&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
 		&& target->exists() 
@@ -346,12 +368,14 @@ bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacke
 
 void OffenseManager::FixWrongPriority(BWAPI::Unit closest) {
 	for (Unit troop : fighters) {
-		if (closest != NULL
-			&& troop->getLastCommand().getType() != NULL && closest->getLastCommand().getType() != NULL
-			&& troop->getLastCommand().getTarget() != NULL && closest->getLastCommand().getTarget() != NULL
-			&& troop->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && closest->getLastCommand().getType() == UnitCommandTypes::Attack_Unit
-			&& calculatePriority(troop->getLastCommand().getTarget(), NULL) < calculatePriority(closest->getLastCommand().getTarget(), NULL)) {
-			troop->attack(closest);
+		if (closest != NULL && troop != NULL
+			&& troop->getLastCommand().getType() != NULL
+			&& troop->getLastCommand().getTarget() != NULL) {
+
+			if (troop->getLastCommand().getType() == UnitCommandTypes::Attack_Unit
+				&& calculatePriority(troop->getLastCommand().getTarget(), NULL) < calculatePriority(closest, NULL)) {
+				/*troop->attack(closest);*/
+			}
 		}
 	}
 }

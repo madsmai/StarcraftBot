@@ -6,6 +6,7 @@
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
 #include "PlacementManager.h"
+#include "InformationManager.h"
 #include <utility>
 #include <vector>
 #include <queue>

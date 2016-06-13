@@ -5,8 +5,8 @@
 
 /*
 TODO:
-- Gemme information om hvor modstanderen er og hvor godt deres forsvar er, 
-	dette skal være tilgængeligt for de andre klasser
+- Gemme information om hvor modstanderen er og hvor godt deres forsvar er,
+dette skal være tilgængeligt for de andre klasser
 */
 
 using namespace BWAPI;
@@ -15,34 +15,32 @@ using namespace BWAPI;
 
 void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
-		
+
 		if (unit->getType().isWorker()){
 			addEnemyWorkers(unit);
 		}
 
-		else if (unit->getType().canAttack() && unit->getType().canMove()){
+		else if ((unit->getType().canAttack() || unit->getType().isSpellcaster()) && unit->getType().canMove()){
 			addEnemyAttackers(unit);
 		}
-		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar ){
+		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar){
 			addDarkTemplar(unit);
 
 		}
 
-		else if (unit->getType() == UnitTypes::Protoss_Gateway || 
-			unit->getType() == UnitTypes::Zerg_Spawning_Pool || 
-			unit->getType() == UnitTypes::Terran_Barracks){
+		else if (unit->getType().canProduce() && unit->getType().isBuilding() && !unit->getType().isResourceDepot()){
 
 			addEnemyBarracks(unit);
 		}
 
-		else if (unit->getType().isBuilding() && unit->getType().canAttack()){
+		else if (unit->getType().isBuilding() && (unit->getType().canAttack() || unit->getType() == UnitTypes::Terran_Bunker)){
 			addEnemyTowers(unit);
 		}
 
 		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
 			addEnemyPassiveBuildings(unit);
-		} 
-		
+		}
+
 		else if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
 			citadelOfAdun = true;
 		}
@@ -63,7 +61,7 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeEnemyWorkers(unit);
 		}
 
-		else if (unit->getType().canAttack() && unit->getType().canMove()){
+		else if ((unit->getType().canAttack() || unit->getType().isSpellcaster()) && unit->getType().canMove()){
 			removeEnemyAttackers(unit);
 		}
 
@@ -71,27 +69,19 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeDarkTemplar(unit);
 		}
 
-		else if (unit->getType() == UnitTypes::Protoss_Gateway ||
-			unit->getType() == UnitTypes::Zerg_Spawning_Pool ||
-			unit->getType() == UnitTypes::Terran_Barracks){
+		else if (unit->getType().canProduce() && unit->getType().isBuilding() && !unit->getType().isResourceDepot()){
 
 			removeEnemyBarracks(unit);
 		}
 
-		else if (unit->getType().isBuilding()){
-			if (unit->getType().canAttack()){
-				removeEnemyTowers(unit);
-			}
-			else if (!unit->getType().canAttack()){
-				removeEnemyPassiveBuildings(unit);
-			}
-			if (unit->getType().isResourceDepot()
-				&& unit->getTilePosition() == enemyBase->getTilePosition()){
-			}
+		else if (unit->getType().isBuilding() && (unit->getType().canAttack() || unit->getType() == UnitTypes::Terran_Bunker)){
+			removeEnemyTowers(unit);
 		}
-
-
+		else if (!unit->getType().canAttack()){
+			removeEnemyPassiveBuildings(unit);
+		}
 	}
+
 }
 
 
@@ -110,7 +100,7 @@ void InformationManager::addEnemyBarracks(BWAPI::Unit barracks){
 	if (!exists) {
 		enemyBarracks.push_back(barracks);
 	}
-		
+
 }
 
 void InformationManager::addEnemyAttackers(BWAPI::Unit attacker){
@@ -204,7 +194,7 @@ void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyBarracks.begin(); it != enemyBarracks.end(); ) {
+	for (it = enemyBarracks.begin(); it != enemyBarracks.end();) {
 		BWAPI::Unit u = *it;
 		if (u->getID() == barracks->getID()){
 			enemyBarracks.erase(it);
@@ -219,13 +209,14 @@ void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 void InformationManager::removeEnemyAttackers(Unit attacker){
 
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); ) {
+	for (it = enemyAttackers.begin(); it != enemyAttackers.end();) {
 		Unit u = *it;
 		if (u->getID() == attacker->getID()){
 			Broodwar << "unit removed from enemyAttackers list" << std::endl;
 			enemyAttackers.erase(it);
-		} else{
-it++;
+		}
+		else{
+			it++;
 		}
 	}
 }
@@ -370,7 +361,7 @@ void InformationManager::enemyArmyStatus(){
 	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
 		Unit u = *it;
 		fighters.insert(u);
-	
+
 	}
 	int armyStrength = 0;
 	int damage = 0;
@@ -413,27 +404,27 @@ void InformationManager::enemyArmyStatus(){
 
 			armyStrength = armyStrength + strength;
 		}
-		
+
 	}
 
 	Broodwar << "Enemy Army Status: \n" << armyStrength << "  Enemy Army Strenght \n"
 		<< totalDamage << "  Enemy damage in total \n"
 		<< totalStrength << "  Enemy strength in total \n"
-		<< totalHp << "  Enemy effective hp in total" 
+		<< totalHp << "  Enemy effective hp in total"
 		<< fighters.size() << "  number of fighters" << std::endl;
 
 }
 
 void InformationManager::ourArmyStatus(){
 	Unitset fighters;
-	
+
 	fighters = OffenseManager::getInstance().fighters;
-	
+
 	int armyStrength = 0;
 	int damage = 0;
 	int strength = 0;
 	int effectiveHp = 0;
-	
+
 	int totalDamage = 0;
 	int totalStrength = 0;
 	int totalHp = 0;
@@ -470,5 +461,5 @@ int InformationManager::writeToLog(std::string text) {
 		log.flush();
 		log.close();
 	}
-		return 42;
+	return 42;
 }
