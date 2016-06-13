@@ -68,6 +68,7 @@ void OffenseManager::onFrame(){
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
+			&& unit->getLastCommand().getTarget() != NULL
 			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
 
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
@@ -232,9 +233,9 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		}
 	}
 	//Finding other units that should also attack this
-	if (properClosestTarget(closest, attacker)) {
-	FixWrongPriority(closest);
-	}
+	/*if (properClosestTarget(closest, attacker)) {*/
+		FixWrongPriority(closest);
+	/*}*/
 	if (attacker->isIdle() 
 		&& InformationManager::getInstance().enemyBase != NULL
 		&& BWTA::getRegion(attacker->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
@@ -248,46 +249,44 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 
 int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	InformationManager::getInstance().writeToLog("Started calculatePriority");
-	if (ourUnit != NULL && enemy->getType().canAttack() && enemy->getType().canMove() && ourUnit->getType().canAttack() && ourUnit->getType().canMove()) {
+	if (ourUnit != NULL) {
+		if (enemy->getType().canAttack() && enemy->getType().canMove() && ourUnit->getType().canAttack() && ourUnit->getType().canMove()) {
 
-		//Is a fighter
+			//Is a fighter
 
-		int effectiveHp = enemy->getHitPoints() + enemy->getShields();
+			int effectiveHp = enemy->getHitPoints() + enemy->getShields();
 
-		int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
+			int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
-		//Integer division round up
-		int hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
+			//Integer division round up
+			int hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
 
-		int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
+			int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
 
-		int priority = damage / hitsToKill;
+			int priority = damage / hitsToKill;
 
-		return priority + 100;
-					}
+			return priority + 100;
+		}
+	}
 	else if (enemy->getType().isBuilding() && enemy->getType().canAttack()) {
 		//Its a tower
 		return 90;
 	}
 	else if (enemy->getType().isWorker()) {
 		return 80;
-				}
+	}
 	else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
 		//Its a factory
 		return 70;
-					}
+	}
 	else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
 		//Passivebuilding
 		return 2;
-					}
-			else {
+	}
+	else {
 		//Unknown
 		return 1;
-}
-
-
-
-
+	}
 }
 
 bool OffenseManager::isFighter(Unit unit){
@@ -337,7 +336,7 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 }
 
 bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
-	return target != NULL 
+	return target != NULL && attacker != NULL
 		&& target->isVisible() 
 		&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
 		&& target->exists() 
@@ -346,12 +345,14 @@ bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacke
 
 void OffenseManager::FixWrongPriority(BWAPI::Unit closest) {
 	for (Unit troop : fighters) {
-		if (closest != NULL
-			&& troop->getLastCommand().getType() != NULL && closest->getLastCommand().getType() != NULL
-			&& troop->getLastCommand().getTarget() != NULL && closest->getLastCommand().getTarget() != NULL
-			&& troop->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && closest->getLastCommand().getType() == UnitCommandTypes::Attack_Unit
-			&& calculatePriority(troop->getLastCommand().getTarget(), NULL) < calculatePriority(closest->getLastCommand().getTarget(), NULL)) {
-			troop->attack(closest);
+		if (closest != NULL && troop != NULL
+			&& troop->getLastCommand().getType() != NULL
+			&& troop->getLastCommand().getTarget() != NULL) {
+
+			if (troop->getLastCommand().getType() == UnitCommandTypes::Attack_Unit
+				&& calculatePriority(troop->getLastCommand().getTarget(), NULL) < calculatePriority(closest, NULL)) {
+				/*troop->attack(closest);*/
+			}
 		}
 	}
 }
