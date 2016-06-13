@@ -32,12 +32,16 @@ private:
 	//The lists
 	std::vector<BWAPI::Unit> mineralProbes;
 	std::vector<BWAPI::Unit> gasProbes;
+	int runFrames = 0;
+	int tagged = 0;
+	Unitset AttackingProbes;
 
 	// auxialliary functions
 	void executeQueue();
 	void nonIdle();
 	void moveCloserTo(TilePosition& moving, const TilePosition& stationary, int dist);
 	bool checkAndAddSupply();
+	void probeFightBack(Unit);
 
 
 	Unit builder;

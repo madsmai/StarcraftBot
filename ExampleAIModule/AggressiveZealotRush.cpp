@@ -6,15 +6,15 @@ AggressiveZealotRush::AggressiveZealotRush() {
 
 	setSquadSize(3);
 	setStrategyVariables();
-	OffenseManager::getInstance().rushOngoing = true;
 
 	buildOrder = { // base Build order
 		probe, gateway, gateway, //2 gateways on 9
 		scoutRequest,
 		probe, probe, zealot, pylon, // 13/16-24
 		zealot, zealot, zealot, pylon, // 19/24-32
-		zealot, zealot, zealot, zealot, pylon, // 27/32-40
-		zealot, zealot, zealot, zealot, pylon, evaluateStrategyRequest }; // 35/40-48
+		zealot, zealot, probe, zealot, zealot, pylon, // 27/32-40
+		zealot, zealot, probe, zealot, zealot, pylon, gateway,
+		evaluateStrategyRequest }; // 35/40-48
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
@@ -36,8 +36,16 @@ void AggressiveZealotRush::evaluateStrategy(){
 	}
 	else {
 
-		// continue with the zealot rush
-		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+		if (rand() % 2 > 0.5){
+			Broodwar << "going goons from aggressive" << std::endl;
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::addGoons);
+		}
+		else {
+			// continue with the zealot rush
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+		}
+
+
 
 	}
 

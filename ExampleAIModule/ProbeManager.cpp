@@ -25,6 +25,30 @@ void ProbeManager::onFrame(){
 	//Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 	////DEBUGGING////
 
+	//If probe under attack, fight back
+	std::vector<Unit>::iterator it;
+	for (it = mineralProbes.begin(); it != mineralProbes.end(); it++){
+		Unit unit = *it;
+		if (unit->isUnderAttack() && AttackingProbes.size() < 2) {
+			probeFightBack(unit);
+		}
+		else if (AttackingProbes.find(unit) != AttackingProbes.end() && (BWTA::getRegion(unit->getPosition()) != InformationManager::getInstance().ourBase->getRegion() || runFrames + 300 < Broodwar->getFrameCount())) {
+			unit->gather(unit->getClosestUnit(Filter::IsMineralField));
+			AttackingProbes.erase(AttackingProbes.find(unit));
+		}
+	}
+	std::vector<Unit>::iterator itt;
+	for (itt = gasProbes.begin(); itt != gasProbes.end(); itt++){
+		Unit unit = *itt;
+		if (unit->isUnderAttack() && AttackingProbes.size() < 2) {
+			probeFightBack(unit);
+		}
+		else if (AttackingProbes.find(unit) != AttackingProbes.end() && (BWTA::getRegion(unit->getPosition()) != InformationManager::getInstance().ourBase->getRegion() || runFrames + 300 < Broodwar->getFrameCount())) {
+			unit->gather(unit->getClosestUnit(Filter::IsMineralField));
+			AttackingProbes.erase(AttackingProbes.find(unit));
+		}
+	}
+
 	checkAndAddSupply();
 	executeQueue();
 	nonIdle();
@@ -251,7 +275,8 @@ void ProbeManager::executeQueue(){
 		moveCloserTo(newPos, ourBase, 2);
 
 		return Broodwar->getBuildLocation(type, newPos, 3); //dist of 3 is really good
-	} else {
+	}
+	else {
 		return Broodwar->getBuildLocation(type, position);
 	}
 }*/
@@ -304,3 +329,45 @@ ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	return i;
 }
 
+void ProbeManager::probeFightBack(Unit attackedUnit) {
+	InformationManager::getInstance().writeToLog("Started probeFightBack");
+	if (attackedUnit != NULL) {
+		Unit attacker = attackedUnit->getClosestUnit(Filter::IsEnemy && Filter::IsAttacking);
+		if (attacker != NULL && !attackedUnit->isAttacking()) {
+			if (attacker->getType().isWorker()) {
+				attackedUnit->attack(attacker);
+
+				if (AttackingProbes.find(attackedUnit) == AttackingProbes.end()) {
+					AttackingProbes.insert(attackedUnit);
+				}
+
+				Unit helper = attackedUnit->getClosestUnit(Filter::IsAlly
+					&& Filter::CanAttack);
+
+				if (helper != NULL
+					&& attacker != NULL
+					&& attacker->isVisible()) {
+
+					helper->attack(attacker);
+
+					if (AttackingProbes.find(helper) == AttackingProbes.end()) {
+						AttackingProbes.insert(helper);
+					}
+				}
+				runFrames = Broodwar->getFrameCount();
+			}
+			else {
+				Unit helper = attackedUnit->getClosestUnit(Filter::IsAlly
+					&& Filter::CanAttack && !Filter::IsWorker);
+
+				if (helper != NULL
+					&& attacker != NULL
+					&& attacker->isVisible()) {
+
+					attackedUnit->move(helper->getPosition());
+					helper->attack(attacker);
+				}
+			}
+		}
+	}
+}

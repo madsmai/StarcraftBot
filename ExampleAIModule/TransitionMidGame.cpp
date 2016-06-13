@@ -5,8 +5,7 @@ TransitionMidGame::TransitionMidGame() {
 
 	Broodwar << name << std::endl;
 
-	OffenseManager::getInstance().rushOngoing = false;
-	setSquadSize(3);
+	setSquadSize(6);
 	setStrategyVariables();
 
 	if (Broodwar->self()->allUnitCount(assimilator) == 0
@@ -32,7 +31,18 @@ TransitionMidGame::TransitionMidGame() {
 			probe, probe, probe, pylon,
 			cannon,
 			evaluateStrategyRequest };
+	}
+	else if (Broodwar->self()->allUnitCount(forge) == 0
+		&& Broodwar->self()->allUnitCount(assimilator) != 0
+		&& Broodwar->self()->allUnitCount(cybercore) != 0){
 
+		// after a rush with goons
+		buildOrder = { probe, probe, probe,
+			probe, pylon, probe, probe,
+			forge, probe, cannon,
+			cannon, probe, probe, cannon,
+			probe, pylon, probe,
+			evaluateStrategyRequest };
 	}
 	else {
 		Broodwar << "Add more cases to midGame transition strategy" << std::endl;
