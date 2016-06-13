@@ -305,12 +305,16 @@ void ProbeManager::addMineralProbe(Unit probe){
 
 bool ProbeManager::checkAndAddSupply(){
 	UnitType pylon = UnitTypes::Protoss_Pylon;
+	static int lastChecked = 0;
 
-	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
+	
+	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 6
 		<= Broodwar->self()->supplyUsed() / 2
 		&& !InformationManager::getInstance().starter
-		&& !builder->isConstructing()){
+		&& !builder->isConstructing()
+		&& lastChecked + pylon.buildTime() < Broodwar->getFrameCount()){
 
+		lastChecked = Broodwar->getFrameCount();
 		std::vector<BuildOrderType>::iterator it;
 		it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, pylon);

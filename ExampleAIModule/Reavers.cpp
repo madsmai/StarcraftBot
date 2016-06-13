@@ -21,7 +21,7 @@ Reavers::Reavers() {
 void Reavers::evaluateStrategy(){
 
 	Broodwar << "Evaluating reaver strategy" << std::endl;
-
+	
 	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
 		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
 		|| InformationManager::getInstance().enemyTowers.size() >= 2){

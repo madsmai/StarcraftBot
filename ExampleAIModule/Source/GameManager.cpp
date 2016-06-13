@@ -1,4 +1,5 @@
 #include "GameManager.h"
+
 using namespace BWAPI;
 using namespace Filter;
 
@@ -64,7 +65,7 @@ void GameManager::onEnd(bool isWinner){
 		log.flush();
 		log.close();
 	}
-	
+
 
 }
 
@@ -73,6 +74,7 @@ void GameManager::onFrame(){
 	//Display FPS
 	BWAPI::Broodwar->drawTextScreen(200, 0, "FPS: %d", BWAPI::Broodwar->getFPS());
 	BWAPI::Broodwar->drawTextScreen(200, 20, "Average FPS: %f", BWAPI::Broodwar->getAverageFPS());
+	BWAPI::Broodwar->drawTextScreen(200, 40, "onGoingrush: %d", OffenseManager::getInstance().rushOngoing);
 
 	if (analyzed) {
 		drawTerrainData();
@@ -138,7 +140,7 @@ void GameManager::onSendText(std::string text){
 		Broodwar << OffenseManager::getInstance().fighters.size() << std::endl;
 	}
 	else if (text == "Army Strength enemy") {
-		
+
 		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy()) << std::endl;
 	}
 	else if (text == "Army Strength self") {
