@@ -9,16 +9,16 @@ AddGoons::AddGoons() {
 
 
 	if (Broodwar->self()->allUnitCount(cybercore) >= 1
-		&& Broodwar -> self() ->allUnitCount(assimilator) >= 1){
+		&& Broodwar->self()->allUnitCount(assimilator) >= 1){
 
 		buildOrder = { probe, probe, gateway,
-			zealot,probe, zealot, dragoon, dragoon,probe, dragoon, 
+			zealot, probe, zealot, dragoon, dragoon, probe, dragoon,
 			evaluateStrategyRequest };
 	}
 	else {
 		buildOrder = { assimilator, probe, cybercore,
 			gasworkerRequest, gasworkerRequest,
-			probe, probe, gateway, zealot, zealot, 
+			probe, probe, gateway, zealot, zealot,
 			dragoon, dragoon, dragoon, goon_range,
 			evaluateStrategyRequest };
 	}
