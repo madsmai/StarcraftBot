@@ -49,7 +49,6 @@ void PlacementManager::drawReservedSpace(){
 	}
 }
 
-//Check if there is space for a unit on a tile
 bool PlacementManager::isReserved(UnitType type, TilePosition pos){
 	for (int x = pos.x; x < (type.tileWidth() + pos.x) && x < mapWidth; x++){
 		for (int y = pos.y; y < (type.tileHeight() + pos.y) && y < mapHeight; y++){
@@ -68,7 +67,7 @@ TilePosition PlacementManager::findNearest(TilePosition position, UnitType type)
 	for (unsigned int i = 0; i < buildings.size(); i++){
 		if (type == buildings.at(i)->getType()){
 			if (minDist > position.getApproxDistance(buildings.at(i)->getTilePosition())){
-				minDist = (int) position.getApproxDistance(buildings.at(i)->getTilePosition());
+				minDist = position.getApproxDistance(buildings.at(i)->getTilePosition());
 				returnPos = buildings.at(i)->getTilePosition();
 			}
 		}
@@ -83,7 +82,7 @@ TilePosition PlacementManager::findNearest(TilePosition position){
 	TilePosition returnPos;
 	for (unsigned int i = 0; i < buildings.size(); i++){
 		if (minDist > position.getApproxDistance(buildings.at(i)->getTilePosition())){
-			minDist = (int) position.getApproxDistance(buildings.at(i)->getTilePosition());
+			minDist = position.getApproxDistance(buildings.at(i)->getTilePosition());
 			returnPos = buildings.at(i)->getTilePosition();
 		}
 	}
@@ -98,7 +97,6 @@ TilePosition PlacementManager::pointBetween(TilePosition pos1, TilePosition pos2
 	return TilePosition(x, y);
 }
 
-//TODO: If there are too many pylons and we can't build anymore make the distance between them smaller
 TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition pos){
 	//If it's an assimilator then place it where BWAPI would
 	if (type == UnitTypes::Protoss_Assimilator){
@@ -111,7 +109,7 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 
 	//Find the tilepositions we want to build at (1/2 and 4/5 of the way between)
 	TilePosition midWay = pointBetween(ourBase, chokePoint, 2);
-	TilePosition cannonPos = pointBetween(ourBase, chokePoint, 10);
+	TilePosition cannonPos = pointBetween(ourBase, chokePoint, 5);
 	
 	
 	//DEBUGGING
@@ -120,10 +118,10 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 	//Broodwar->drawCircleMap(Position(TilePosition(midWay.x, midWay.y)), 16, Colors::Yellow, false); }
 	//, nullptr, type.buildTime() + 1000);
 
-	Broodwar->registerEvent([cannonPos, type](Game*)
-	{Broodwar->drawTextMap(Position(TilePosition(cannonPos.x, cannonPos.y)), "9/10 Point");
-	Broodwar->drawCircleMap(Position(TilePosition(cannonPos.x, cannonPos.y)), 16, Colors::Yellow, false); }
-	, nullptr, type.buildTime() + 1000);
+	//Broodwar->registerEvent([cannonPos, type](Game*)
+	//{Broodwar->drawTextMap(Position(TilePosition(cannonPos.x, cannonPos.y)), "9/10 Point");
+	//Broodwar->drawCircleMap(Position(TilePosition(cannonPos.x, cannonPos.y)), 16, Colors::Yellow, false); }
+	//, nullptr, type.buildTime() + 1000);
 
 	/*TilePosition nearest = findNearest(pos, UnitTypes::Protoss_Pylon);
 	Broodwar->registerEvent([nearest, type](Game*)
@@ -145,6 +143,7 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 	std::set<TilePosition> checkedTiles;
 
 	//Pointer to current BWTA region
+	BWTA::Region* baseRegion = BWTA::getRegion(ourBase);
 	BWTA::Region* initRegion = BWTA::getRegion(tileQueue.front());
 
 	while (!tileQueue.empty()){
@@ -158,63 +157,69 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 		//Broodwar->registerEvent([returnPos, type](Game*)
 		//{Broodwar->drawBoxMap(Position(TilePosition(returnPos.x, returnPos.y)), 
 		//	Position(TilePosition(returnPos.x+1, returnPos.y+1)), Colors::Red, false); }
-		//, nullptr, type.buildTime() + 10);
+		//, nullptr, type.buildTime());
 
 
-		//If position is valid and in the right region, add nabours as possible positions
-		if (returnPos.isValid() && (BWTA::getRegion(returnPos) == initRegion)){
+		//If the position is not reserved, is valid and in the right region
+		if (!isReserved(type, returnPos)
+			&& Broodwar->canBuildHere(returnPos, type) 
+			&& returnPos.isValid()
+			&& (BWTA::getRegion(returnPos) == baseRegion)){
 
-			//If the position is not reserved, we use it
-			if (!isReserved(type, returnPos) && Broodwar->canBuildHere(returnPos, type)){
-
-				//For pylons and photon cannons there are more checks, these checks don't pass, currently
-				if (type == UnitTypes::Protoss_Pylon 
-					&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) > 4){
-					return returnPos;
-				}
-				else if (type == UnitTypes::Protoss_Photon_Cannon 
-					&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Photon_Cannon)) > 3 * 16 
-					&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Nexus)) > ourBase.getApproxDistance(chokePoint)*0.8){
-					return returnPos;
-				}
-				else if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Photon_Cannon
-					&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) < (7 * 16)){
-					return returnPos;
-				}
+			//For pylons and photon cannons there are more checks
+			if (type == UnitTypes::Protoss_Pylon 
+				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) > 5){
+				return returnPos;
 			}
-			//Otherwise add all the nearby positions if we haven't already checked them (or are about to)
-			else{
-				TilePosition up = TilePosition(returnPos.x, returnPos.y - 1);
-				TilePosition down = TilePosition(returnPos.x, returnPos.y + 1);
-				TilePosition left = TilePosition(returnPos.x - 1, returnPos.y);
-				TilePosition right = TilePosition(returnPos.x + 1, returnPos.y);
+			else if (type == UnitTypes::Protoss_Photon_Cannon 
+				&& returnPos.getApproxDistance(chokePoint) < chokePoint.getApproxDistance(ourBase)
+				&& returnPos.getApproxDistance(findNearest(returnPos)) < 5 //Maybe change 7 (thier range)
+				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Photon_Cannon)) > 5
+				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) < 5){ //Maybe also change to 7
+				return returnPos;
+			}
+			else if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Photon_Cannon
+				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) < 7){
+				return returnPos;
+			}
+		}
+		//Otherwise add all the nearby positions if we haven't already checked them (or are about to)
+		else{
+			TilePosition up = TilePosition(returnPos.x, returnPos.y - 1);
+			TilePosition down = TilePosition(returnPos.x, returnPos.y + 1);
+			TilePosition left = TilePosition(returnPos.x - 1, returnPos.y);
+			TilePosition right = TilePosition(returnPos.x + 1, returnPos.y);
 
-				if (checkedTiles.find(up) == checkedTiles.end()){
-					tileQueue.push(up);
-					checkedTiles.insert(up);
-				}
-				if (checkedTiles.find(down) == checkedTiles.end()){
-					tileQueue.push(down);
-					checkedTiles.insert(down);
-				}
-				if (checkedTiles.find(left) == checkedTiles.end()){
-					tileQueue.push(left);
-					checkedTiles.insert(left);
-				}
-				if (checkedTiles.find(right) == checkedTiles.end()){
-					tileQueue.push(right);
-					checkedTiles.insert(right);
-				}
+			//Add to queue if position is valid and in right region
+			if (checkedTiles.find(up) == checkedTiles.end() && up.isValid() 
+				&& (BWTA::getRegion(up) == baseRegion || BWTA::getRegion(up) == initRegion)){
+				tileQueue.push(up);
+				checkedTiles.insert(up);
+			}
+			if (checkedTiles.find(down) == checkedTiles.end() && up.isValid() 
+				&& (BWTA::getRegion(down) == baseRegion || BWTA::getRegion(down) == initRegion)){
+				tileQueue.push(down);
+				checkedTiles.insert(down);
+			}
+			if (checkedTiles.find(left) == checkedTiles.end() && up.isValid() 
+				&& (BWTA::getRegion(left) == baseRegion || BWTA::getRegion(left) == initRegion)){
+				tileQueue.push(left);
+				checkedTiles.insert(left);
+			}
+			if (checkedTiles.find(right) == checkedTiles.end() && up.isValid() 
+				&& (BWTA::getRegion(right) == baseRegion || BWTA::getRegion(right) == initRegion)){
+				tileQueue.push(right);
+				checkedTiles.insert(right);
 			}
 		}
 	}
-
+	
 
 	TilePosition backupPos = Broodwar->getBuildLocation(type, pos);
 	//DEBUGGING//
 	Broodwar->registerEvent([backupPos, type](Game*)
 	{Broodwar->drawBoxMap(Position(TilePosition(backupPos.x, backupPos.y)),
-	Position(TilePosition(backupPos.x + 1, backupPos.y + 1)), Colors::Purple, false); 
+	Position(TilePosition(backupPos.x + type.tileWidth(), backupPos.y + type.tileHeight())), Colors::Purple, false); 
 	Broodwar->drawTextMap(Position(TilePosition(backupPos.x, backupPos.y)), "BWAPI made"); }
 	, nullptr, type.buildTime() + 1000);
 
