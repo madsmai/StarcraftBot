@@ -22,7 +22,7 @@ void ProbeManager::onFrame(){
 		Broodwar->drawTextMap(builder->getPosition(), isConstr);
 	}
 
-	Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
+	//Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 	////DEBUGGING////
 
 	checkAndAddSupply();
@@ -146,11 +146,10 @@ void ProbeManager::executeQueue(){
 
 		//Find new building position
 		if(builderMoving == false){
-			buildingPosition = Broodwar->getBuildLocation(type, builder->getTilePosition());
+			//buildingPosition = Broodwar->getBuildLocation(type, builder->getTilePosition());
+			buildingPosition = PlacementManager::getInstance().getBuildingPlacement(type, builder->getTilePosition());
 			const char* mess = "NEW LOCATION";
-			Broodwar->drawTextMap(InformationManager::getInstance().ourBase->getPosition(),mess);
-			//buildingPosition = getNewBuildLocation(type, builder->getTilePosition());
-			//buildingPosition = PlacementManager::getInstance().getBuildingPlacement(type, builder->getTilePosition());
+			Broodwar->drawTextMap(InformationManager::getInstance().ourBase->getPosition(), mess);
 		}
 
 		//// Debugging STARTED ////
@@ -174,6 +173,7 @@ void ProbeManager::executeQueue(){
 				, nullptr, type.buildTime() + 100);
 				*/
 
+				PlacementManager::getInstance().reserveSpace(type, buildingPosition);
 				ResourceManager::getInstance().reserveMinerals(type);
 				ResourceManager::getInstance().reserveGas(type);
 				queue.erase(queue.begin()); //Remove building from queue
