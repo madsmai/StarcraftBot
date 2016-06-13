@@ -6,12 +6,13 @@ TODO:
 
 - Abuse andre bots dårlig micro
 
-
 - Troops skal ikke bevæge sig ud af basen med mindre der ikke er nogle enemies i basen.
 
 - Hvis vores scout dør kan vi ikke angribe
 
--
+- EnemyAttackers liste bliver bugged når units går ind i bunkers fordi vi ikke længere kan se dem som attackers men de er ikke fjernet fra listen
+
+- Færdiggøre metoden til at beskytte vores base.
 
 */
 
@@ -71,18 +72,19 @@ void OffenseManager::onFrame(){
 		}
 		if (unit->isMoving()
 			&& unit->getLastCommand().getType() != NULL
+			&& unit->getLastCommand().getTarget() != NULL
 			&& unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit) {
 
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
 		}
-	}
-
-	if (enemiesInOurRegion()){
+	/*Unitset enemiesAtOurBase = getEnemiesInOurRegion();
+	if (!enemiesAtOurBase.empty()){
 		defendOurBase();
-	}
+	}*/
 
-	else if (squad.size() >= squadSize) {
+	}
+	if (squad.size() >= squadSize) {
 		rush(squad);
 		squad.clear();
 	}
@@ -246,7 +248,7 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	}
 	//Finding other units that should also attack this
 	/*if (properClosestTarget(closest, attacker)) {
-		FixWrongPriority(closest);
+	FixWrongPriority(closest);
 	}*/
 	if (attacker->isIdle() 
 		&& InformationManager::getInstance().enemyBase != NULL
@@ -264,49 +266,49 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 	if (enemy != NULL)  {
 		if (ourUnit != NULL && enemy->getType().canAttack() && enemy->getType().canMove() && ourUnit->getType().canAttack() && ourUnit->getType().canMove()) {
 
-			//Is a fighter
+		//Is a fighter
 
-			int effectiveHp = enemy->getHitPoints() + enemy->getShields();
+		int effectiveHp = enemy->getHitPoints() + enemy->getShields();
 
-			int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
+		int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
-			//Integer division round up
-			int hitsToKill;
-			if (ourDamage != 0) {
-				hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
-			}
-			else {
-				hitsToKill = effectiveHp + (ourDamage - 1);
-			}
-			
-
-			/*int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();*/
-
-			int damage = (enemy->getType().groundWeapon().damageAmount() - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
-
-			int priority = damage / hitsToKill;
-
-			return priority + 100;
-		}
-		else if (enemy->getType().isBuilding() && (enemy->getType().canAttack() || enemy->getType() == UnitTypes::Terran_Bunker)) {
-			//Its a tower
-			return 90;
-		}
-		else if (enemy->getType().isWorker()) {
-			return 80;
-		}
-		else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
-			//Its a factory
-			return 70;
-		}
-		else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
-			//Passivebuilding
-			return 2;
+		//Integer division round up
+		int hitsToKill;
+		if (ourDamage != 0) {
+			hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
 		}
 		else {
-			//Unknown
-			return 1;
+			hitsToKill = effectiveHp + (ourDamage - 1);
 		}
+			
+
+		/*int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();*/
+
+		int damage = (enemy->getType().groundWeapon().damageAmount() - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
+
+		int priority = damage / hitsToKill;
+
+		return priority + 100;
+					}
+		else if (enemy->getType().isBuilding() && (enemy->getType().canAttack() || enemy->getType() == UnitTypes::Terran_Bunker)) {
+		//Its a tower
+		return 90;
+	}
+	else if (enemy->getType().isWorker()) {
+		return 80;
+				}
+	else if (enemy->getType().isBuilding() && enemy->getType().canProduce() && !enemy->getType().isResourceDepot()) {
+		//Its a factory
+		return 70;
+					}
+	else if (enemy->getType().isBuilding() && !enemy->getType().canAttack()) {
+		//Passivebuilding
+		return 2;
+					}
+			else {
+		//Unknown
+		return 1;
+}
 	}
 	return 0;
 }
@@ -367,12 +369,14 @@ bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacke
 
 void OffenseManager::FixWrongPriority(BWAPI::Unit closest) {
 	for (Unit troop : fighters) {
-		if (closest != NULL
-			&& troop->getLastCommand().getType() != NULL && closest->getLastCommand().getType() != NULL
-			&& troop->getLastCommand().getTarget() != NULL && closest->getLastCommand().getTarget() != NULL
-			&& troop->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && closest->getLastCommand().getType() == UnitCommandTypes::Attack_Unit
-			&& calculatePriority(troop->getLastCommand().getTarget(), NULL) < calculatePriority(closest->getLastCommand().getTarget(), NULL)) {
-			troop->attack(closest);
+		if (closest != NULL && troop != NULL
+			&& troop->getLastCommand().getType() != NULL
+			&& troop->getLastCommand().getTarget() != NULL) {
+
+			if (troop->getLastCommand().getType() == UnitCommandTypes::Attack_Unit
+				&& calculatePriority(troop->getLastCommand().getTarget(), NULL) < calculatePriority(closest, NULL)) {
+				/*troop->attack(closest);*/
+			}
 		}
 	}
 }
@@ -436,14 +440,13 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 	return underTower;
 }
 
-bool OffenseManager::enemiesInOurRegion(){
-	for (Unit enemy : InformationManager::getInstance().enemyAttackers){
-		if (InformationManager::getInstance().ourBase->getRegion() == BWTA::getRegion(enemy->getPosition())){
-			return true;
-		}
-	} return false;
+Unitset OffenseManager::getEnemiesInOurRegion(){
+	Region ourRegion = Broodwar->getRegionAt(InformationManager::getInstance().ourBase->getPosition());
+	return ourRegion->getUnits(Filter::IsEnemy);
 }
 
 void OffenseManager::defendOurBase(){
-
+	//if (!fighters.empty()) {
+	//	fighters.move(InformationManager::getInstance().ourBase->getPosition());
+	//}
 }

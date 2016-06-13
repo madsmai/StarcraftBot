@@ -12,7 +12,6 @@ public:
 
 	static OffenseManager& getInstance();
 
-
 	int runFrames;
 
 	BWAPI::Unitset fighters;
@@ -41,7 +40,7 @@ private:
 	void fillReaverOrCarrier(BWAPI::Unit);
 	bool properClosestTarget(BWAPI::Unit, BWAPI::Unit);
 
-	bool enemiesInOurRegion();
+	BWAPI::Unitset getEnemiesInOurRegion();
 	void defendOurBase();
 
 

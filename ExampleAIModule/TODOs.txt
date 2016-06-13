@@ -10,12 +10,25 @@ Strategi-skift-design:
 - evaluateStrategy metoder
 
 TODO:
-- Ekstra scout på 4-player map. De skal ikke gå samme vej.
-- Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
 
+Prio 1:
 -Debugging skal ikke ske i release versionen
+-Angribe probes
+-Repair towers
+-Dark Templars mod protoss
+	-Bygge lige nok towers til at overleve de andres zealot rush og ikke mere
+-Bug ved enemy invis units
+
+- Rebuild probes og buildings on destroy
+
+- Rush igen hvis units er idle i vores base og ongoing er true
+Prio 2:
+- Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
 -Threat levels, evaluer hvordan "range" har betydning
 - Calculate Army Strength doesn't work when the enemy is behind the fog. Use InformationManager instead.
+
+
+
 
 
 

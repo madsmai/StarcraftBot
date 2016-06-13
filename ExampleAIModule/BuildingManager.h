@@ -16,6 +16,9 @@ public:
 
 	static BuildingManager& getInstance();
 
+	//Getter
+	std::vector<BWAPI::Unit> getBuildings(){ return buildings; }
+
 private:
 	//The lists
 	std::vector<BWAPI::Unit> buildings;

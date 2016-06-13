@@ -51,11 +51,14 @@ std::string BuildOrderType::getName(){
 		return getTechType().getName();
 	}
 	else if (type == types::MetaRequestType){
-		if (getRequestType() == 0){
+		if (getRequestType() == scoutRequest){
 			return "scoutRequest";
 		}
-		else if (getRequestType() == 1){
+		else if (getRequestType() == gasworkerRequest){
 			return "gasworkerRequest";
+		}
+		else if (getRequestType() == evaluateStrategyRequest){
+			return "evaluateStrategyRequest";
 		}
 		else {
 			return "Error. No such request type";

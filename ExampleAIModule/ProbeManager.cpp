@@ -22,7 +22,7 @@ void ProbeManager::onFrame(){
 		Broodwar->drawTextMap(builder->getPosition(), isConstr);
 	}
 
-	Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
+	//Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 	////DEBUGGING////
 
 	//If probe under attack, fight back
@@ -169,12 +169,11 @@ void ProbeManager::executeQueue(){
 		}
 
 		//Find new building position
-		if (builderMoving == false){
-			buildingPosition = Broodwar->getBuildLocation(type, builder->getTilePosition());
+		if(builderMoving == false){
+			//buildingPosition = Broodwar->getBuildLocation(type, builder->getTilePosition());
+			buildingPosition = PlacementManager::getInstance().getBuildingPlacement(type, builder->getTilePosition());
 			const char* mess = "NEW LOCATION";
 			Broodwar->drawTextMap(InformationManager::getInstance().ourBase->getPosition(), mess);
-			//buildingPosition = getNewBuildLocation(type, builder->getTilePosition());
-			//buildingPosition = PlacementManager::getInstance().getBuildingPlacement(type, builder->getTilePosition());
 		}
 
 		//// Debugging STARTED ////
@@ -198,6 +197,7 @@ void ProbeManager::executeQueue(){
 				, nullptr, type.buildTime() + 100);
 				*/
 
+				PlacementManager::getInstance().reserveSpace(type, buildingPosition);
 				ResourceManager::getInstance().reserveMinerals(type);
 				ResourceManager::getInstance().reserveGas(type);
 				queue.erase(queue.begin()); //Remove building from queue
@@ -305,12 +305,16 @@ void ProbeManager::addMineralProbe(Unit probe){
 
 bool ProbeManager::checkAndAddSupply(){
 	UnitType pylon = UnitTypes::Protoss_Pylon;
+	static int lastChecked = 0;
 
-	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 4
+	
+	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 6
 		<= Broodwar->self()->supplyUsed() / 2
 		&& !InformationManager::getInstance().starter
-		&& !builder->isConstructing()){
+		&& !builder->isConstructing()
+		&& lastChecked + pylon.buildTime() < Broodwar->getFrameCount()){
 
+		lastChecked = Broodwar->getFrameCount();
 		std::vector<BuildOrderType>::iterator it;
 		it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, pylon);
