@@ -60,9 +60,11 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
 		removeScout(unit);
 
-		std::vector<BuildOrderType>::iterator it;
-		it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
-		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, BuildOrderType::scoutRequest);
+		if (InformationManager::getInstance().enemyBase == NULL){
+			std::vector<BuildOrderType>::iterator it;
+			it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
+			BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, BuildOrderType::scoutRequest);
+		}
 	}
 }
 
