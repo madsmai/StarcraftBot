@@ -39,6 +39,9 @@ private:
 	bool isFighter(BWAPI::Unit);
 	void fillReaverOrCarrier(BWAPI::Unit);
 	bool properClosestTarget(BWAPI::Unit, BWAPI::Unit);
+	
+	void explore(BWAPI::Unit);
+
 
 	BWAPI::Unitset getEnemiesInOurRegion();
 	void defendOurBase();
