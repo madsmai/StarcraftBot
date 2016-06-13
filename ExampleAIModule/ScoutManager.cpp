@@ -1,4 +1,5 @@
 #include "ScoutManager.h"
+#include "ProbeManager.h"
 
 /*
 TODO:
@@ -33,7 +34,6 @@ void ScoutManager::onFrame(){
 			}
 			else if (unit->isIdle()
 				&& BWTA::getNearestBaseLocation(unit->getPosition()) == InformationManager::getInstance().emptyMainBase){
-				//goScout(unit);
 
 				double minDistance = 9999999;
 				std::set<BWTA::BaseLocation*>::iterator it; 		// iteratation set
@@ -59,6 +59,10 @@ void ScoutManager::onFrame(){
 void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
 		removeScout(unit);
+
+		std::vector<BuildOrderType>::iterator it;
+		it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, BuildOrderType::scoutRequest);
 	}
 }
 
