@@ -1,9 +1,7 @@
 #pragma once
 
 #include <BWAPI.h>
-#include "ProbeManager.h"
 #include "BuildingManager.h"
-#include "OffenseManager.h"
 #include "BuildOrderType.h"
 #include "StrategyManager.h"
 #include <queue>

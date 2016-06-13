@@ -61,7 +61,7 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeEnemyWorkers(unit);
 		}
 
-		else if (unit->getType().canAttack() && unit->getType().canMove()){
+		else if ((unit->getType().canAttack() || unit->getType().isSpellcaster()) && unit->getType().canMove()){
 			removeEnemyAttackers(unit);
 		}
 
@@ -69,15 +69,13 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			removeDarkTemplar(unit);
 		}
 
-		else if (unit->getType() == UnitTypes::Protoss_Gateway ||
-			unit->getType() == UnitTypes::Zerg_Spawning_Pool ||
-			unit->getType() == UnitTypes::Terran_Barracks){
+		else if (unit->getType().canProduce() && unit->getType().isBuilding() && !unit->getType().isResourceDepot()){
 
 			removeEnemyBarracks(unit);
 		}
 
 		else if (unit->getType().isBuilding()){
-			if (unit->getType().canAttack()){
+			if (unit->getType().canAttack() || unit->getType() == UnitTypes::Terran_Bunker){
 				removeEnemyTowers(unit);
 			}
 			else if (!unit->getType().canAttack()){
@@ -86,6 +84,13 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			if (unit->getType().isResourceDepot()
 				&& unit->getTilePosition() == enemyBase->getTilePosition()){
 			}
+		}
+		else if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
+			citadelOfAdun = false;
+		}
+
+		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives){
+			templarArchives = false;
 		}
 
 

@@ -6,12 +6,13 @@ TODO:
 
 - Abuse andre bots dårlig micro
 
-
 - Troops skal ikke bevæge sig ud af basen med mindre der ikke er nogle enemies i basen.
 
 - Hvis vores scout dør kan vi ikke angribe
 
--
+- EnemyAttackers liste bliver bugged når units går ind i bunkers fordi vi ikke længere kan se dem som attackers men de er ikke fjernet fra listen
+
+- Færdiggøre metoden til at beskytte vores base.
 
 */
 
@@ -77,13 +78,13 @@ void OffenseManager::onFrame(){
 			Broodwar->drawLine(CoordinateType::Enum::Map, unit->getPosition().x, unit->getPosition().y,
 				unit->getLastCommand().getTarget()->getPosition().x, unit->getLastCommand().getTarget()->getPosition().y, Colors::Red);
 		}
-	}
-
-	if (enemiesInOurRegion()){
+	/*Unitset enemiesAtOurBase = getEnemiesInOurRegion();
+	if (!enemiesAtOurBase.empty()){
 		defendOurBase();
-	}
+	}*/
 
-	else if (squad.size() >= squadSize) {
+	}
+	if (squad.size() >= squadSize) {
 		rush(squad);
 		squad.clear();
 	}
@@ -272,18 +273,18 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 		int ourDamage = (Broodwar->self()->damage(ourUnit->getType().groundWeapon()) - enemy->getPlayer()->armor(enemy->getType())) * ourUnit->getType().maxGroundHits();
 
 		//Integer division round up
-			int hitsToKill;
-			if (ourDamage != 0) {
-				hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
-			}
-			else {
-				hitsToKill = effectiveHp + (ourDamage - 1);
-			}
+		int hitsToKill;
+		if (ourDamage != 0) {
+			hitsToKill = (effectiveHp + (ourDamage - 1)) / ourDamage;
+		}
+		else {
+			hitsToKill = effectiveHp + (ourDamage - 1);
+		}
 			
 
-			/*int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();*/
+		/*int damage = (enemy->getPlayer()->damage(enemy->getType().groundWeapon()) - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();*/
 
-			int damage = (enemy->getType().groundWeapon().damageAmount() - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
+		int damage = (enemy->getType().groundWeapon().damageAmount() - Broodwar->self()->armor(ourUnit->getType())) * enemy->getType().maxGroundHits();
 
 		int priority = damage / hitsToKill;
 
@@ -439,14 +440,13 @@ bool OffenseManager::avoidTowers(BWAPI::Unit fighter) {
 	return underTower;
 }
 
-bool OffenseManager::enemiesInOurRegion(){
-	for (Unit enemy : InformationManager::getInstance().enemyAttackers){
-		if (InformationManager::getInstance().ourBase->getRegion() == BWTA::getRegion(enemy->getPosition())){
-			return true;
-		}
-	} return false;
+Unitset OffenseManager::getEnemiesInOurRegion(){
+	Region ourRegion = Broodwar->getRegionAt(InformationManager::getInstance().ourBase->getPosition());
+	return ourRegion->getUnits(Filter::IsEnemy);
 }
 
 void OffenseManager::defendOurBase(){
-
+	//if (!fighters.empty()) {
+	//	fighters.move(InformationManager::getInstance().ourBase->getPosition());
+	//}
 }
