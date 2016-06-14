@@ -190,12 +190,6 @@ void ProbeManager::executeQueue(){
 			builderMoving = false;
 			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
 				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
-				
-				/*
-				Broodwar->registerEvent([buildingPosition, type](Game*)
-				{Broodwar->drawBoxMap(Position(buildingPosition), Position(buildingPosition + type.tileSize()), Colors::Yellow); }
-				, nullptr, type.buildTime() + 100);
-				*/
 
 				PlacementManager::getInstance().reserveSpace(type, buildingPosition);
 				ResourceManager::getInstance().reserveMinerals(type);

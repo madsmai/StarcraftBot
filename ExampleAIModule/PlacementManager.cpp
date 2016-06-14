@@ -154,17 +154,19 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 
 
 		//DEBUGGING//
-		//Broodwar->registerEvent([returnPos, type](Game*)
-		//{Broodwar->drawBoxMap(Position(TilePosition(returnPos.x, returnPos.y)), 
-		//	Position(TilePosition(returnPos.x+1, returnPos.y+1)), Colors::Red, false); }
-		//, nullptr, type.buildTime());
+		Broodwar->registerEvent([returnPos, type](Game*)
+		{Broodwar->drawBoxMap(Position(TilePosition(returnPos.x, returnPos.y)), 
+			Position(TilePosition(returnPos.x+1, returnPos.y+1)), Colors::Red, false); }
+		, nullptr, type.buildTime());
 
 
-		//If the position is not reserved, is valid and in the right region
+		//If the position is not reserved, is valid and in the right region, and the region doesn't have any units on it
 		if (!isReserved(type, returnPos)
 			&& Broodwar->canBuildHere(returnPos, type) 
 			&& returnPos.isValid()
-			&& (BWTA::getRegion(returnPos) == baseRegion)){
+			&& (BWTA::getRegion(returnPos) == baseRegion)
+			&& Broodwar->getUnitsInRectangle(Position(returnPos),
+				Position(TilePosition(returnPos.x + type.tileWidth(), returnPos.y + type.tileHeight()))).empty()){
 
 			//For pylons and photon cannons there are more checks
 			if (type == UnitTypes::Protoss_Pylon 
@@ -173,12 +175,15 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 			}
 			else if (type == UnitTypes::Protoss_Photon_Cannon 
 				&& returnPos.getApproxDistance(chokePoint) < chokePoint.getApproxDistance(ourBase)
-				&& returnPos.getApproxDistance(findNearest(returnPos)) < 5 //Maybe change 7 (thier range)
+				&& returnPos.getApproxDistance(findNearest(returnPos)) < 5 //Maybe change to 7 (thier range)
 				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Photon_Cannon)) > 5
 				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) < 5){ //Maybe also change to 7
 				return returnPos;
 			}
-			else if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Photon_Cannon
+			else if (type == UnitTypes::Protoss_Gateway && returnPos.getApproxDistance(findNearest(returnPos)) > 1){
+				return returnPos;
+			}
+			else if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Photon_Cannon && type != UnitTypes::Protoss_Gateway
 				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) < 7){
 				return returnPos;
 			}
