@@ -17,6 +17,11 @@ Prio 1:
 -Repair towers
 -Dark Templars mod protoss
 	-Bygge lige nok towers til at overleve de andres zealot rush og ikke mere
+-Bug ved enemy invis units
+
+- Rebuild probes og buildings on destroy
+
+- Rush igen hvis units er idle i vores base og ongoing er true
 Prio 2:
 -Triggers
 - Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
