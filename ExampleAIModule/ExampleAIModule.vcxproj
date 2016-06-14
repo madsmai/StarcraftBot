@@ -101,10 +101,12 @@
     <ClCompile Include="BuildOrderManager.cpp" />
     <ClCompile Include="BuildOrderType.cpp" />
     <ClCompile Include="Carriers.cpp" />
+    <ClCompile Include="CarrierSpam.cpp" />
     <ClCompile Include="CommonZealotRush.cpp" />
     <ClCompile Include="ContinueZealotRush.cpp" />
     <ClCompile Include="EarlyDarkTemplar.cpp" />
     <ClCompile Include="InformationManager.cpp" />
+    <ClCompile Include="ObserverTech.cpp" />
     <ClCompile Include="OffenseManager.cpp" />
     <ClCompile Include="PlacementManager.cpp" />
     <ClCompile Include="ProbeManager.cpp" />
@@ -124,10 +126,12 @@
     <ClInclude Include="BuildOrderManager.h" />
     <ClInclude Include="BuildOrderType.h" />
     <ClInclude Include="Carriers.h" />
+    <ClInclude Include="CarrierSpam.h" />
     <ClInclude Include="CommonZealotRush.h" />
     <ClInclude Include="ContinueZealotRush.h" />
     <ClInclude Include="EarlyDarkTemplar.h" />
     <ClInclude Include="InformationManager.h" />
+    <ClInclude Include="ObserverTech.h" />
     <ClInclude Include="OffenseManager.h" />
     <ClInclude Include="PlacementManager.h" />
     <ClInclude Include="ProbeManager.h" />

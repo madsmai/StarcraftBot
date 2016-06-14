@@ -56,6 +56,14 @@ void BuildOrderManager::onFrame(){
 			AddGoons();
 			break;
 
+		case StrategyManager::observerTech:
+			ObserverTech();
+			break;
+
+		case StrategyManager::carrier_spam:
+			CarrierSpam();
+			break;
+
 		case StrategyManager::none:
 			Broodwar << "No strategy is set" << std::endl;
 			break;

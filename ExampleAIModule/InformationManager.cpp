@@ -55,6 +55,14 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 }
 
 void InformationManager::onUnitDestroy(BWAPI::Unit unit){
+	
+	if (unit->getPlayer() == Broodwar->self()
+		&& unit->getType() == UnitTypes::Protoss_Observer){
+		hasInvisDetection = false;
+	}
+
+	
+	
 	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
 
 		if (unit->getType().isWorker()){

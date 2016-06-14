@@ -71,10 +71,16 @@ void GameManager::onEnd(bool isWinner){
 
 
 void GameManager::onFrame(){
-	//Display FPS
-	BWAPI::Broodwar->drawTextScreen(200, 0, "FPS: %d", BWAPI::Broodwar->getFPS());
-	BWAPI::Broodwar->drawTextScreen(200, 20, "Average FPS: %f", BWAPI::Broodwar->getAverageFPS());
-	BWAPI::Broodwar->drawTextScreen(200, 40, "onGoingrush: %d", OffenseManager::getInstance().rushOngoing);
+
+	Broodwar->drawTextScreen(0, 0,
+		"FPS: %d \t APM: %d \n FrameCount: %d \t rushing?: %d",
+		Broodwar->getFPS(), Broodwar->getAPM(), Broodwar->getFrameCount(), OffenseManager::getInstance().rushOngoing);
+
+	Broodwar->drawTextScreen(200, 0, "Invis spottet: %d \n" "has detection: %d",
+		InformationManager::getInstance().invisSpottet, InformationManager::getInstance().hasInvisDetection);
+
+	Broodwar->drawTextScreen(300, 100, "Current Strategy: %d \n Next Strategy: %d",
+		StrategyManager::getInstance().getCurrentStrategy(), StrategyManager::getInstance().getNextStrategy());
 
 	if (analyzed) {
 		drawTerrainData();
@@ -143,6 +149,13 @@ void GameManager::onSendText(std::string text){
 
 		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy()) << std::endl;
 	}
+
+	else if (text == "invis"){
+	
+		InformationManager::getInstance().invisSpottet = true;
+
+	}
+
 	else if (text == "Army Strength self") {
 		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) << std::endl;
 	}

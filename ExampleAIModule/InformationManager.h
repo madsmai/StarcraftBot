@@ -18,6 +18,9 @@ public:
 	bool antiRush = false;
 	bool antiTurtle = false;
 
+	bool hasInvisDetection = false;
+	bool invisSpottet = false;
+
 	static InformationManager& getInstance();
 
 	void onUnitDiscover(BWAPI::Unit);

@@ -8,46 +8,57 @@ TransitionMidGame::TransitionMidGame() {
 	setSquadSize(6);
 	setStrategyVariables();
 
-	if (Broodwar->self()->allUnitCount(assimilator) == 0
+	if (StrategyManager::getInstance().transistionMidCalled){
+		// Transistion mid has already been run
+		buildOrder = { evaluateStrategyRequest };
+	}
+	else if (Broodwar->self()->allUnitCount(assimilator) == 0
 		&& Broodwar->self()->allUnitCount(forge) == 0
 		&& Broodwar->self()->allUnitCount(cybercore) == 0){
 
 		// after a zealot rush
 		buildOrder = { probe, assimilator, probe, probe,
 			gasworkerRequest, gasworkerRequest,
-			probe, pylon, probe, probe,
+			probe, probe, probe,
 			forge, cybercore, probe, cannon,
 			cannon, probe, probe, cannon,
-			probe, pylon, probe,
+			probe, probe,
 			evaluateStrategyRequest };
 	}
-	else if (Broodwar->self()->allUnitCount(forge) != 0
-		&& Broodwar->self()->allUnitCount(assimilator) != 0
-		&& Broodwar->self()->allUnitCount(cybercore) != 0){
+	else if (Broodwar->self()->allUnitCount(forge) > 0
+		&& Broodwar->self()->allUnitCount(assimilator) > 0
+		&& Broodwar->self()->allUnitCount(cybercore) > 0){
 
-		// after a DT rush
-		buildOrder = { cannon, probe, probe, probe, probe,
-			pylon, probe, probe, probe,
-			probe, probe, probe, pylon,
-			cannon,
+		// after a DT rush or observerTech
+		buildOrder = { cannon, probe, zealot, zealot,
+			probe, dragoon, dragoon,
+			probe, cannon, zealot,
+			probe, probe, ground_armor,
+			probe, dragoon, probe, zealot, dragoon,
+			probe, cannon,
 			evaluateStrategyRequest };
 	}
 	else if (Broodwar->self()->allUnitCount(forge) == 0
-		&& Broodwar->self()->allUnitCount(assimilator) != 0
-		&& Broodwar->self()->allUnitCount(cybercore) != 0){
+		&& Broodwar->self()->allUnitCount(assimilator) > 0
+		&& Broodwar->self()->allUnitCount(cybercore) > 0){
 
 		// after a rush with goons
-		buildOrder = { probe, probe, probe,
-			probe, pylon, probe, probe,
+		buildOrder = { probe, zealot, zealot,
+			probe, dragoon, zealot, probe,
+			probe, probe, probe,
 			forge, probe, cannon,
 			cannon, probe, probe, cannon,
-			probe, pylon, probe,
+			probe, probe,
 			evaluateStrategyRequest };
 	}
+
 	else {
 		Broodwar << "Add more cases to midGame transition strategy" << std::endl;
+		abort();
 	}
 
+
+	// queue it up
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
 	}
@@ -57,8 +68,23 @@ TransitionMidGame::TransitionMidGame() {
 void TransitionMidGame::evaluateStrategy(){
 
 	Broodwar << "Evaluating mid game strategy" << std::endl;
-	StrategyManager::getInstance().setNextStrategy(StrategyManager::carriers);
 
+	StrategyManager::getInstance().transistionMidCalled = true;
+
+	if (InformationManager::getInstance().invisSpottet
+		&& !InformationManager::getInstance().hasInvisDetection){
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
+	}
+	else {
+		if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Stargate) > 0){
+			// back to carrier spam
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::carrier_spam);
+		}
+		else {
+			// go carriers
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::carriers);
+		}
+	}
 }
 
 void TransitionMidGame::setStrategyVariables(){
@@ -70,28 +96,28 @@ void TransitionMidGame::setStrategyVariables(){
 		InformationManager::getInstance().starter = false;
 		InformationManager::getInstance().endgame = true;
 	}
-	
+
 	if (antiAir){
 		InformationManager::getInstance().antiAir = true;
 	}
 	else {
 		InformationManager::getInstance().antiAir = false;
 	}
-	
+
 	if (antiInvis){
 		InformationManager::getInstance().antiInvis = true;
 	}
 	else {
 		InformationManager::getInstance().antiInvis = false;
 	}
-	
+
 	if (antiRush){
 		InformationManager::getInstance().antiRush = true;
 	}
 	else {
 		InformationManager::getInstance().antiRush = false;
 	}
-	
+
 	if (antiTurtle){
 		InformationManager::getInstance().antiTurtle = true;
 	}

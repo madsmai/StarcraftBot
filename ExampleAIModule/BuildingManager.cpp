@@ -79,6 +79,15 @@ void BuildingManager::onFrame(){
 }
 
 void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
+	
+	if (unit->getType() == UnitTypes::Protoss_Probe){
+
+
+	}
+
+
+
+	
 	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
 		std::vector<BWAPI::Unit>::iterator it;
 

@@ -9,7 +9,7 @@ int StrategyManager::setInitialStrategy(){
 	switch (enemyRace){
 
 	case Races::Enum::Protoss:
-		return aggressiveZealotRush;
+		return earlyDarkTemplar;
 		break;
 
 	case Races::Enum::Zerg:
@@ -30,6 +30,13 @@ int StrategyManager::setInitialStrategy(){
 }
 
 void StrategyManager::evaluateStrategies(){
+
+	std::ofstream log;
+	log.open("bwapi-data//AI/Strategies.txt", std::ios::app);
+	log << "Evaluating: " << getCurrentStrategy() << "\n";
+	log.flush();
+	log.close();
+
 
 	switch (getCurrentStrategy()){
 
@@ -63,6 +70,14 @@ void StrategyManager::evaluateStrategies(){
 
 	case addGoons:
 		AddGoons::evaluateStrategy();
+		break;
+
+	case observerTech:
+		ObserverTech::evaluateStrategy();
+		break;
+
+	case carrier_spam:
+		CarrierSpam::evaluateStrategy();
 		break;
 	}
 }

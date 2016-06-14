@@ -9,11 +9,13 @@ Strategi-skift-design:
 - Hvis vi rusher og modstanderens combat strength er større end vores
 - evaluateStrategy metoder
 
+
 TODO:
 
 Prio 1:
+- Holde pause i angreb for at samle store angrebsstyrker!!!
 -Debugging skal ikke ske i release versionen
--Angribe probes
+-Angribe probes med scout
 -Repair towers
 -Dark Templars mod protoss
 	-Bygge lige nok towers til at overleve de andres zealot rush og ikke mere
@@ -23,6 +25,7 @@ Prio 1:
 
 - Rush igen hvis units er idle i vores base og ongoing er true
 Prio 2:
+-Triggers
 - Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
 -Threat levels, evaluer hvordan "range" har betydning
 - Calculate Army Strength doesn't work when the enemy is behind the fog. Use InformationManager instead.
