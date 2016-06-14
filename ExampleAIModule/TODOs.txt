@@ -9,6 +9,7 @@ Strategi-skift-design:
 - Hvis vi rusher og modstanderens combat strength er større end vores
 - evaluateStrategy metoder
 
+
 TODO:
 
 Prio 1:

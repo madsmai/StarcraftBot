@@ -50,6 +50,9 @@ private:
 	//Rename me
 	void FixWrongPriority(BWAPI::Unit);
 
+	//Taken from scoutManager because we can't include more to this class
+	void goScout(BWAPI::Unit);
+
 	OffenseManager(){};
 	~OffenseManager(){};
 };

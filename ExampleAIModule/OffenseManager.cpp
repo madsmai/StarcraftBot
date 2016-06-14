@@ -64,7 +64,8 @@ void OffenseManager::onFrame(){
 			}
 		}
 		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
-			&& (unit->isIdle() || unit->getLastCommand().getType() == UnitCommandTypes::Move)) {
+			&& (unit->isIdle() || unit->getLastCommand().getType() == UnitCommandTypes::Move 
+			|| (unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && !unit->isAttacking()))) {
 
 			searchAndDestroy(unit);
 			explore(unit);
@@ -425,32 +426,59 @@ void OffenseManager::defendOurBase(){
 }
 
 void OffenseManager::explore(Unit explorer) {
-	if (explorer != NULL && explorer->isIdle()) {
+	if (explorer != NULL 
+		&& explorer->getTilePosition().x != NULL && explorer->getTilePosition().y != NULL
+		&& explorer->isIdle()
+		&& BWTA::getRegion(explorer->getTilePosition()) != NULL) {
 		if (InformationManager::getInstance().enemyBase != NULL
 			&& BWTA::getRegion(explorer->getTilePosition()) != InformationManager::getInstance().ourBase->getRegion()) {
 
-			std::vector<Position> edgeOfBase = InformationManager::getInstance().enemyBase->getRegion()->getPolygon();
+			/*std::vector<Position> edgeOfBase = InformationManager::getInstance().enemyBase->getRegion()->getPolygon();*/
 
-			//std::vector<Position>::iterator exploredPositions;
-			//
-			//std::set<BWTA::BaseLocation*>::iterator it;
-			//it = InformationManager::getInstance().baseLocations.begin();
+			std::vector<Position> edgeOfBase = BWTA::getRegion(explorer->getTilePosition())->getPolygon();
 
-			//for (exploredPositions = edgeOfBase.begin(); exploredPositions != edgeOfBase.end(); exploredPositions++) {
-			//	Position p = *exploredPositions;
-			//	if (!Broodwar->isExplored(TilePosition(p))) {
-			//		explorer->move(p);
-			//		break;
-			//	}
-			//	else {
-			//		continue;
-			//	}
-			//}
-			//if (exploredPositions == edgeOfBase.end()) {
+			std::vector<Position>::iterator exploredPositions;
+			bool foundPosition = false;
 
-			//}
-			Position randomEdge = edgeOfBase[rand() % edgeOfBase.size()];
-			explorer->move(edgeOfBase[rand() % edgeOfBase.size()]);
+			for (exploredPositions = edgeOfBase.begin(); exploredPositions != edgeOfBase.end(); exploredPositions++) {
+				Position p = *exploredPositions;
+				if (!Broodwar->isExplored(TilePosition(p)) 
+					&& BWTA::isConnected(explorer->getTilePosition(), TilePosition(p))
+					&& p.isValid()) {
+					foundPosition = true;
+					explorer->move(p);
+					break;
+				}
+			}
+			if (!foundPosition) {
+				goScout(explorer);
+			}
+			//Position randomEdge = edgeOfBase[rand() % edgeOfBase.size()];
+			//explorer->move(edgeOfBase[rand() % edgeOfBase.size()]);
 		}
+	}
+}
+void OffenseManager::goScout(BWAPI::Unit scout){
+	InformationManager::getInstance().baseLocations = BWTA::getBaseLocations();
+	double minDistance = 9999999;
+	BWTA::BaseLocation* currentBase = BWTA::getNearestBaseLocation(scout->getPosition());
+
+	std::set<BWTA::BaseLocation*>::iterator it; 		// iteratation set
+	for (it = InformationManager::getInstance().baseLocations.begin(); it != InformationManager::getInstance().baseLocations.end(); it++){
+		BWTA::BaseLocation* nextBase = *it;
+		Broodwar->pingMinimap(nextBase->getPosition());
+		// Remove our baselocation
+		if (!Broodwar->isExplored(nextBase->getTilePosition())) {
+			scout->move(nextBase->getPosition());
+		}
+		//if (nextBase->getPosition() == InformationManager::getInstance().ourBase->getPosition()
+		//	|| currentBase->getPosition() == InformationManager::getInstance().nextBase->getPosition()){
+		//	continue;
+		//}
+		//else if (currentBase->getGroundDistance(InformationManager::getInstance().nextBase) < minDistance) {
+		//	minDistance = currentBase->getGroundDistance(InformationManager::getInstance().nextBase);
+		//	Broodwar->sendText("Moving to enemy base");
+		//	scout->move(nextBase->getPosition());
+		//}
 	}
 }
