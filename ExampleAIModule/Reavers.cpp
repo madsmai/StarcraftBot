@@ -22,20 +22,16 @@ void Reavers::evaluateStrategy(){
 
 	Broodwar << "Evaluating reaver strategy" << std::endl;
 	
-	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
-		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
-		|| InformationManager::getInstance().enemyTowers.size() >= 2){
-
-		// convert to midgame
-		//StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
-
+	if (InformationManager::getInstance().invisSpottet
+		&& !InformationManager::getInstance().hasInvisDetection){
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
-
-		// continue with the zealot rush
-		//StrategyManager::getInstance().setNextStrategy(StrategyManager::none);
-
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::carriers);
 	}
+
+
+	
 }
 
 void Reavers::setStrategyVariables(){

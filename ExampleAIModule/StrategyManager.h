@@ -9,6 +9,8 @@
 #include "Reavers.h"
 #include "Carriers.h"
 #include "AddGoons.h"
+#include "ObserverTech.h"
+#include "CarrierSpam.h"
 
 class StrategyManager {
 public:
@@ -17,7 +19,7 @@ public:
 
 	enum strategy{ none, basic, commonZealotRush, aggressiveZealotRush, 
 		earlyDarkTemplar, continueZealotRush, transitionMidGame,
-		addGoons ,reavers, carriers};
+		addGoons ,reavers, carriers, carrier_spam, observerTech};
 
 
 	int getCurrentStrategy(){ return currentStrategy; }
@@ -25,7 +27,8 @@ public:
 	void setCurrentStrategy(int strategy){ currentStrategy = strategy; }
 	void setNextStrategy(int strategy){ nextStrategy = strategy; }
 
-	
+	bool transistionMidCalled = false;
+
 	void evaluateStrategies();
 
 

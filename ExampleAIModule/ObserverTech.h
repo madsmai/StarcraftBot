@@ -5,7 +5,9 @@
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
 
-class TransitionMidGame : public Strategy {
+using namespace BWAPI;
+
+class ObserverTech :public Strategy {
 public:
 
 	std::string getName() { return name; }
@@ -21,10 +23,11 @@ public:
 
 	void setSquadSize(int size){ OffenseManager::getInstance().setSquadSize(size); }
 	static void evaluateStrategy();
+
 	void setStrategyVariables();
 
 	// constructor
-	TransitionMidGame();
+	ObserverTech();
 
 private:
 
@@ -42,11 +45,9 @@ private:
 	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
 
-	UnitType stargate = UnitTypes::Protoss_Stargate;
-
-	UpgradeType ground_weapons = UpgradeTypes::Protoss_Ground_Weapons;
-	UpgradeType ground_armor = UpgradeTypes::Protoss_Ground_Armor;
-
+	UnitType robotics = UnitTypes::Protoss_Robotics_Facility;
+	UnitType observatory = UnitTypes::Protoss_Observatory;
+	UnitType observer = UnitTypes::Protoss_Observer;
 
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
@@ -55,7 +56,7 @@ private:
 	bool starter = false;
 	bool endgame = true;
 	bool antiAir = false;
-	bool antiInvis = false;
+	bool antiInvis = true;
 	bool antiRush = false;
 	bool antiTurtle = false;
 
@@ -63,6 +64,7 @@ private:
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "Transition to midgame";
+	std::string name = "ObserverTech";
 
 };
+

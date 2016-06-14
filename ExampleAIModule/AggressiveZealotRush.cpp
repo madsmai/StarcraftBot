@@ -26,27 +26,28 @@ void AggressiveZealotRush::evaluateStrategy(){
 
 	Broodwar << "Evaluating aggressive zealot rush" << std::endl;
 
-	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
-		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
-		|| InformationManager::getInstance().enemyTowers.size() >= 2){
-
-		// convert to midgame
-		StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
-
+	if (InformationManager::getInstance().invisSpottet
+		&& !InformationManager::getInstance().hasInvisDetection){
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
+		if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
+			>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
+			|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
-		if (rand() % 2 > 0.5){
-			Broodwar << "going goons from aggressive" << std::endl;
-			StrategyManager::getInstance().setNextStrategy(StrategyManager::addGoons);
+			// convert to midgame
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
 		}
 		else {
-			// continue with the zealot rush
-			StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+			if (rand() % 2 > 0.5){
+				Broodwar << "going goons from aggressive" << std::endl;
+				StrategyManager::getInstance().setNextStrategy(StrategyManager::addGoons);
+			}
+			else {
+				// continue with the zealot rush
+				StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+			}
 		}
-
-
-
 	}
 
 }

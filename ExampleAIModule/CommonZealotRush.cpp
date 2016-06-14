@@ -14,7 +14,8 @@ CommonZealotRush::CommonZealotRush(){
 		probe, probe, gateway, // 12
 		probe, zealot, probe, pylon, // 16
 		zealot, zealot, zealot, pylon, // 22
-		zealot, zealot, zealot, pylon, evaluateStrategyRequest };
+		zealot, zealot, zealot, pylon, gateway,
+		evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
@@ -27,20 +28,27 @@ void CommonZealotRush::evaluateStrategy(){
 
 	Broodwar << "Evaluating common zealot rush" << std::endl;
 
-	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
-		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
-		|| InformationManager::getInstance().enemyTowers.size() >= 2){
-
-		// convert to midgame
-		StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
-
+	if (InformationManager::getInstance().invisSpottet
+		&& !InformationManager::getInstance().hasInvisDetection){
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
+		if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
+			>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
+			|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
-		// continue with the zealot rush
-		StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+			// convert to midgame
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
+		}
+		else {
 
+			// continue with the zealot rush
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
+		}
 	}
+
+
+
 }
 
 void CommonZealotRush::setStrategyVariables(){

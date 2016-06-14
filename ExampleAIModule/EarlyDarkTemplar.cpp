@@ -11,9 +11,9 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 	buildOrder = { // base build
 		probe, gateway, probe, scoutRequest, assimilator, probe,
 		cybercore, gasworkerRequest, gasworkerRequest, probe, forge,
-		citadel, probe, gasworkerRequest, archives,
-		gateway, dtemplar, dtemplar,cannon, pylon,
-		dtemplar, probe, probe,
+		citadel, probe, gasworkerRequest, cannon, cannon, archives,
+		gateway, dtemplar, dtemplar, pylon,
+		dtemplar, probe, probe, cannon,
 		evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
@@ -25,8 +25,14 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 void EarlyDarkTemplar::evaluateStrategy(){
 
 	Broodwar << "Evaluating early dark templar" << std::endl;
-	StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
 
+	if (InformationManager::getInstance().invisSpottet
+		&& !InformationManager::getInstance().hasInvisDetection){
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
+	}
+	else {
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
+	}
 }
 
 void EarlyDarkTemplar::setStrategyVariables(){

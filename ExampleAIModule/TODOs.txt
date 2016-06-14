@@ -12,6 +12,7 @@ Strategi-skift-design:
 TODO:
 
 Prio 1:
+- Holde pause i angreb for at samle store angrebsstyrker!!!
 -Debugging skal ikke ske i release versionen
 -Angribe probes med scout
 -Repair towers

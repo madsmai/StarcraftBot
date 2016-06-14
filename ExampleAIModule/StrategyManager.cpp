@@ -31,6 +31,13 @@ int StrategyManager::setInitialStrategy(){
 
 void StrategyManager::evaluateStrategies(){
 
+	std::ofstream log;
+	log.open("bwapi-data//AI/Strategies.txt", std::ios::app);
+	log << "Evaluating: " << getCurrentStrategy() << "\n";
+	log.flush();
+	log.close();
+
+
 	switch (getCurrentStrategy()){
 
 	case commonZealotRush:
@@ -63,6 +70,14 @@ void StrategyManager::evaluateStrategies(){
 
 	case addGoons:
 		AddGoons::evaluateStrategy();
+		break;
+
+	case observerTech:
+		ObserverTech::evaluateStrategy();
+		break;
+
+	case carrier_spam:
+		CarrierSpam::evaluateStrategy();
 		break;
 	}
 }

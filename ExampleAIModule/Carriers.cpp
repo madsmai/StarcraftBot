@@ -7,9 +7,9 @@ Carriers::Carriers() {
 	setSquadSize(6);
 	setStrategyVariables();
 
-	buildOrder = { stargate, probe, probe,
-		fleet_beacon, stargate, zealot, zealot,
-		carrier, zealot, carrier, carrier_capacity, carrier,
+	buildOrder = { stargate, probe, cannon, probe,
+		fleet_beacon, stargate, zealot, dragoon,
+		carrier, zealot, dragoon, carrier, carrier_capacity, stargate,
 		evaluateStrategyRequest };
 
 	for (BuildOrderType order : buildOrder){
@@ -20,22 +20,17 @@ Carriers::Carriers() {
 
 void Carriers::evaluateStrategy(){
 
-	Broodwar << "Evaluating reaver strategy" << std::endl;
+	Broodwar << "Evaluating carrier strategy" << std::endl;
 
-	if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
-		>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
-		|| InformationManager::getInstance().enemyTowers.size() >= 2){
-
-		// convert to midgame
-		//StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
-
+	if (InformationManager::getInstance().invisSpottet
+		&& !InformationManager::getInstance().hasInvisDetection){
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
-
-		// continue with the zealot rush
-		//StrategyManager::getInstance().setNextStrategy(StrategyManager::none);
-
+		// continue with carrier spam
+		StrategyManager::getInstance().setNextStrategy(StrategyManager::carrier_spam);
 	}
+
 }
 
 void Carriers::setStrategyVariables(){

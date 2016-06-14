@@ -5,7 +5,7 @@
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
 
-class TransitionMidGame : public Strategy {
+class CarrierSpam : public Strategy {
 public:
 
 	std::string getName() { return name; }
@@ -22,9 +22,8 @@ public:
 	void setSquadSize(int size){ OffenseManager::getInstance().setSquadSize(size); }
 	static void evaluateStrategy();
 	void setStrategyVariables();
-
 	// constructor
-	TransitionMidGame();
+	CarrierSpam();
 
 private:
 
@@ -41,12 +40,17 @@ private:
 	UnitType archives = UnitTypes::Protoss_Templar_Archives;
 	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
-
+	UnitType robotics = UnitTypes::Protoss_Robotics_Facility;
+	UnitType supportbay = UnitTypes::Protoss_Robotics_Support_Bay;
+	UnitType reaver = UnitTypes::Protoss_Reaver;
+	UnitType scarab = UnitTypes::Protoss_Scarab;
 	UnitType stargate = UnitTypes::Protoss_Stargate;
+	UnitType fleet_beacon = UnitTypes::Protoss_Fleet_Beacon;
+	UnitType carrier = UnitTypes::Protoss_Carrier;
+	UnitType interceptor = UnitTypes::Protoss_Interceptor;
 
-	UpgradeType ground_weapons = UpgradeTypes::Protoss_Ground_Weapons;
-	UpgradeType ground_armor = UpgradeTypes::Protoss_Ground_Armor;
-
+	UpgradeType carrier_capacity = UpgradeTypes::Carrier_Capacity;
+	UpgradeType reaver_capacity = UpgradeTypes::Reaver_Capacity;
 
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;
@@ -57,12 +61,12 @@ private:
 	bool antiAir = false;
 	bool antiInvis = false;
 	bool antiRush = false;
-	bool antiTurtle = false;
+	bool antiTurtle = true;
 
 	// Build order for the specific tactic
 	std::vector<BuildOrderType> buildOrder;
 
 	// name of the tactic
-	std::string name = "Transition to midgame";
+	std::string name = "Carrier spam strategy";
 
 };
