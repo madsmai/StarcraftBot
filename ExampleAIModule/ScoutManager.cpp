@@ -24,6 +24,7 @@ void ScoutManager::onFrame(){
 
 		for (BWAPI::Unit unit : activeScouts){
 			if (unit->isUnderAttack()) {
+				Broodwar << "Retreat!!" << std::endl;
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
 			}
 			else if (unit->isIdle()
@@ -66,6 +67,27 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 			BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, BuildOrderType::scoutRequest);
 		}
 	}
+	if (!activeScouts.empty()
+		&& unit->getType().isWorker()
+		&& unit->getPlayer()->isEnemy(Broodwar->self())){
+
+		BWAPI::Unit scout = activeScouts.front();
+		UnitCommand currentCommand = scout->getLastCommand();
+
+		// ignore if the scout already is attacking
+		if (currentCommand.getType() == UnitCommandTypes::Attack_Unit
+			&& currentCommand.getTarget()->exists()){
+			Broodwar << "Sup popperrino" << std::endl;
+			return;
+		}
+		Broodwar << "get fucked Janus pt2" << std::endl;
+
+		BWAPI::Unit closestEnemy = scout->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
+		if (!closestEnemy){
+			return;
+		}
+		scout->attack(closestEnemy);
+	}
 }
 
 void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
@@ -81,22 +103,34 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 			for (it = activeScouts.begin(); it != activeScouts.end(); it++) { //Change where the active scouts are going
 				BWAPI::Unit u = *it;
 				u->move(unit->getPosition());
-				u->attack(unit);
+				//u->attack(unit);
 			}
 			Broodwar->sendText("Done scouting, found mainbase");
 		}
 
-		else if (unit->getPlayer() != Broodwar->self() 
+		if (unit->getType().isWorker()
+			&& unit->getPlayer()->isEnemy(Broodwar->self())){
+
+			BWAPI::Unit scout = activeScouts.front();
+			UnitCommand currentCommand = scout->getLastCommand();
+
+			// ignore if the scout already is attacking
+			if (currentCommand.getType() == UnitCommandTypes::Attack_Unit){
+				return;
+			}
+			scout->attack(unit);
+		}
+
+		else if (unit->getPlayer() != Broodwar->self()
 			&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
 			&& !unit->getPlayer()->isEnemy(Broodwar->self())) {
 
-			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());		
+			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());
 
 		}
 		else if (unit->getPlayer() != Broodwar->self()
 			&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
-			InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());			
-			//Broodwar->sendText("Found expansion");
+			InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());
 		}
 	}
 }
@@ -113,12 +147,12 @@ void ScoutManager::goScout(BWAPI::Unit scout){
 			|| scout->getPosition() == InformationManager::getInstance().nextBase->getPosition()){
 			InformationManager::getInstance().baseLocations.erase(*it);
 			Broodwar->sendText("Removed our base");
-		}	
+		}
 		else if (InformationManager::getInstance().ourBase->getGroundDistance(InformationManager::getInstance().nextBase) < minDistance) {
 			minDistance = InformationManager::getInstance().ourBase->getGroundDistance(InformationManager::getInstance().nextBase);
 			Broodwar->sendText("Moving to enemy base");
 			scout->move(InformationManager::getInstance().nextBase->getPosition());
-		}	
+		}
 	}
 }
 
@@ -131,7 +165,7 @@ void ScoutManager::addScout(BWAPI::Unit scout){
 
 void ScoutManager::removeScout(BWAPI::Unit scout){
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = activeScouts.begin(); it != activeScouts.end(); ) { //If it is in activeScout
+	for (it = activeScouts.begin(); it != activeScouts.end();) { //If it is in activeScout
 		BWAPI::Unit u = *it;
 		if (u->getID() == scout->getID()){
 			activeScouts.erase(it);
