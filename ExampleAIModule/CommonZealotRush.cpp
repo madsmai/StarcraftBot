@@ -33,8 +33,8 @@ void CommonZealotRush::evaluateStrategy(){
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
-		if (InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy())
-			>= InformationManager::getInstance().calculateArmyStrength(Broodwar->self())
+		if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
+			>= InformationManager::getInstance().enemyArmyStrength
 			|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
 			// convert to midgame

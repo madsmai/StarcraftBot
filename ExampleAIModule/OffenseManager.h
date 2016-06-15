@@ -18,11 +18,12 @@ public:
 	BWAPI::Unit coward;
 	BWAPI::Unitset squad;
 
-	
+
 
 	bool rushOngoing = false;
 
 	void setSquadSize(int size){ squadSize = size; }
+	int getSquadSize(){ return squadSize; }
 
 private:
 	//Zealots
@@ -40,7 +41,12 @@ private:
 	void fillReaverOrCarrier(BWAPI::Unit);
 
 	bool properTarget(BWAPI::Unit, BWAPI::Unit);
-	
+	bool checkedMainBase = false;
+
+
+	//Based on the method of the same name by Dave Churchils in his UAlbertoBot
+	void smartAttackUnit(BWAPI::Unit, BWAPI::Unit);
+
 	void explore(BWAPI::Unit);
 
 

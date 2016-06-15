@@ -33,7 +33,12 @@ public:
 
 	int writeToLog(std::string text);
 
-	int calculateArmyStrength(BWAPI::Player);
+	int calculateArmyStrength(BWAPI::Unitset);
+	int calculateUnitStrength(BWAPI::UnitType);
+
+	int enemyArmyStrength = 0;
+	std::vector<int> seenEnemyIds;
+
 	void addEnemyBarracks(BWAPI::Unit);
 	void addEnemyAttackers(BWAPI::Unit);
 	void addEnemyWorkers(BWAPI::Unit);
@@ -61,6 +66,7 @@ public:
 	//Protoss
 	bool citadelOfAdun = false;
 	bool templarArchives = false;
+	bool observatory = false;
 	bool logging = false;
 	std::vector<BWAPI::Unit> darkTemplars;
 
