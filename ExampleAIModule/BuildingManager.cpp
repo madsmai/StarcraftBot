@@ -80,29 +80,35 @@ void BuildingManager::onFrame(){
 
 void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
 
-	// adds a probe to the front of the queue when a probe was destroyed
-	if (unit->getType() == UnitTypes::Protoss_Probe){
-		BuildOrderManager::getInstance().getNewFixedOrderQueue()
-			.insert(BuildOrderManager::getInstance().getNewFixedOrderQueue().begin(), UnitTypes::Protoss_Probe);
-	}
+	if (unit->getPlayer() == Broodwar->self()){
+		// adds a probe to the front of the queue when a probe was destroyed
+		if (unit->getType() == UnitTypes::Protoss_Probe){
+			BuildOrderManager::getInstance().getNewFixedOrderQueue()
+				.insert(BuildOrderManager::getInstance().getNewFixedOrderQueue().begin(), UnitTypes::Protoss_Probe);
+		}
+		else if (unit->getType().isBuilding()){
+			std::vector<BWAPI::Unit>::iterator it;
 
-
-
-
-	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
-		std::vector<BWAPI::Unit>::iterator it;
-
-		//Loop through buildings
-		for (it = buildings.begin(); it != buildings.end();){
-			if (*it == unit){
-				buildings.erase(it);
-				break;
-			}
-			else {
-				it++;
+			//Loop through buildings
+			for (it = buildings.begin(); it != buildings.end();){
+				if (*it == unit){
+					buildings.erase(it);
+					break;
+				}
+				else {
+					it++;
+				}
 			}
 		}
+
 	}
+
+	
+
+
+
+
+	
 }
 
 void BuildingManager::onUnitComplete(BWAPI::Unit unit){
