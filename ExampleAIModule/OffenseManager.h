@@ -38,7 +38,8 @@ private:
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
 	bool isFighter(BWAPI::Unit);
 	void fillReaverOrCarrier(BWAPI::Unit);
-	bool properClosestTarget(BWAPI::Unit, BWAPI::Unit);
+
+	bool properTarget(BWAPI::Unit, BWAPI::Unit);
 	
 	void explore(BWAPI::Unit);
 

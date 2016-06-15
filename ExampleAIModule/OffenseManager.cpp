@@ -150,23 +150,23 @@ bool OffenseManager::fightBack(BWAPI::Unit attackedUnit) {
 				Unit bestTarget;
 				for (Unit troop : nearbyEnemies) {
 					int currentPrio = calculatePriority(troop, attackedUnit);
-					if (currentPrio > maxPrio) {
+					if (properTarget(troop,attackedUnit) && currentPrio > maxPrio) {
 						maxPrio = currentPrio;
 						bestTarget = troop;
 					}
 				}
-				Broodwar->drawCircleMap(bestTarget->getPosition(), 15, Colors::Brown);
-				attackedUnit->attack(bestTarget);
-				getHelp(attackedUnit, bestTarget);
-				return true;
-			}
-			else {
-				if (!attackedUnit->isAttacking()) {
-					attackedUnit->attack(attacker);
+				if (bestTarget != NULL && properTarget(bestTarget, attackedUnit)) {
+					Broodwar->drawCircleMap(bestTarget->getPosition(), 15, Colors::Brown);
+					attackedUnit->attack(bestTarget);
+					getHelp(attackedUnit, bestTarget);
+					return true;
 				}
-				getHelp(attackedUnit, attacker);
-				return true;
 			}
+		if (!attackedUnit->isAttacking()) {
+			attackedUnit->attack(attacker);
+		}
+		getHelp(attackedUnit, attacker);
+		return true;
 		}
 	}
 	return false;
@@ -184,7 +184,8 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 		if (helper != NULL
 			&& badGuy->isVisible()
 			&& badGuy != NULL
-			&& fighters.find(helper) != fighters.end()) {
+			&& fighters.find(helper) != fighters.end()
+			&& properTarget(badGuy,helper)) {
 
 			helper->attack(badGuy);
 			return true;
@@ -202,31 +203,31 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Finds units to kill and kills them
 	Unit closest;
 	closest = attacker->getClosestUnit((Filter::CanAttack || Filter::IsSpellcaster) && Filter::CanMove && Filter::IsEnemy, 1240);
-	if (properClosestTarget(closest, attacker)) {
+	if (properTarget(closest, attacker)) {
 		attacker->attack(closest);
 		FixWrongPriority(closest);
 		return;
 	}
 	closest = attacker->getClosestUnit(Filter::IsBuilding && (Filter::CanAttack || Filter::GetType == UnitTypes::Terran_Bunker) && Filter::IsEnemy, 1240);
-	if (properClosestTarget(closest, attacker)) {
+	if (properTarget(closest, attacker)) {
 		attacker->attack(closest);
 		FixWrongPriority(closest);
 		return;
 	}
 	closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 1240);
-	if (properClosestTarget(closest, attacker)) {
+	if (properTarget(closest, attacker)) {
 		attacker->attack(closest);
 		FixWrongPriority(closest);
 		return;
 	}
 	closest = attacker->getClosestUnit(Filter::CanProduce && Filter::IsBuilding && !Filter::IsResourceDepot && Filter::IsEnemy, 1240);
-	if (properClosestTarget(closest, attacker)) {
+	if (properTarget(closest, attacker)) {
 		attacker->attack(closest);
 		FixWrongPriority(closest);
 		return;
 	}
 	closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible, 1240);
-	if (properClosestTarget(closest, attacker)) {
+	if (properTarget(closest, attacker)) {
 		attacker->attack(closest);
 		FixWrongPriority(closest);
 		return;
@@ -333,12 +334,32 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 	}
 }
 
-bool OffenseManager::properClosestTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
-	return target != NULL && attacker != NULL
-		&& target->isVisible()
-		&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
-		&& target->exists()
-		&& target->getPosition().isValid();
+bool OffenseManager::properTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
+	if (target != NULL) {
+		if (attacker != NULL) {
+			if (target->isVisible()) {
+				if (BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())) {
+					if (attacker->hasPath(target)) {
+						if (target->exists()) {
+							if (target->getPosition().isValid()) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+return false;
+}
+	
+
+	//return target != NULL && attacker != NULL && target->getPosition().x != NULL && target->getPosition().y != NULL
+	//	&& attacker->getTilePosition().x != NULL && attacker->getTilePosition().y != NULL
+	//	&& target->isVisible()
+	//	&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())
+	//	&& attacker->hasPath(target)
+	//	&& target->exists()
+	//	&& target->getPosition().isValid();
 }
 
 void OffenseManager::FixWrongPriority(BWAPI::Unit closest) {
