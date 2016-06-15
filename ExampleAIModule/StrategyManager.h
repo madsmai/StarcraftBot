@@ -28,6 +28,7 @@ public:
 	void setNextStrategy(int strategy){ nextStrategy = strategy; }
 
 	bool transistionMidCalled = false;
+	bool carriersCalled = false;
 
 	void evaluateStrategies();
 

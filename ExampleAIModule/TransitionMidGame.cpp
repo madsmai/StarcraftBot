@@ -76,12 +76,13 @@ void TransitionMidGame::evaluateStrategy(){
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
-		if (Broodwar->self()->allUnitCount(UnitTypes::Protoss_Stargate) > 0){
-			// back to carrier spam
+		if (StrategyManager::getInstance().carriersCalled){
+			// Carriers have already been run, go back to spamming
 			StrategyManager::getInstance().setNextStrategy(StrategyManager::carrier_spam);
+			return;
 		}
 		else {
-			// go carriers
+			// go tech carriers
 			StrategyManager::getInstance().setNextStrategy(StrategyManager::carriers);
 		}
 	}

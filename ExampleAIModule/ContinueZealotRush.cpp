@@ -8,10 +8,14 @@ ContinueZealotRush::ContinueZealotRush() {
 	setStrategyVariables();
 
 	if (Broodwar->self()->allUnitCount(cybercore) >= 1){
-		buildOrder = { zealot, dragoon, dragoon, zealot, probe, zealot, evaluateStrategyRequest };
+		buildOrder = { zealot, dragoon, dragoon, 
+			zealot, zealot, zealot, probe, 
+			evaluateStrategyRequest };
 	}
 	else {
-		buildOrder = { zealot, zealot, probe, zealot, zealot, evaluateStrategyRequest };
+		buildOrder = { zealot, zealot, zealot, 
+			probe, zealot, zealot, zealot, 
+			evaluateStrategyRequest };
 	}
 
 	for (BuildOrderType order : buildOrder){

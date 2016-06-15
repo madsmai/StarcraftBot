@@ -79,15 +79,16 @@ void BuildingManager::onFrame(){
 }
 
 void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
-	
+
+	// adds a probe to the front of the queue when a probe was destroyed
 	if (unit->getType() == UnitTypes::Protoss_Probe){
-
-
+		BuildOrderManager::getInstance().getNewFixedOrderQueue()
+			.insert(BuildOrderManager::getInstance().getNewFixedOrderQueue().begin(), UnitTypes::Protoss_Probe);
 	}
 
 
 
-	
+
 	if (unit->getType().isBuilding() && unit->getPlayer() == BWAPI::Broodwar->self()){
 		std::vector<BWAPI::Unit>::iterator it;
 

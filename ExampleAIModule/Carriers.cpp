@@ -22,6 +22,8 @@ void Carriers::evaluateStrategy(){
 
 	Broodwar << "Evaluating carrier strategy" << std::endl;
 
+	StrategyManager::getInstance().carriersCalled = true;
+
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);

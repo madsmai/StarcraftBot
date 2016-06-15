@@ -5,7 +5,7 @@ CommonZealotRush::CommonZealotRush(){
 
 	Broodwar << name << std::endl;
 
-	setSquadSize(3);
+	setSquadSize(5);
 	setStrategyVariables();
 
 	buildOrder = { // base Build order
