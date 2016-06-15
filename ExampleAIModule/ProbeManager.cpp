@@ -241,7 +241,6 @@ void ProbeManager::executeQueue(){
 		else if (request == BuildOrderType::evaluateStrategyRequest){
 
 			StrategyManager::getInstance().evaluateStrategies();
-
 			queue.erase(queue.begin()); //Remove the request from the queue
 		}
 	}
