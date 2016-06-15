@@ -24,7 +24,7 @@ void ScoutManager::onFrame(){
 
 		for (BWAPI::Unit unit : activeScouts){
 			if (unit->isUnderAttack()) {
-				Broodwar << "Retreat!!" << std::endl;
+				retreating = true;
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
 			}
 			else if (unit->isIdle()
@@ -70,7 +70,8 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 
 	if (!activeScouts.empty()){
 		if (unit->getType().isWorker()
-			&& unit->getPlayer()->isEnemy(Broodwar->self())){
+			&& unit->getPlayer()->isEnemy(Broodwar->self())
+			&& !retreating){
 
 			BWAPI::Unit scout = activeScouts.front();
 			UnitCommand currentCommand = scout->getLastCommand();
@@ -104,13 +105,13 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 			for (it = activeScouts.begin(); it != activeScouts.end(); it++) { //Change where the active scouts are going
 				BWAPI::Unit u = *it;
 				u->move(unit->getPosition());
-				//u->attack(unit);
 			}
 			Broodwar->sendText("Done scouting, found mainbase");
 		}
 
 		if (unit->getType().isWorker()
-			&& unit->getPlayer()->isEnemy(Broodwar->self())){
+			&& unit->getPlayer()->isEnemy(Broodwar->self())
+			&& !retreating){
 
 			BWAPI::Unit scout = activeScouts.front();
 			UnitCommand currentCommand = scout->getLastCommand();
