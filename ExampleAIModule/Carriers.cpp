@@ -2,8 +2,6 @@
 
 Carriers::Carriers() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(12);
 	setStrategyVariables();
 
@@ -20,7 +18,7 @@ Carriers::Carriers() {
 
 void Carriers::evaluateStrategy(){
 
-	Broodwar << "Evaluating carrier strategy" << std::endl;
+	//Broodwar << "Evaluating carrier strategy" << std::endl;
 
 	StrategyManager::getInstance().carriersCalled = true;
 

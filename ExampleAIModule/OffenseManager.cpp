@@ -56,28 +56,31 @@ void OffenseManager::onFrame(){
 			if (InformationManager::getInstance().calculateArmyStrength(readyFighters)
 				< InformationManager::getInstance().enemyArmyStrength
 				&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())) {
-				
+
 				if (rushOngoing) {
 					setSquadSize(squadSize + 6);
 				}
 				rushOngoing = false;
-				
+
 				for (Unit fighter : fighters) {
 					if (squad.find(fighter) == squad.end()) {
 						squad.insert(fighter);
 					}
 				}
-				Broodwar << "Their army is stronger" << std::endl;
+				if (debugging){
+					Broodwar << "Their army is stronger" << std::endl;
+				}
+
 				readyFighters.move(InformationManager::getInstance().ourBase->getPosition());
 			}
 			else {
 				fightBack(unit);
 			}
 		}
-		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL 
+		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
 			&& (rushOngoing || !getEnemiesInOurRegion().empty())
-			&& (unit->isIdle() 
-			|| (unit->getLastCommand().getType() == UnitCommandTypes::Move && unit->getLastCommand().getTargetPosition() != InformationManager::getInstance().ourBase->getPosition() )
+			&& (unit->isIdle()
+			|| (unit->getLastCommand().getType() == UnitCommandTypes::Move && unit->getLastCommand().getTargetPosition() != InformationManager::getInstance().ourBase->getPosition())
 			|| (unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && !unit->isAttacking()))) {
 
 			searchAndDestroy(unit);
@@ -124,12 +127,19 @@ bool OffenseManager::rush(BWAPI::Unitset attackers) {
 				lastChecked = BWAPI::Broodwar->getFrameCount();
 			}
 			else {
-				Broodwar << "Failed to rush, enemyBase was null " << std::endl;
+				if (debugging){
+					Broodwar << "Failed to rush, enemyBase was null " << std::endl;
+				}
+
 			}
 		}
 	}
 	else {
-		Broodwar << "Failed to rush attackers was empty " << std::endl;
+
+		if (debugging){
+			Broodwar << "Failed to rush attackers was empty " << std::endl;
+		}
+
 	}
 	return true;
 
@@ -205,7 +215,11 @@ bool OffenseManager::getHelp(BWAPI::Unit victim, BWAPI::Unit badGuy) {
 		}
 		else {
 			return false;
-			Broodwar << "Failed to get help, helper was null" << std::endl;
+
+			if (debugging){
+
+				Broodwar << "Failed to get help, helper was null" << std::endl;
+			}
 		}
 	}
 	return false;

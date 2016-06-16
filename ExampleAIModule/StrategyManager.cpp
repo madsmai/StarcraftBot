@@ -5,11 +5,11 @@ using namespace BWAPI;
 int StrategyManager::setInitialStrategy(){
 
 	Race enemyRace = Broodwar->enemy()->getRace();
-	Broodwar << "Enemy race is: " << enemyRace << std::endl;
+	//Broodwar << "Enemy race is: " << enemyRace << std::endl;
 	switch (enemyRace){
 
 	case Races::Enum::Protoss:
-		return aggressiveZealotRush;
+		return earlyDarkTemplar;
 		break;
 
 	case Races::Enum::Zerg:
@@ -17,7 +17,7 @@ int StrategyManager::setInitialStrategy(){
 		break;
 
 	case Races::Enum::Terran:
-		return earlyDarkTemplar;
+		return commonZealotRush;
 		break;
 
 	case Races::Enum::Unknown:
@@ -31,11 +31,11 @@ int StrategyManager::setInitialStrategy(){
 
 void StrategyManager::evaluateStrategies(){
 
-	std::ofstream log;
+	/*std::ofstream log;
 	log.open("bwapi-data//AI/Strategies.txt", std::ios::app);
 	log << "Evaluating: " << getCurrentStrategy() << "\n";
 	log.flush();
-	log.close();
+	log.close();*/
 
 
 	switch (getCurrentStrategy()){

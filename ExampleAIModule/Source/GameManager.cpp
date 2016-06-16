@@ -9,10 +9,13 @@ bool analysis_just_finished;
 
 void GameManager::onStart(){
 	//Enable user input
-	BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
 
-	//Random message
-	BWAPI::Broodwar->sendText("Starting...");
+	if (debugging){
+		BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
+	}
+
+	
+
 	/*
 	For printing out amount of reservedMinerals:
 	int  min = ResourceManager::getInstance().getReservedMinerals();
@@ -27,7 +30,7 @@ void GameManager::onStart(){
 
 	//Call on starts
 	BuildOrderManager::getInstance().onStart();
-	BWAPI::Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;
+	//BWAPI::Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;
 }
 
 void GameManager::onEnd(bool isWinner){
@@ -71,29 +74,29 @@ void GameManager::onEnd(bool isWinner){
 
 
 void GameManager::onFrame(){
+	if (debugging){
+		Broodwar->drawTextScreen(0, 0,
+			"FPS: %d \t APM: %d \n FrameCount: %d \t rushing?: %d",
+			Broodwar->getFPS(), Broodwar->getAPM(), Broodwar->getFrameCount(), OffenseManager::getInstance().rushOngoing);
 
-	Broodwar->drawTextScreen(0, 0,
-		"FPS: %d \t APM: %d \n FrameCount: %d \t rushing?: %d",
-		Broodwar->getFPS(), Broodwar->getAPM(), Broodwar->getFrameCount(), OffenseManager::getInstance().rushOngoing);
+		Broodwar->drawTextScreen(200, 0, "Invis spottet: %d \n" "has detection: %d",
+			InformationManager::getInstance().invisSpottet, InformationManager::getInstance().hasInvisDetection);
 
-	Broodwar->drawTextScreen(200, 0, "Invis spottet: %d \n" "has detection: %d",
-		InformationManager::getInstance().invisSpottet, InformationManager::getInstance().hasInvisDetection);
+		Broodwar->drawTextScreen(300, 100, "Current Strategy: %d \n Next Strategy: %d",
+			StrategyManager::getInstance().getCurrentStrategy(), StrategyManager::getInstance().getNextStrategy());
 
-	Broodwar->drawTextScreen(300, 100, "Current Strategy: %d \n Next Strategy: %d",
-		StrategyManager::getInstance().getCurrentStrategy(), StrategyManager::getInstance().getNextStrategy());
+		Broodwar->drawTextScreen(300, 0, "Squadsize: %d \n squad.size(): %d",
+			OffenseManager::getInstance().getSquadSize(), OffenseManager::getInstance().squad.size());
 
-	Broodwar->drawTextScreen(300, 0, "Squadsize: %d \n squad.size(): %d", 
-		OffenseManager::getInstance().getSquadSize(), OffenseManager::getInstance().squad.size());
-
-	Broodwar->drawTextScreen(0, 100, "Our Army Strength: %d \n Enemy Army Strength: %d",
-		InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters), InformationManager::getInstance().enemyArmyStrength);
-
-
-	if (analyzed) {
+		Broodwar->drawTextScreen(0, 100, "Our Army Strength: %d \n Enemy Army Strength: %d",
+			InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters), InformationManager::getInstance().enemyArmyStrength);
+	}
+	
+	if (analyzed & debugging) {
 		drawTerrainData();
 	}
 	if (analysis_just_finished) {
-		Broodwar << "Finished analyzing map." << std::endl;;
+		//Broodwar << "Finished analyzing map." << std::endl;;
 		analysis_just_finished = false;
 	}
 

@@ -236,7 +236,7 @@ void InformationManager::removeEnemyAttackers(Unit attacker){
 	for (it = enemyAttackers.begin(); it != enemyAttackers.end();) {
 		Unit u = *it;
 		if (u->getID() == attacker->getID()){
-			Broodwar << "unit removed from enemyAttackers list" << std::endl;
+			//Broodwar << "unit removed from enemyAttackers list" << std::endl;
 			enemyAttackers.erase(it);
 		}
 		else{

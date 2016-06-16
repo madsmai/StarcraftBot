@@ -2,8 +2,6 @@
 
 AggressiveZealotRush::AggressiveZealotRush() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(3);
 	setStrategyVariables();
 
@@ -24,7 +22,7 @@ AggressiveZealotRush::AggressiveZealotRush() {
 
 void AggressiveZealotRush::evaluateStrategy(){
 
-	Broodwar << "Evaluating aggressive zealot rush" << std::endl;
+	//Broodwar << "Evaluating aggressive zealot rush" << std::endl;
 
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){
@@ -40,7 +38,7 @@ void AggressiveZealotRush::evaluateStrategy(){
 		}
 		else {
 			if (rand() % 2 > 0.5){
-				Broodwar << "going goons from aggressive" << std::endl;
+				//Broodwar << "going goons from aggressive" << std::endl;
 				StrategyManager::getInstance().setNextStrategy(StrategyManager::addGoons);
 			}
 			else {

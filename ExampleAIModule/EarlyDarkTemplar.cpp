@@ -3,8 +3,6 @@
 
 EarlyDarkTemplar::EarlyDarkTemplar() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(1);
 	setStrategyVariables();
 
@@ -24,7 +22,7 @@ EarlyDarkTemplar::EarlyDarkTemplar() {
 
 void EarlyDarkTemplar::evaluateStrategy(){
 
-	Broodwar << "Evaluating early dark templar" << std::endl;
+	//Broodwar << "Evaluating early dark templar" << std::endl;
 
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){

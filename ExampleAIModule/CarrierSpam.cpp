@@ -2,8 +2,6 @@
 
 CarrierSpam::CarrierSpam() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(8);
 	setStrategyVariables();
 
@@ -18,7 +16,7 @@ CarrierSpam::CarrierSpam() {
 
 void CarrierSpam::evaluateStrategy(){
 
-	Broodwar << "Evaluating carrier spam strategy " << std::endl;
+	//Broodwar << "Evaluating carrier spam strategy " << std::endl;
 
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){

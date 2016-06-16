@@ -3,8 +3,6 @@
 
 TransitionMidGame::TransitionMidGame() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(6);
 	setStrategyVariables();
 
@@ -67,7 +65,7 @@ TransitionMidGame::TransitionMidGame() {
 
 void TransitionMidGame::evaluateStrategy(){
 
-	Broodwar << "Evaluating mid game strategy" << std::endl;
+	//Broodwar << "Evaluating mid game strategy" << std::endl;
 
 	StrategyManager::getInstance().transistionMidCalled = true;
 
