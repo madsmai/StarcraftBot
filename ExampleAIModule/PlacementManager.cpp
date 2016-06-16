@@ -11,7 +11,7 @@ void PlacementManager::onUnitDestroy(BWAPI::Unit unit){
 	if (!(type.isBuilding() && unit->getPlayer() == Broodwar->self())){
 		return;
 	}
-	TilePosition pos = TilePosition(unit->getPosition());
+	TilePosition pos = unit->getTilePosition();
 	releaseSpace(type, pos);
 }
 
@@ -26,8 +26,8 @@ void PlacementManager::reserveSpace(UnitType type, TilePosition pos){
 
 void PlacementManager::releaseSpace(UnitType type, TilePosition pos){
 	//Remove all the points that are in the area to the reservedPlaces table
-	for (int x = pos.x; x < (type.tileWidth() + pos.x) && x < mapWidth; x++){
-		for (int y = pos.y; y < (type.tileHeight() + pos.y) && y < mapHeight; y++){
+	for (int x = pos.x; x < (pos.x + type.tileWidth()) && x < mapWidth; x++){
+		for (int y = pos.y; y < (pos.y + type.tileHeight()) && y < mapHeight; y++){
 			reservedPlaces[x][y] = false;
 		}
 	}
@@ -60,34 +60,102 @@ bool PlacementManager::isReserved(UnitType type, TilePosition pos){
 	return false;
 }
 
-TilePosition PlacementManager::findNearest(TilePosition position, UnitType type){
-	std::vector<BWAPI::Unit> buildings = BuildingManager::getInstance().getBuildings();
+int PlacementManager::findNearest(TilePosition position, UnitType anchor, UnitType finding){
+	Unitset buildings = Broodwar->self()->getUnits();
+	std::vector<TilePosition> anchorPoints;
 	int minDist = INT_MAX;
-	TilePosition returnPos;
-	for (unsigned int i = 0; i < buildings.size(); i++){
-		if (type == buildings.at(i)->getType()){
-			if (minDist > position.getApproxDistance(buildings.at(i)->getTilePosition())){
-				minDist = position.getApproxDistance(buildings.at(i)->getTilePosition());
-				returnPos = buildings.at(i)->getTilePosition();
+
+	//find the 4 corners of the anchor building
+	anchorPoints.push_back(position);
+	anchorPoints.push_back(TilePosition(position.x + anchor.tileWidth(), position.y));
+	anchorPoints.push_back(TilePosition(position.x, position.y + anchor.tileHeight()));
+	anchorPoints.push_back(TilePosition(position.x + anchor.tileWidth(), position.y + anchor.tileHeight()));
+
+	//Loop through all our buildings
+	for (Unit unit : buildings){
+		UnitType type = unit->getType();
+		if (type.isBuilding() && type == finding){
+			TilePosition building = unit->getTilePosition();
+			std::vector<TilePosition> buildingPoints;
+
+			//find the 4 corners of the other building
+			buildingPoints.push_back(building);
+			buildingPoints.push_back(TilePosition(building.x + type.tileWidth(), building.y));
+			buildingPoints.push_back(TilePosition(building.x, building.y + type.tileHeight()));
+			buildingPoints.push_back(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight()));
+
+			//Check corners against each other
+			for (unsigned int j = 0; j < anchorPoints.size(); j++){
+				for (unsigned int k = 0; k < buildingPoints.size(); k++){
+					//If the distance between two corners are smaller than current smallest we use that position
+					if (minDist > anchorPoints[j].getApproxDistance(buildingPoints[k])){
+						minDist = anchorPoints[j].getApproxDistance(buildingPoints[k]);
+					}
+				}
 			}
+
+			//No reason to check anymore
+			if (minDist == 0){
+				break;
+			}
+
+			//DEBUGGING//
+			//Broodwar->registerEvent([building, type](Game*)
+			//{Broodwar->drawBoxMap(Position(building), Position(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight())), Colors::Yellow, false); }
+			//, nullptr, type.buildTime() + 10);
 		}
 	}
 
-	return returnPos;
+	return minDist;
 }
 
-TilePosition PlacementManager::findNearest(TilePosition position){
-	std::vector<BWAPI::Unit> buildings = BuildingManager::getInstance().getBuildings();
+int PlacementManager::findNearest(TilePosition position, UnitType anchor){
+	Unitset buildings = Broodwar->self()->getUnits();
+	std::vector<TilePosition> anchorPoints;
 	int minDist = INT_MAX;
-	TilePosition returnPos;
-	for (unsigned int i = 0; i < buildings.size(); i++){
-		if (minDist > position.getApproxDistance(buildings.at(i)->getTilePosition())){
-			minDist = position.getApproxDistance(buildings.at(i)->getTilePosition());
-			returnPos = buildings.at(i)->getTilePosition();
+
+	//find the 4 corners of the anchor building
+	anchorPoints.push_back(position);
+	anchorPoints.push_back(TilePosition(position.x + anchor.tileWidth(), position.y));
+	anchorPoints.push_back(TilePosition(position.x, position.y + anchor.tileHeight()));
+	anchorPoints.push_back(TilePosition(position.x + anchor.tileWidth(), position.y + anchor.tileHeight()));
+
+	//Loop through all our buildings
+	for (Unit unit : buildings){
+		UnitType type = unit->getType();
+		if (type.isBuilding()){
+			TilePosition building = unit->getTilePosition();
+			std::vector<TilePosition> buildingPoints;
+
+			//find the 4 corners of the other building
+			buildingPoints.push_back(building);
+			buildingPoints.push_back(TilePosition(building.x + type.tileWidth(), building.y));
+			buildingPoints.push_back(TilePosition(building.x, building.y + type.tileHeight()));
+			buildingPoints.push_back(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight()));
+
+			//Check corners against each other
+			for (unsigned int j = 0; j < anchorPoints.size(); j++){
+				for (unsigned int k = 0; k < buildingPoints.size(); k++){
+					//If the distance between two corners are smaller than current smallest we use that position
+					if (minDist > anchorPoints[j].getApproxDistance(buildingPoints[k])){
+						minDist = anchorPoints[j].getApproxDistance(buildingPoints[k]);
+					}
+				}
+			}
+
+			//No reason to check anymore
+			if (minDist == 0){
+				break;
+			}
+
+			//DEBUGGING//
+			//Broodwar->registerEvent([building, type](Game*)
+			//{Broodwar->drawBoxMap(Position(building), Position(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight())), Colors::Yellow, false); }
+			//, nullptr, type.buildTime() + 10);
 		}
 	}
 
-	return returnPos;
+	return minDist;
 }
 
 TilePosition PlacementManager::pointBetween(TilePosition pos1, TilePosition pos2, int towardsTile2){
@@ -111,29 +179,28 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 	TilePosition midWay = pointBetween(ourBase, chokePoint, 2);
 	TilePosition cannonPos = pointBetween(ourBase, chokePoint, 5);
 	
-	
 	//DEBUGGING
 	//Broodwar->registerEvent([midWay, type](Game*)
 	//{Broodwar->drawTextMap(Position(TilePosition(midWay.x, midWay.y)), "MidWayPoint"); 
 	//Broodwar->drawCircleMap(Position(TilePosition(midWay.x, midWay.y)), 16, Colors::Yellow, false); }
 	//, nullptr, type.buildTime() + 1000);
-
+	//
 	//Broodwar->registerEvent([cannonPos, type](Game*)
 	//{Broodwar->drawTextMap(Position(TilePosition(cannonPos.x, cannonPos.y)), "9/10 Point");
 	//Broodwar->drawCircleMap(Position(TilePosition(cannonPos.x, cannonPos.y)), 16, Colors::Yellow, false); }
 	//, nullptr, type.buildTime() + 1000);
-
-	/*TilePosition nearest = findNearest(pos, UnitTypes::Protoss_Pylon);
-	Broodwar->registerEvent([nearest, type](Game*)
-	{Broodwar->drawTextMap(Position(TilePosition(nearest.x, nearest.y)), "Closest pylon");
-	Broodwar->drawCircleMap(Position(TilePosition(nearest.x, nearest.y)), 16, Colors::Yellow, false); }
-	, nullptr, type.buildTime() + 1000);*/
+	//
+	//TilePosition nearest = findNearest(pos, UnitTypes::Protoss_Pylon);
+	//Broodwar->registerEvent([nearest, type](Game*)
+	//{Broodwar->drawTextMap(Position(TilePosition(nearest.x, nearest.y)), "Closest pylon");
+	//Broodwar->drawCircleMap(Position(TilePosition(nearest.x, nearest.y)), 16, Colors::Yellow, false); }
+	//, nullptr, type.buildTime() + 1000);
 	
 	//Make a queue of possible places to put a building, push midWay onto it
 	//If it's a cannon we want to place it elsewhere
 	std::queue<TilePosition> tileQueue;
 	if (type == UnitTypes::Protoss_Photon_Cannon){
-		tileQueue.push(cannonPos); //(9/10)
+		tileQueue.push(cannonPos); //(4/5)
 	}
 	else{
 		tileQueue.push(midWay);
@@ -152,13 +219,11 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 		checkedTiles.insert(returnPos);
 		tileQueue.pop();
 
-
 		//DEBUGGING//
-		Broodwar->registerEvent([returnPos, type](Game*)
-		{Broodwar->drawBoxMap(Position(TilePosition(returnPos.x, returnPos.y)), 
-			Position(TilePosition(returnPos.x+1, returnPos.y+1)), Colors::Red, false); }
-		, nullptr, type.buildTime());
-
+		//Broodwar->registerEvent([returnPos, type](Game*)
+		//{Broodwar->drawBoxMap(Position(TilePosition(returnPos.x, returnPos.y)), 
+		//	Position(TilePosition(returnPos.x+1, returnPos.y+1)), Colors::Red, false); }
+		//, nullptr, type.buildTime());
 
 		//If the position is not reserved, is valid and in the right region, and the region doesn't have any units on it
 		if (!isReserved(type, returnPos)
@@ -169,64 +234,67 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 				Position(TilePosition(returnPos.x + type.tileWidth(), returnPos.y + type.tileHeight()))).empty()){
 
 			//For pylons and photon cannons there are more checks
-			if (type == UnitTypes::Protoss_Pylon 
-				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) > 5){
-				return returnPos;
+			if (type == UnitTypes::Protoss_Pylon){
+
+				if (findNearest(returnPos, type, type) > 3){ //Space between pylons
+					return returnPos;
+				}
 			}
-			else if (type == UnitTypes::Protoss_Photon_Cannon 
-				&& returnPos.getApproxDistance(chokePoint) < chokePoint.getApproxDistance(ourBase)
-				&& returnPos.getApproxDistance(findNearest(returnPos)) < 5 //Maybe change to 7 (thier range)
-				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Photon_Cannon)) > 5
-				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) < 5){ //Maybe also change to 7
-				return returnPos;
+			else if (type == UnitTypes::Protoss_Photon_Cannon){
+				if (returnPos.getApproxDistance(chokePoint) < chokePoint.getApproxDistance(ourBase)
+					&& findNearest(returnPos, type) < 6 //Maybe change to 7 (thier range)
+					&& findNearest(returnPos, type, type) > 1 //Space between cannons
+					&& findNearest(returnPos, type, UnitTypes::Protoss_Pylon) < 5){ //Maybe also change to 7){
+					return returnPos;
+				}
 			}
-			else if (type == UnitTypes::Protoss_Gateway && returnPos.getApproxDistance(findNearest(returnPos)) > 1){
-				return returnPos;
+			else if (type == UnitTypes::Protoss_Gateway){
+				if (findNearest(returnPos, type) > 0
+					&& findNearest(returnPos, type, UnitTypes::Protoss_Pylon) < 7){
+					return returnPos;
+				}
 			}
-			else if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Photon_Cannon && type != UnitTypes::Protoss_Gateway
-				&& returnPos.getApproxDistance(findNearest(returnPos, UnitTypes::Protoss_Pylon)) < 7){
+			else if (findNearest(returnPos, type, UnitTypes::Protoss_Pylon) < 7){
 				return returnPos;
 			}
 		}
 		//Otherwise add all the nearby positions if we haven't already checked them (or are about to)
-		else{
-			TilePosition up = TilePosition(returnPos.x, returnPos.y - 1);
-			TilePosition down = TilePosition(returnPos.x, returnPos.y + 1);
-			TilePosition left = TilePosition(returnPos.x - 1, returnPos.y);
-			TilePosition right = TilePosition(returnPos.x + 1, returnPos.y);
+		TilePosition up = TilePosition(returnPos.x, returnPos.y - 1);
+		TilePosition down = TilePosition(returnPos.x, returnPos.y + 1);
+		TilePosition left = TilePosition(returnPos.x - 1, returnPos.y);
+		TilePosition right = TilePosition(returnPos.x + 1, returnPos.y);
 
-			//Add to queue if position is valid and in right region
-			if (checkedTiles.find(up) == checkedTiles.end() && up.isValid() 
-				&& (BWTA::getRegion(up) == baseRegion || BWTA::getRegion(up) == initRegion)){
-				tileQueue.push(up);
-				checkedTiles.insert(up);
-			}
-			if (checkedTiles.find(down) == checkedTiles.end() && up.isValid() 
-				&& (BWTA::getRegion(down) == baseRegion || BWTA::getRegion(down) == initRegion)){
-				tileQueue.push(down);
-				checkedTiles.insert(down);
-			}
-			if (checkedTiles.find(left) == checkedTiles.end() && up.isValid() 
-				&& (BWTA::getRegion(left) == baseRegion || BWTA::getRegion(left) == initRegion)){
-				tileQueue.push(left);
-				checkedTiles.insert(left);
-			}
-			if (checkedTiles.find(right) == checkedTiles.end() && up.isValid() 
-				&& (BWTA::getRegion(right) == baseRegion || BWTA::getRegion(right) == initRegion)){
-				tileQueue.push(right);
-				checkedTiles.insert(right);
-			}
+		//Add to queue if position is valid and in right region
+		if (checkedTiles.find(up) == checkedTiles.end() && up.isValid() 
+			&& (BWTA::getRegion(up) == baseRegion || BWTA::getRegion(up) == initRegion)){
+			tileQueue.push(up);
+			checkedTiles.insert(up);
+		}
+		if (checkedTiles.find(down) == checkedTiles.end() && up.isValid() 
+			&& (BWTA::getRegion(down) == baseRegion || BWTA::getRegion(down) == initRegion)){
+			tileQueue.push(down);
+			checkedTiles.insert(down);
+		}
+		if (checkedTiles.find(left) == checkedTiles.end() && up.isValid() 
+			&& (BWTA::getRegion(left) == baseRegion || BWTA::getRegion(left) == initRegion)){
+			tileQueue.push(left);
+			checkedTiles.insert(left);
+		}
+		if (checkedTiles.find(right) == checkedTiles.end() && up.isValid() 
+			&& (BWTA::getRegion(right) == baseRegion || BWTA::getRegion(right) == initRegion)){
+			tileQueue.push(right);
+			checkedTiles.insert(right);
 		}
 	}
 	
 
 	TilePosition backupPos = Broodwar->getBuildLocation(type, pos);
 	//DEBUGGING//
-	Broodwar->registerEvent([backupPos, type](Game*)
+	Broodwar->registerEvent([backupPos, type, midWay](Game*)
 	{Broodwar->drawBoxMap(Position(TilePosition(backupPos.x, backupPos.y)),
 	Position(TilePosition(backupPos.x + type.tileWidth(), backupPos.y + type.tileHeight())), Colors::Purple, false); 
-	Broodwar->drawTextMap(Position(TilePosition(backupPos.x, backupPos.y)), "BWAPI made"); }
-	, nullptr, type.buildTime() + 1000);
+	Broodwar->drawTextMap(Position(backupPos), "BWAPI made"); }
+	, nullptr, type.buildTime());
 
 	//It fails if it gets to this line so we just revert to 
 	return backupPos;

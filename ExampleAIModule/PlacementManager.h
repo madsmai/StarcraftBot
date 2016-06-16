@@ -6,7 +6,6 @@
 #include <BWTA.h>
 #include <assert.h>
 #include <iostream>
-#include "BuildingManager.h"
 
 using namespace BWAPI;
 
@@ -34,8 +33,8 @@ private:
 	bool isReserved(UnitType, TilePosition);
 
 	//Helper functions
-	TilePosition findNearest(TilePosition, UnitType);
-	TilePosition findNearest(TilePosition);
+	int findNearest(TilePosition, UnitType, UnitType);
+	int findNearest(TilePosition, UnitType);
 	TilePosition pointBetween(TilePosition, TilePosition, int);
 
 	//Map the size of the playing field, everything starts off being unreseverd
