@@ -114,7 +114,8 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 
 		if (unit->getType().isWorker()
 			&& unit->getPlayer()->isEnemy(Broodwar->self())
-			&& !retreating){
+			&& !retreating
+			&& doneScouting){
 
 			BWAPI::Unit scout = activeScouts.front();
 			UnitCommand currentCommand = scout->getLastCommand();
