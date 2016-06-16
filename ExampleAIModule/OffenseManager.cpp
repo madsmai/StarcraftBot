@@ -56,7 +56,7 @@ void OffenseManager::onFrame(){
 			if (InformationManager::getInstance().calculateArmyStrength(readyFighters)
 				< InformationManager::getInstance().enemyArmyStrength
 				&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())) {
-
+				
 				if (rushOngoing) {
 					setSquadSize(squadSize + 6);
 				}

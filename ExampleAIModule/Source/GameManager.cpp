@@ -89,7 +89,6 @@ void GameManager::onFrame(){
 		InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters), InformationManager::getInstance().enemyArmyStrength);
 
 
-
 	if (analyzed) {
 		drawTerrainData();
 	}
@@ -156,12 +155,6 @@ void GameManager::onSendText(std::string text){
 	else if (text == "Army Strength enemy") {
 
 		Broodwar << InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters) << std::endl;
-	}
-
-	else if (text == "invis"){
-	
-		InformationManager::getInstance().invisSpottet = true;
-
 	}
 
 	else if (text == "Army Strength self") {

@@ -28,7 +28,8 @@ ObserverTech::ObserverTech() {
 	}
 	else {
 		// core, robotics and observatory missing
-		buildOrder = { cybercore, zealot, zealot,
+		buildOrder = { assimilator, cybercore, zealot, zealot,
+			gasworkerRequest, gasworkerRequest,
 			robotics, zealot, dragoon,
 			observatory, zealot, dragoon, observer,
 			evaluateStrategyRequest };

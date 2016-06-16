@@ -10,6 +10,8 @@ TODO:
 using namespace BWAPI;
 
 void ScoutManager::onFrame(){
+
+
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!inactiveScouts.empty()){
 		Broodwar << "inactive scouts was not empty" << std::endl;
@@ -107,6 +109,7 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 				u->move(unit->getPosition());
 			}
 			Broodwar->sendText("Done scouting, found mainbase");
+			doneScouting = true;
 		}
 
 		if (unit->getType().isWorker()
@@ -185,6 +188,26 @@ void ScoutManager::removeScout(BWAPI::Unit scout){
 			it++;
 		}
 	}
+}
+
+
+bool ScoutManager::checkAgain(){
+	static int lastChecked = 0;
+	if (lastChecked + 600 < BWAPI::Broodwar->getFrameCount()
+		&& scoutSent && activeScouts.empty() && inactiveScouts.empty()
+		&& !doneScouting){
+
+		// a scout was sent but never got to the enemy base. Make a new request.
+		lastChecked = Broodwar->getFrameCount();
+		
+		// sending a new scout!
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert
+			(BuildOrderManager::getInstance().getNewFixedOrderQueue().begin(), BuildOrderType::requests::scoutRequest);
+		return true;
+	}
+	return false;
+
+
 }
 
 ScoutManager& ScoutManager::getInstance(){ //Return ref to ScoutManager object
