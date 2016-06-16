@@ -29,23 +29,16 @@ void AggressiveZealotRush::evaluateStrategy(){
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
-		if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
-			>= InformationManager::getInstance().enemyArmyStrength
-			|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
-			// convert to midgame
-			StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
+		if (rand() % 2 > 0.5){
+			//Broodwar << "going goons from aggressive" << std::endl;
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::addGoons);
 		}
 		else {
-			if (rand() % 2 > 0.5){
-				//Broodwar << "going goons from aggressive" << std::endl;
-				StrategyManager::getInstance().setNextStrategy(StrategyManager::addGoons);
-			}
-			else {
-				// continue with the zealot rush
-				StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
-			}
+			// continue with the zealot rush
+			StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
 		}
+
 	}
 
 }

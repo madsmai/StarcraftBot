@@ -38,7 +38,7 @@ private:
 	UnitType dragoon = UnitTypes::Protoss_Dragoon;
 	UnitType citadel = UnitTypes::Protoss_Citadel_of_Adun;
 	UnitType archives = UnitTypes::Protoss_Templar_Archives;
-	UnitType dtemplar = UnitTypes::Protoss_Dark_Templar;
+	UnitType DT = UnitTypes::Protoss_Dark_Templar;
 	UnitType cannon = UnitTypes::Protoss_Photon_Cannon;
 	int scoutRequest = BuildOrderType::requests::scoutRequest;
 	int gasworkerRequest = BuildOrderType::requests::gasworkerRequest;

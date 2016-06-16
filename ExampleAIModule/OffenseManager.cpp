@@ -58,13 +58,19 @@ void OffenseManager::onFrame(){
 				&& InformationManager::getInstance().ourBase->getRegion() != BWTA::getRegion(unit->getTilePosition())) {
 
 				if (rushOngoing) {
-					setSquadSize(squadSize + 6);
+					if (squadSize >= 18){}
+					else if (squadSize >= 12){
+						squadSize += 3;
+					}
+					else {
+						setSquadSize(squadSize + 6);
+					}
 				}
 				rushOngoing = false;
 
 				for (Unit fighter : fighters) {
-					if (squad.find(fighter) == squad.end()) {
-						squad.insert(fighter);
+					if (squad.find(unit) == squad.end()) {
+						squad.insert(unit);
 					}
 				}
 				if (debugging){
@@ -383,7 +389,6 @@ void OffenseManager::fillReaverOrCarrier(Unit unit){
 bool OffenseManager::properTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
 
 	//Folded out for debug
-
 	//if (target != NULL) {
 	//	if (attacker->getTilePosition() != TilePositions::Unknown) {
 	//		if (target->getTilePosition() != TilePositions::Unknown) {

@@ -3,16 +3,18 @@
 
 EarlyDarkTemplar::EarlyDarkTemplar() {
 
-	setSquadSize(1);
+	setSquadSize(4);
 	setStrategyVariables();
 
-	buildOrder = { // base build
-		probe, gateway, probe, scoutRequest, assimilator, probe,
-		cybercore, gasworkerRequest, gasworkerRequest, probe, forge,
-		citadel, probe, gasworkerRequest, cannon, cannon, archives,
-		gateway, dtemplar, dtemplar, pylon,
-		dtemplar, probe, probe, cannon,
+	buildOrder = {
+		probe, gateway, probe, scoutRequest, assimilator, probe, //11/17
+		cybercore, zealot, gasworkerRequest, gasworkerRequest, probe, // 14/17
+		forge, zealot, pylon, cannon, zealot, // 18/25
+		citadel, probe, gasworkerRequest, cannon, archives,
+		gateway, DT, pylon, DT,
+		probe, DT, probe, cannon, DT, pylon, DT,
 		evaluateStrategyRequest };
+
 
 	for (BuildOrderType order : buildOrder){
 		BuildOrderManager::getInstance().getNewFixedOrderQueue().push_back(order);
