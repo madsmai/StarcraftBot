@@ -68,7 +68,7 @@ void OffenseManager::onFrame(){
 					}
 				}
 				Broodwar << "Their army is stronger" << std::endl;
-				fighters.move(InformationManager::getInstance().ourBase->getPosition());
+				readyFighters.move(InformationManager::getInstance().ourBase->getPosition());
 			}
 			else {
 				fightBack(unit);

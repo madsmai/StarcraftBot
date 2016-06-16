@@ -35,6 +35,7 @@ public:
 
 	int calculateArmyStrength(BWAPI::Unitset);
 	int calculateUnitStrength(BWAPI::UnitType);
+	int calculateEnemyArmyStrength();
 
 	int enemyArmyStrength = 0;
 	std::vector<int> seenEnemyIds;

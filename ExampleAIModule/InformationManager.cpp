@@ -22,16 +22,8 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 
 		else if ((unit->getType().canAttack() || unit->getType().isSpellcaster()) && unit->getType().canMove()){
 			addEnemyAttackers(unit);
-			std::vector<int>::iterator it;
-			bool seenBefore = false;
-			for (it = seenEnemyIds.begin(); it != seenEnemyIds.end(); it++) {
-				int x = *it;
-				if (unit->getID() == x) {
-					seenBefore = true;
-				}
-			}
-			if (!seenBefore) {
-				enemyArmyStrength += calculateUnitStrength(unit->getType());
+			if (enemyArmyStrength < calculateEnemyArmyStrength()) {
+				enemyArmyStrength = calculateEnemyArmyStrength();
 			}
 		}
 		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar){
@@ -85,17 +77,7 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 
 		else if ((unit->getType().canAttack() || unit->getType().isSpellcaster()) && unit->getType().canMove()){
 			removeEnemyAttackers(unit);
-			std::vector<int>::iterator it;
-			bool seenBefore = false;
-			for (it = seenEnemyIds.begin(); it != seenEnemyIds.end(); it++) {
-				int x = *it;
-				if (unit->getID() == x) {
-					seenBefore = true;
-				}
-			}
-			if (!seenBefore) {
-				enemyArmyStrength -= calculateUnitStrength(unit->getType());
-			}
+			enemyArmyStrength -= calculateUnitStrength(unit->getType());
 		}
 
 		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar){
@@ -492,4 +474,15 @@ int InformationManager::calculateUnitStrength(BWAPI::UnitType troop) {
 	strength = effectiveHp * damage;
 
 	return strength;
+}
+int InformationManager::calculateEnemyArmyStrength() {
+	std::vector<BWAPI::Unit>::iterator it;
+	int sum = 0;
+	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->isVisible()) {
+			sum += calculateUnitStrength(u->getType());
+		}
+	}
+	return sum;
 }
