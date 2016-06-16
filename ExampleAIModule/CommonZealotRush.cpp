@@ -3,9 +3,7 @@
 
 CommonZealotRush::CommonZealotRush(){
 
-	Broodwar << name << std::endl;
-
-	setSquadSize(5);
+	setSquadSize(4);
 	setStrategyVariables();
 
 	buildOrder = { // base Build order
@@ -26,7 +24,7 @@ CommonZealotRush::CommonZealotRush(){
 
 void CommonZealotRush::evaluateStrategy(){
 
-	Broodwar << "Evaluating common zealot rush" << std::endl;
+	//Broodwar << "Evaluating common zealot rush" << std::endl;
 
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){

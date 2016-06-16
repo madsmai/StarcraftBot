@@ -2,8 +2,6 @@
 
 AddGoons::AddGoons() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(6);
 	setStrategyVariables();
 
@@ -31,7 +29,7 @@ AddGoons::AddGoons() {
 
 void AddGoons::evaluateStrategy(){
 
-	Broodwar << "Evaluating AddGoon strategy" << std::endl;
+	//Broodwar << "Evaluating AddGoon strategy" << std::endl;
 
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){

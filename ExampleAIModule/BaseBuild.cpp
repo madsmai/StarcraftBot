@@ -3,8 +3,6 @@
 
 BaseBuild::BaseBuild() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(999);
 	setStrategyVariables();
 

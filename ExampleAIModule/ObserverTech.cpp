@@ -2,8 +2,6 @@
 
 ObserverTech::ObserverTech() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(6);
 	setStrategyVariables();
 
@@ -43,7 +41,7 @@ ObserverTech::ObserverTech() {
 
 void ObserverTech::evaluateStrategy(){
 
-	Broodwar << "Evaluating observer teching" << std::endl;
+	//Broodwar << "Evaluating observer teching" << std::endl;
 	InformationManager::getInstance().hasInvisDetection = true;
 	StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
 

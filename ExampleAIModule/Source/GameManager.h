@@ -17,6 +17,9 @@ DWORD WINAPI AnalyzeThread();
 class GameManager : public BWAPI::AIModule
 {
 public:
+
+	bool debugging = false;
+
 	virtual void onStart();
 	virtual void onFrame();
 	virtual void onUnitComplete(BWAPI::Unit unit);

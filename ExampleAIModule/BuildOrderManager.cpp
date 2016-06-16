@@ -17,7 +17,7 @@ void BuildOrderManager::onFrame(){
 
 	if (StrategyManager::getInstance().getCurrentStrategy() == StrategyManager::none){
 
-		Broodwar << "Setting a new current strategy" << std::endl;
+		//Broodwar << "Setting a new current strategy" << std::endl;
 
 		StrategyManager::getInstance().setCurrentStrategy(StrategyManager::getInstance().getNextStrategy());
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::none);
@@ -65,7 +65,7 @@ void BuildOrderManager::onFrame(){
 			break;
 
 		case StrategyManager::none:
-			Broodwar << "No strategy is set" << std::endl;
+			TransitionMidGame();
 			break;
 
 		}

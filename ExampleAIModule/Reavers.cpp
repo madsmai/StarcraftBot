@@ -2,8 +2,6 @@
 
 Reavers::Reavers() {
 
-	Broodwar << name << std::endl;
-
 	setSquadSize(6);
 	setStrategyVariables();
 
@@ -20,7 +18,7 @@ Reavers::Reavers() {
 
 void Reavers::evaluateStrategy(){
 
-	Broodwar << "Evaluating reaver strategy" << std::endl;
+	//Broodwar << "Evaluating reaver strategy" << std::endl;
 	
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){
