@@ -341,9 +341,11 @@ int InformationManager::calculateArmyStrength(BWAPI::Unitset fighters) {
 			if (!observatory && troop->getType() == UnitTypes::Protoss_Dark_Templar) {
 				effectiveHp = effectiveHp * 100;
 			}
+			if (troop->getType() == UnitTypes::Protoss_Carrier) {
+				damage = troop->getInterceptorCount() * troop->getPlayer()->damage(UnitTypes::Protoss_Interceptor.groundWeapon());
+			}
 
 			strength = effectiveHp * damage;
-
 			armyStrength = armyStrength + strength;
 		}
 	} return armyStrength;

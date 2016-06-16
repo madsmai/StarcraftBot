@@ -36,7 +36,7 @@ void OffenseManager::onUnitComplete(Unit unit){
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
 		}
 		else {
-			unit->patrol(InformationManager::getInstance().ourBase->getPosition());
+			unit->move(InformationManager::getInstance().ourBase->getPosition());
 			squad.insert(unit);
 		}
 	}
@@ -229,37 +229,51 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 	//Called when our fighters are idle in the enemy base
 	//Finds units to kill and kills them
 	Unit closest;
-	closest = attacker->getClosestUnit((Filter::CanAttack || Filter::IsSpellcaster) && Filter::CanMove && Filter::IsEnemy, 1240);
+	closest = attacker->getClosestUnit((Filter::CanAttack || Filter::IsSpellcaster) && Filter::CanMove && Filter::IsEnemy, 2240);
 	if (properTarget(closest, attacker)) {
 		smartAttackUnit(attacker, closest);
 		FixWrongPriority(closest);
 		return;
 	}
-	closest = attacker->getClosestUnit(Filter::IsBuilding && (Filter::CanAttack || Filter::GetType == UnitTypes::Terran_Bunker) && Filter::IsEnemy, 1240);
+	closest = attacker->getClosestUnit(Filter::IsBuilding && (Filter::CanAttack || Filter::GetType == UnitTypes::Terran_Bunker) && Filter::IsEnemy, 2240);
 	if (properTarget(closest, attacker)) {
 		smartAttackUnit(attacker, closest);
 		FixWrongPriority(closest);
 		return;
 	}
-	closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 1240);
+	closest = attacker->getClosestUnit(Filter::IsWorker && Filter::IsEnemy, 2240);
 	if (properTarget(closest, attacker)) {
 		smartAttackUnit(attacker, closest);
 		FixWrongPriority(closest);
 		return;
 	}
-	closest = attacker->getClosestUnit(Filter::CanProduce && Filter::IsBuilding && !Filter::IsResourceDepot && Filter::IsEnemy, 1240);
+	closest = attacker->getClosestUnit(Filter::CanProduce && Filter::IsBuilding && !Filter::IsResourceDepot && Filter::IsEnemy, 2240);
 	if (properTarget(closest, attacker)) {
 		smartAttackUnit(attacker, closest);
 		FixWrongPriority(closest);
 		return;
 	}
-	closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible, 1240);
+	closest = attacker->getClosestUnit(Filter::IsBuilding && !Filter::CanAttack && Filter::IsEnemy && Filter::IsVisible, 2240);
 	if (properTarget(closest, attacker)) {
 		smartAttackUnit(attacker, closest);
 		FixWrongPriority(closest);
 		return;
 	}
-
+	if (!InformationManager::getInstance().enemyAttackers.empty()) {
+		smartAttackUnit(attacker, InformationManager::getInstance().enemyAttackers.front());
+	}
+	else if (!InformationManager::getInstance().enemyTowers.empty()) {
+		smartAttackUnit(attacker, InformationManager::getInstance().enemyTowers.front());
+	}
+	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
+		smartAttackUnit(attacker, InformationManager::getInstance().enemyWorkers.front());
+	}
+	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
+		smartAttackUnit(attacker, InformationManager::getInstance().enemyBarracks.front());
+	}
+	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
+		smartAttackUnit(attacker, InformationManager::getInstance().enemyPassiveBuildings.front());
+	}
 
 }
 
@@ -294,8 +308,6 @@ int OffenseManager::calculatePriority(Unit enemy, Unit ourUnit) {
 			else {
 				return 100;
 			}
-
-
 			return priority + 100;
 		}
 		else if (enemy->getType().isBuilding() && (enemy->getType().canAttack() || enemy->getType() == UnitTypes::Terran_Bunker)) {
@@ -373,12 +385,12 @@ bool OffenseManager::properTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
 	//Folded out for debug
 
 	//if (target != NULL) {
-	//	if (attacker != NULL) {
-	//		if (BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())) {
-	//			if (attacker->hasPath(target)) {
-	//				if (target->exists()) {
+	//	if (attacker->getTilePosition() != TilePositions::Unknown) {
+	//		if (target->getTilePosition() != TilePositions::Unknown) {
+	//			if (BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition())) {
+	//				if (attacker->hasPath(target)) {
 	//					if (target->getPosition().isValid()) {
-	//						return true;
+							return true;
 	//					}
 	//				}
 	//			}
@@ -387,9 +399,9 @@ bool OffenseManager::properTarget(BWAPI::Unit target, BWAPI::Unit attacker) {
 	//}
 	//return false;
 
-	return (target != NULL && attacker != NULL
-		&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition()) && attacker->hasPath(target)
-		&& target->exists() && target->getPosition().isValid());
+	//return (target != NULL && attacker != NULL
+	//	&& BWTA::isConnected(attacker->getTilePosition(), target->getTilePosition()) && attacker->hasPath(target)
+	//	&& target->exists() && target->getPosition().isValid());
 }
 
 void OffenseManager::FixWrongPriority(BWAPI::Unit closest) {
@@ -488,17 +500,28 @@ void OffenseManager::explore(Unit explorer) {
 
 			std::vector<Position> edgeOfBase = BWTA::getRegion(explorer->getTilePosition())->getPolygon();
 
+			std::vector<Position>::iterator exploredPositions;
+			bool foundPosition = false;
+
 			if (BWTA::getRegion(explorer->getTilePosition()) == InformationManager::getInstance().enemyBase->getRegion()
 				|| checkedMainBase) {
 				checkedMainBase = true;
+				for (exploredPositions = edgeOfBase.begin(); exploredPositions != edgeOfBase.end(); exploredPositions++) {
+					Position p = *exploredPositions;
+					if (!Broodwar->isVisible(TilePosition(p))
+						&& BWTA::isConnected(explorer->getTilePosition(), TilePosition(p))
+						&& explorer->hasPath(p)
+						&& p.isValid()) {
+						foundPosition = true;
+						explorer->move(p);
+						break;
+					}
+				}
 			}
 			else {
 				explorer->move(InformationManager::getInstance().enemyBase->getPosition());
 				return;
 			}
-
-			std::vector<Position>::iterator exploredPositions;
-			bool foundPosition = false;
 
 			for (exploredPositions = edgeOfBase.begin(); exploredPositions != edgeOfBase.end(); exploredPositions++) {
 				Position p = *exploredPositions;
