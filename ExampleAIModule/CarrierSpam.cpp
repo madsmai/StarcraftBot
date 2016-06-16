@@ -2,7 +2,7 @@
 
 CarrierSpam::CarrierSpam() {
 
-	setSquadSize(8);
+	setSquadSize(OffenseManager::getInstance().getSquadSize());
 	setStrategyVariables();
 
 	buildOrder = { carrier, carrier, zealot, dragoon,

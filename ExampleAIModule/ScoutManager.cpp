@@ -25,7 +25,8 @@ void ScoutManager::onFrame(){
 	if (!activeScouts.empty()){
 
 		for (BWAPI::Unit unit : activeScouts){
-			if (unit->isUnderAttack()) {
+			if (unit->isUnderAttack()
+				&& doneScouting) {
 				retreating = true;
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
 			}

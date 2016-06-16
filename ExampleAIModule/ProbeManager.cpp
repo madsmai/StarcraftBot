@@ -251,7 +251,8 @@ bool ProbeManager::checkAndAddSupply(){
 	
 	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 6
 		<= Broodwar->self()->supplyUsed() / 2
-		&& !InformationManager::getInstance().starter
+		&& (!InformationManager::getInstance().starter 
+		|| Broodwar->getLastError() == BWAPI::Errors::Insufficient_Supply) // something went wrong in a starter
 		&& !builder->isConstructing()
 		&& lastChecked + pylon.buildTime() < Broodwar->getFrameCount()){
 

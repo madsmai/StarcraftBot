@@ -3,7 +3,7 @@
 
 CommonZealotRush::CommonZealotRush(){
 
-	setSquadSize(4);
+	setSquadSize(3);
 	setStrategyVariables();
 
 	buildOrder = { // base Build order
@@ -31,18 +31,18 @@ void CommonZealotRush::evaluateStrategy(){
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
 	}
 	else {
-		if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
-			>= InformationManager::getInstance().enemyArmyStrength
-			|| InformationManager::getInstance().enemyTowers.size() >= 2){
+		//if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
+		//	>= InformationManager::getInstance().enemyArmyStrength
+		//	|| InformationManager::getInstance().enemyTowers.size() >= 2){
 
-			// convert to midgame
-			StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
-		}
-		else {
+		//	// convert to midgame
+		//	StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
+		//}
+		//else {
 
 			// continue with the zealot rush
 			StrategyManager::getInstance().setNextStrategy(StrategyManager::continueZealotRush);
-		}
+		/*}*/
 	}
 
 
