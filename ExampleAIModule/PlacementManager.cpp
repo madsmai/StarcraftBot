@@ -3,7 +3,7 @@
 using namespace BWAPI;
 
 void PlacementManager::onFrame(){
-	drawReservedSpace();
+	//drawReservedSpace();
 }
 
 void PlacementManager::onUnitDestroy(BWAPI::Unit unit){
