@@ -23,11 +23,12 @@ void CarrierSpam::evaluateStrategy(){
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){
 		StrategyManager::getInstance().setNextStrategy(StrategyManager::observerTech);
+		return;
 	}
-	else {
-		// continue with carrier spam
-		StrategyManager::getInstance().setNextStrategy(StrategyManager::carrier_spam);
-	}
+
+	StrategyManager::getInstance().setNextStrategy(StrategyManager::carrier_spam);
+	return;
+
 }
 
 void CarrierSpam::setStrategyVariables(){

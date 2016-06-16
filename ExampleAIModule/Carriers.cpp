@@ -4,7 +4,7 @@ Carriers::Carriers() {
 
 	Broodwar << name << std::endl;
 
-	setSquadSize(6);
+	setSquadSize(12);
 	setStrategyVariables();
 
 	buildOrder = { stargate, probe, cannon, probe,
@@ -21,6 +21,8 @@ Carriers::Carriers() {
 void Carriers::evaluateStrategy(){
 
 	Broodwar << "Evaluating carrier strategy" << std::endl;
+
+	StrategyManager::getInstance().carriersCalled = true;
 
 	if (InformationManager::getInstance().invisSpottet
 		&& !InformationManager::getInstance().hasInvisDetection){

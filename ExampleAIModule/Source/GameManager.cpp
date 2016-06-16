@@ -82,6 +82,13 @@ void GameManager::onFrame(){
 	Broodwar->drawTextScreen(300, 100, "Current Strategy: %d \n Next Strategy: %d",
 		StrategyManager::getInstance().getCurrentStrategy(), StrategyManager::getInstance().getNextStrategy());
 
+	Broodwar->drawTextScreen(300, 0, "Squadsize: %d \n squad.size(): %d", 
+		OffenseManager::getInstance().getSquadSize(), OffenseManager::getInstance().squad.size());
+
+	Broodwar->drawTextScreen(0, 100, "Our Army Strength: %d \n Enemy Army Strength: %d",
+		InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters), InformationManager::getInstance().enemyArmyStrength);
+
+
 	if (analyzed) {
 		drawTerrainData();
 	}
@@ -147,17 +154,11 @@ void GameManager::onSendText(std::string text){
 	}
 	else if (text == "Army Strength enemy") {
 
-		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->enemy()) << std::endl;
-	}
-
-	else if (text == "invis"){
-	
-		InformationManager::getInstance().invisSpottet = true;
-
+		Broodwar << InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters) << std::endl;
 	}
 
 	else if (text == "Army Strength self") {
-		Broodwar << InformationManager::getInstance().calculateArmyStrength(Broodwar->self()) << std::endl;
+		Broodwar << InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters) << std::endl;
 	}
 	else if (text == "size"){
 		Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;

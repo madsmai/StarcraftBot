@@ -5,8 +5,8 @@
 
 /*
 TODO:
-- Gemme information om hvor modstanderen er og hvor godt deres forsvar er, 
-	dette skal være tilgængeligt for de andre klasser
+- Gemme information om hvor modstanderen er og hvor godt deres forsvar er,
+dette skal være tilgængeligt for de andre klasser
 */
 
 using namespace BWAPI;
@@ -15,13 +15,16 @@ using namespace BWAPI;
 
 void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
-		
+
 		if (unit->getType().isWorker()){
 			addEnemyWorkers(unit);
 		}
 
 		else if ((unit->getType().canAttack() || unit->getType().isSpellcaster()) && unit->getType().canMove()){
 			addEnemyAttackers(unit);
+			if (enemyArmyStrength < calculateEnemyArmyStrength()) {
+				enemyArmyStrength = calculateEnemyArmyStrength();
+			}
 		}
 		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar){
 			addDarkTemplar(unit);
@@ -39,30 +42,33 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 
 		else if (unit->getType().isBuilding() && !unit->getType().canAttack()){
 			addEnemyPassiveBuildings(unit);
-		} 
-		
-		else if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
+		}
+		if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
 			citadelOfAdun = true;
+			invisSpottet = true;
 		}
 
-		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives){
+		if (unit->getType() == UnitTypes::Protoss_Templar_Archives){
 			templarArchives = true;
+			invisSpottet = true;
 		}
-
-
+		if (unit->getType() == UnitTypes::Protoss_Observatory) {
+			observatory = true;
+			invisSpottet = true;
+		}
 	}
 
 }
 
 void InformationManager::onUnitDestroy(BWAPI::Unit unit){
-	
+
 	if (unit->getPlayer() == Broodwar->self()
 		&& unit->getType() == UnitTypes::Protoss_Observer){
 		hasInvisDetection = false;
 	}
 
-	
-	
+
+
 	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
 
 		if (unit->getType().isWorker()){
@@ -71,6 +77,7 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 
 		else if ((unit->getType().canAttack() || unit->getType().isSpellcaster()) && unit->getType().canMove()){
 			removeEnemyAttackers(unit);
+			enemyArmyStrength -= calculateUnitStrength(unit->getType());
 		}
 
 		else if (unit->getType() == UnitTypes::Protoss_Dark_Templar){
@@ -89,17 +96,17 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 			else if (!unit->getType().canAttack()){
 				removeEnemyPassiveBuildings(unit);
 			}
-			}
 		}
-		else if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
-			citadelOfAdun = false;
-		}
-
-		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives){
-			templarArchives = false;
-		}
-
 	}
+	else if (unit->getType() == UnitTypes::Protoss_Citadel_of_Adun){
+		citadelOfAdun = false;
+	}
+
+	else if (unit->getType() == UnitTypes::Protoss_Templar_Archives){
+		templarArchives = false;
+	}
+
+}
 
 
 //Adding enemy units to vectors
@@ -117,7 +124,7 @@ void InformationManager::addEnemyBarracks(BWAPI::Unit barracks){
 	if (!exists) {
 		enemyBarracks.push_back(barracks);
 	}
-		
+
 }
 
 void InformationManager::addEnemyAttackers(BWAPI::Unit attacker){
@@ -233,7 +240,7 @@ void InformationManager::removeEnemyAttackers(Unit attacker){
 			enemyAttackers.erase(it);
 		}
 		else{
-it++;
+			it++;
 		}
 	}
 }
@@ -316,55 +323,26 @@ InformationManager& InformationManager::getInstance(){ //Return ref to Informati
 	return i;
 }
 
-int InformationManager::calculateArmyStrength(BWAPI::Player player) {
-	Unitset fighters;
-	if (player == Broodwar->self()) {
-		fighters = OffenseManager::getInstance().fighters;
-	}
-	else if (player->isEnemy(Broodwar->self())) {
-		std::vector<BWAPI::Unit>::iterator it;
-		for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
-			Unit u = *it;
-			fighters.insert(u);
-		}
-	}
+int InformationManager::calculateArmyStrength(BWAPI::Unitset fighters) {
 	int armyStrength = 0;
 	int damage = 0;
 	int strength = 0;
 	int effectiveHp = 0;
-	int totalDamage = 0;
-	int totalStrength = 0;
-	int totalHp = 0;
 
 	for (Unit troop : fighters) {
 		if (troop->isVisible()){
 
 			effectiveHp = troop->getHitPoints() + troop->getShields();
-			totalHp += effectiveHp;
 
 			damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
 			if (troop->getType().groundWeapon().maxRange() > 100) {
 				damage = (damage * 6) / 5;
 			}
-			totalDamage += damage;
-
-			strength = effectiveHp * damage;
-			totalStrength += strength;
-
-			armyStrength = armyStrength + strength;
-		}
-		else {
-			effectiveHp = troop->getType().maxHitPoints() + troop->getType().maxShields();
-			totalHp += effectiveHp;
-
-			damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
-			if (troop->getType().groundWeapon().maxRange() > 100) {
-				damage = (damage * 6) / 5;
+			if (!observatory && troop->getType() == UnitTypes::Protoss_Dark_Templar) {
+				effectiveHp = effectiveHp * 100;
 			}
-			totalDamage += damage;
 
 			strength = effectiveHp * damage;
-			totalStrength += strength;
 
 			armyStrength = armyStrength + strength;
 		}
@@ -378,7 +356,7 @@ void InformationManager::enemyArmyStatus(){
 	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
 		Unit u = *it;
 		fighters.insert(u);
-	
+
 	}
 	int armyStrength = 0;
 	int damage = 0;
@@ -421,27 +399,27 @@ void InformationManager::enemyArmyStatus(){
 
 			armyStrength = armyStrength + strength;
 		}
-		
+
 	}
 
 	Broodwar << "Enemy Army Status: \n" << armyStrength << "  Enemy Army Strenght \n"
 		<< totalDamage << "  Enemy damage in total \n"
 		<< totalStrength << "  Enemy strength in total \n"
-		<< totalHp << "  Enemy effective hp in total" 
+		<< totalHp << "  Enemy effective hp in total"
 		<< fighters.size() << "  number of fighters" << std::endl;
 
 }
 
 void InformationManager::ourArmyStatus(){
 	Unitset fighters;
-	
+
 	fighters = OffenseManager::getInstance().fighters;
-	
+
 	int armyStrength = 0;
 	int damage = 0;
 	int strength = 0;
 	int effectiveHp = 0;
-	
+
 	int totalDamage = 0;
 	int totalStrength = 0;
 	int totalHp = 0;
@@ -478,5 +456,33 @@ int InformationManager::writeToLog(std::string text) {
 		log.flush();
 		log.close();
 	}
-		return 42;
+	return 42;
+}
+
+int InformationManager::calculateUnitStrength(BWAPI::UnitType troop) {
+	int damage = 0;
+	int strength = 0;
+	int effectiveHp = 0;
+
+	effectiveHp = troop.maxHitPoints() + troop.maxShields();
+
+	damage = (Broodwar->enemy()->damage(troop.groundWeapon())) * troop.maxGroundHits();
+	if (troop.groundWeapon().maxRange() > 100) {
+		damage = (damage * 6) / 5;
+	}
+
+	strength = effectiveHp * damage;
+
+	return strength;
+}
+int InformationManager::calculateEnemyArmyStrength() {
+	std::vector<BWAPI::Unit>::iterator it;
+	int sum = 0;
+	for (it = enemyAttackers.begin(); it != enemyAttackers.end(); it++) {
+		BWAPI::Unit u = *it;
+		if (u->isVisible()) {
+			sum += calculateUnitStrength(u->getType());
+		}
+	}
+	return sum;
 }

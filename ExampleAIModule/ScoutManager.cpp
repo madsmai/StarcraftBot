@@ -10,6 +10,8 @@ TODO:
 using namespace BWAPI;
 
 void ScoutManager::onFrame(){
+
+
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!inactiveScouts.empty()){
 		Broodwar << "inactive scouts was not empty" << std::endl;
@@ -24,6 +26,7 @@ void ScoutManager::onFrame(){
 
 		for (BWAPI::Unit unit : activeScouts){
 			if (unit->isUnderAttack()) {
+				retreating = true;
 				unit->move(InformationManager::getInstance().ourBase->getPosition());
 			}
 			else if (unit->isIdle()
@@ -34,7 +37,6 @@ void ScoutManager::onFrame(){
 			}
 			else if (unit->isIdle()
 				&& BWTA::getNearestBaseLocation(unit->getPosition()) == InformationManager::getInstance().emptyMainBase){
-
 				double minDistance = 9999999;
 				std::set<BWTA::BaseLocation*>::iterator it; 		// iteratation set
 				for (it = InformationManager::getInstance().baseLocations.begin(); it != InformationManager::getInstance().baseLocations.end(); ++it){
@@ -45,7 +47,8 @@ void ScoutManager::onFrame(){
 						InformationManager::getInstance().baseLocations.erase(*it);
 						Broodwar->sendText("Removed empty main base");
 					}
-					else if (InformationManager::getInstance().currentBase->getGroundDistance(InformationManager::getInstance().nextBase) < minDistance) {
+					else if (InformationManager::getInstance().currentBase->getGroundDistance(InformationManager::getInstance().nextBase) < minDistance
+						&& BWTA::getRegion(unit->getTilePosition()) != BWTA::getRegion(InformationManager::getInstance().nextBase->getPosition())) {
 						minDistance = InformationManager::getInstance().currentBase->getGroundDistance(InformationManager::getInstance().nextBase);
 						Broodwar->sendText("Moving to enemy base");
 						unit->move(InformationManager::getInstance().nextBase->getPosition());
@@ -66,6 +69,29 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 			BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, BuildOrderType::scoutRequest);
 		}
 	}
+
+	if (!activeScouts.empty()){
+		if (unit->getType().isWorker()
+			&& unit->getPlayer()->isEnemy(Broodwar->self())
+			&& !retreating){
+
+			BWAPI::Unit scout = activeScouts.front();
+			UnitCommand currentCommand = scout->getLastCommand();
+
+			// ignore if the scout already is attacking
+			if (currentCommand.getType() == UnitCommandTypes::Attack_Unit
+				&& currentCommand.getTarget()->exists()){
+				return;
+			}
+
+			BWAPI::Unit closestEnemy = scout->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
+			if (!closestEnemy){
+				// no workers, getting another closest target
+				closestEnemy = scout->getClosestUnit(Filter::IsEnemy);
+			}
+			scout->attack(closestEnemy);
+		}
+	}
 }
 
 void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
@@ -81,22 +107,35 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 			for (it = activeScouts.begin(); it != activeScouts.end(); it++) { //Change where the active scouts are going
 				BWAPI::Unit u = *it;
 				u->move(unit->getPosition());
-				u->attack(unit);
 			}
 			Broodwar->sendText("Done scouting, found mainbase");
+			doneScouting = true;
 		}
 
-		else if (unit->getPlayer() != Broodwar->self() 
+		if (unit->getType().isWorker()
+			&& unit->getPlayer()->isEnemy(Broodwar->self())
+			&& !retreating){
+
+			BWAPI::Unit scout = activeScouts.front();
+			UnitCommand currentCommand = scout->getLastCommand();
+
+			// ignore if the scout already is attacking
+			if (currentCommand.getType() == UnitCommandTypes::Attack_Unit){
+				return;
+			}
+			scout->attack(unit);
+		}
+
+		else if (unit->getPlayer() != Broodwar->self()
 			&& BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()
 			&& !unit->getPlayer()->isEnemy(Broodwar->self())) {
 
-			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());		
+			InformationManager::getInstance().emptyMainBase = BWTA::getNearestBaseLocation(unit->getPosition());
 
 		}
 		else if (unit->getPlayer() != Broodwar->self()
 			&& !BWTA::getNearestBaseLocation(unit->getPosition())->isStartLocation()) {
-			InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());			
-			//Broodwar->sendText("Found expansion");
+			InformationManager::getInstance().expansion = BWTA::getNearestBaseLocation(unit->getPosition());
 		}
 	}
 }
@@ -113,12 +152,12 @@ void ScoutManager::goScout(BWAPI::Unit scout){
 			|| scout->getPosition() == InformationManager::getInstance().nextBase->getPosition()){
 			InformationManager::getInstance().baseLocations.erase(*it);
 			Broodwar->sendText("Removed our base");
-		}	
+		}
 		else if (InformationManager::getInstance().ourBase->getGroundDistance(InformationManager::getInstance().nextBase) < minDistance) {
 			minDistance = InformationManager::getInstance().ourBase->getGroundDistance(InformationManager::getInstance().nextBase);
 			Broodwar->sendText("Moving to enemy base");
 			scout->move(InformationManager::getInstance().nextBase->getPosition());
-		}	
+		}
 	}
 }
 
@@ -131,7 +170,7 @@ void ScoutManager::addScout(BWAPI::Unit scout){
 
 void ScoutManager::removeScout(BWAPI::Unit scout){
 	std::vector<BWAPI::Unit>::iterator it;
-	for (it = activeScouts.begin(); it != activeScouts.end(); ) { //If it is in activeScout
+	for (it = activeScouts.begin(); it != activeScouts.end();) { //If it is in activeScout
 		BWAPI::Unit u = *it;
 		if (u->getID() == scout->getID()){
 			activeScouts.erase(it);
@@ -149,6 +188,26 @@ void ScoutManager::removeScout(BWAPI::Unit scout){
 			it++;
 		}
 	}
+}
+
+
+bool ScoutManager::checkAgain(){
+	static int lastChecked = 0;
+	if (lastChecked + 600 < BWAPI::Broodwar->getFrameCount()
+		&& scoutSent && activeScouts.empty() && inactiveScouts.empty()
+		&& !doneScouting){
+
+		// a scout was sent but never got to the enemy base. Make a new request.
+		lastChecked = Broodwar->getFrameCount();
+		
+		// sending a new scout!
+		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert
+			(BuildOrderManager::getInstance().getNewFixedOrderQueue().begin(), BuildOrderType::requests::scoutRequest);
+		return true;
+	}
+	return false;
+
+
 }
 
 ScoutManager& ScoutManager::getInstance(){ //Return ref to ScoutManager object

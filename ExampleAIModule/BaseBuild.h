@@ -31,6 +31,7 @@ private:
 	//Unit Types, Upgrade types, Request Types
 	UnitType probe = UnitTypes::Protoss_Probe;
 	UnitType pylon = UnitTypes::Protoss_Pylon;
+	int scoutRequest = BuildOrderType::requests::scoutRequest;
 
 	bool starter = true;
 	bool endgame = false;

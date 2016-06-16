@@ -18,6 +18,10 @@ public:
 	void onUnitDiscover(BWAPI::Unit unit);
 	void goScout(BWAPI::Unit scout);
 
+	bool retreating = false;
+	bool scoutSent = false;
+	bool doneScouting = false;
+
 	static ScoutManager& getInstance();
 
 	void addScout(BWAPI::Unit scout);
@@ -26,6 +30,8 @@ public:
 	std::vector<BWAPI::Unit> const &getInactiveScouts() { return inactiveScouts; }
 
 private:
+
+	bool checkAgain();
 
 	std::vector<BWAPI::Unit> activeScouts;
 	std::vector<BWAPI::Unit> inactiveScouts;
