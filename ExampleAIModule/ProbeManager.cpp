@@ -203,8 +203,8 @@ void ProbeManager::executeQueue(){
 	else if (queue.front().isRequest()){
 		int request = queue.front().getRequestType();
 		//Make a scout
-		if (request == BuildOrderType::scoutRequest 
-			&& !builder->isConstructing() && (builder->isIdle() || builder->isGatheringMinerals())){
+		if (request == BuildOrderType::scoutRequest
+			&& builder->getLastCommand().getType() != UnitCommandTypes::Build){
 			ScoutManager::getInstance().addScout(mineralProbes.front());
 
 			// sets the builder to NULL if scout is builder

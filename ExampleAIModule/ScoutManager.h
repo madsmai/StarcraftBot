@@ -18,6 +18,8 @@ public:
 	void onUnitDiscover(BWAPI::Unit unit);
 	void goScout(BWAPI::Unit scout);
 
+	bool retreating = false;
+
 	static ScoutManager& getInstance();
 
 	void addScout(BWAPI::Unit scout);
