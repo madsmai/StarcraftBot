@@ -1,5 +1,6 @@
 #include "TransitionMidGame.h"
 
+//Author of class: Kasper
 
 TransitionMidGame::TransitionMidGame() {
 
@@ -48,10 +49,6 @@ TransitionMidGame::TransitionMidGame() {
 			cannon, probe, probe, cannon,
 			probe, probe,
 			evaluateStrategyRequest };
-	}
-
-	else {
-		Broodwar << "Add more cases to midGame transition strategy" << std::endl;
 	}
 
 

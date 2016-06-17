@@ -13,17 +13,16 @@ Strategi-skift-design:
 TODO:
 
 Prio 1:
--Debugging skal ikke ske i release versionen
 
--Repair towers
+- Repair towers
 
-- Rebuild probes og buildings on destroy
+- Rebuild buildings on destroy
 
 
 Prio 2:
--Triggers
+- Triggers
 - Vi skal kunne ændre strategier dynamisk på baggrund af hvad modstanderen har
--Threat levels, evaluer hvordan "range" har betydning
+- Threat levels, evaluer hvordan "range" har betydning
 
 
 

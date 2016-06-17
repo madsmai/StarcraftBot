@@ -1,5 +1,7 @@
 #include "AggressiveZealotRush.h"
 
+//Author of class: Kasper
+
 AggressiveZealotRush::AggressiveZealotRush() {
 
 	setSquadSize(3);

@@ -1,12 +1,9 @@
 #include "ProbeManager.h"
 
-/*
-TODO:
-
-*/
-
 using namespace BWAPI;
 
+
+// Author: Mads Maibohm
 void ProbeManager::onFrame(){
 
 	////DEBUGGING////
@@ -57,6 +54,7 @@ void ProbeManager::onFrame(){
 }
 
 
+// Author: Mads Engberg
 //Make sure that no-one is idle
 void ProbeManager::nonIdle(){
 	//Make idle mineralWorkers do stuff
@@ -94,7 +92,7 @@ void ProbeManager::nonIdle(){
 	}
 }
 
-
+// Author: Mads Engberg
 //Remove destroyed worker
 void ProbeManager::onUnitDestroy(Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
@@ -124,6 +122,7 @@ void ProbeManager::onUnitDestroy(Unit unit){
 	}
 }
 
+// Author: Mads Engberg
 //Add newly made worker to list
 void ProbeManager::onUnitComplete(Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
@@ -131,7 +130,7 @@ void ProbeManager::onUnitComplete(Unit unit){
 	}
 }
 
-
+// Author: Mads Engberg
 void ProbeManager::executeQueue(){
 	std::vector<BuildOrderType>& queue = BuildOrderManager::getInstance().getNewFixedOrderQueue();
 
@@ -247,11 +246,12 @@ void ProbeManager::executeQueue(){
 	}
 }
 
+// Author: Mads Engberg
 void ProbeManager::addMineralProbe(Unit probe){
 	mineralProbes.push_back(probe);
 }
 
-
+// Author: Kasper
 bool ProbeManager::checkAndAddSupply(){
 	UnitType pylon = UnitTypes::Protoss_Pylon;
 	static int lastChecked = 0;
@@ -282,6 +282,7 @@ ProbeManager& ProbeManager::getInstance(){ //Return ref to probemanager object
 	return i;
 }
 
+// Author: Mads Maibohm
 void ProbeManager::probeFightBack(Unit attackedUnit) {
 	InformationManager::getInstance().writeToLog("Started probeFightBack");
 	if (attackedUnit != NULL) {

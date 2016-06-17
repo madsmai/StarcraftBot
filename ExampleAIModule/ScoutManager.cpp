@@ -1,17 +1,11 @@
 #include "ScoutManager.h"
 #include "ProbeManager.h"
 
-/*
-TODO:
-- Scouten bevæger sig ud og scouter igen. Nok pga onDiscover
-- Scouten laver ikke noget når den kommer tilbage
-*/
 
 using namespace BWAPI;
 
+//Author: Sami
 void ScoutManager::onFrame(){
-
-
 	std::vector<BWAPI::Unit>::iterator it;
 	if (!inactiveScouts.empty()){
 		//Broodwar << "inactive scouts was not empty" << std::endl;
@@ -23,7 +17,6 @@ void ScoutManager::onFrame(){
 	}
 
 	if (!activeScouts.empty()){
-
 		for (BWAPI::Unit unit : activeScouts){
 			if (unit->isUnderAttack()
 				&& doneScouting) {
@@ -60,6 +53,7 @@ void ScoutManager::onFrame(){
 	}
 }
 
+//Author: Sami
 void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 	if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()){
 		removeScout(unit);
@@ -72,29 +66,11 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 	}
 
 	if (!activeScouts.empty()){
-		if (unit->getType().isWorker()
-			&& unit->getPlayer()->isEnemy(Broodwar->self())
-			&& !retreating){
-
-			BWAPI::Unit scout = activeScouts.front();
-			UnitCommand currentCommand = scout->getLastCommand();
-
-			// ignore if the scout already is attacking
-			if (currentCommand.getType() == UnitCommandTypes::Attack_Unit
-				&& currentCommand.getTarget()->exists()){
-				return;
-			}
-
-			BWAPI::Unit closestEnemy = scout->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
-			if (!closestEnemy){
-				// no workers, getting another closest target
-				closestEnemy = scout->getClosestUnit(Filter::IsEnemy);
-			}
-			scout->attack(closestEnemy);
-		}
+		attackTheirWorkers(unit);
 	}
 }
 
+//Author: Sami
 void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 	if (!activeScouts.empty()){
 		if (unit->getType().isResourceDepot()
@@ -118,14 +94,7 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 			&& !retreating
 			&& doneScouting){
 
-			BWAPI::Unit scout = activeScouts.front();
-			UnitCommand currentCommand = scout->getLastCommand();
-
-			// ignore if the scout already is attacking
-			if (currentCommand.getType() == UnitCommandTypes::Attack_Unit){
-				return;
-			}
-			scout->attack(unit);
+			attackTheirWorkers(unit);
 		}
 
 		else if (unit->getPlayer() != Broodwar->self()
@@ -142,6 +111,7 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 	}
 }
 
+//Author: Sami
 void ScoutManager::goScout(BWAPI::Unit scout){
 	//InformationManager::getInstance().baseLocations = BWTA::getStartLocations();
 	double minDistance = 9999999;
@@ -163,6 +133,7 @@ void ScoutManager::goScout(BWAPI::Unit scout){
 	}
 }
 
+//Author: Sami
 void ScoutManager::addScout(BWAPI::Unit scout){
 	inactiveScouts.push_back(scout);
 	//Broodwar->sendText("Added scout to inactive scouts");
@@ -170,6 +141,7 @@ void ScoutManager::addScout(BWAPI::Unit scout){
 	//Broodwar << inactiveScouts.size() << std::endl;
 }
 
+//Author: Sami
 void ScoutManager::removeScout(BWAPI::Unit scout){
 	std::vector<BWAPI::Unit>::iterator it;
 	for (it = activeScouts.begin(); it != activeScouts.end();) { //If it is in activeScout
@@ -192,24 +164,40 @@ void ScoutManager::removeScout(BWAPI::Unit scout){
 	}
 }
 
+//Author: Kasper
+void ScoutManager::attackTheirWorkers(BWAPI::Unit unit){
+	BWAPI::Unit scout = activeScouts.front();
+	UnitCommand currentCommand = scout->getLastCommand();
 
-bool ScoutManager::checkAgain(){
-	static int lastChecked = 0;
-	if (lastChecked + 600 < BWAPI::Broodwar->getFrameCount()
-		&& scoutSent && activeScouts.empty() && inactiveScouts.empty()
-		&& !doneScouting){
-
-		// a scout was sent but never got to the enemy base. Make a new request.
-		lastChecked = Broodwar->getFrameCount();
-		
-		// sending a new scout!
-		BuildOrderManager::getInstance().getNewFixedOrderQueue().insert
-			(BuildOrderManager::getInstance().getNewFixedOrderQueue().begin(), BuildOrderType::requests::scoutRequest);
-		return true;
+	// ignore if the scout already is attacking
+	if (currentCommand.getType() == UnitCommandTypes::Attack_Unit){
+		return;
 	}
-	return false;
+	scout->attack(unit);
+}
 
+//Author: Kasper
+void ScoutManager::keepAttackTheirWorkers(BWAPI::Unit unit){
+	if (unit->getType().isWorker()
+		&& unit->getPlayer()->isEnemy(Broodwar->self())
+		&& !retreating){
 
+		BWAPI::Unit scout = activeScouts.front();
+		UnitCommand currentCommand = scout->getLastCommand();
+
+		// ignore if the scout already is attacking
+		if (currentCommand.getType() == UnitCommandTypes::Attack_Unit
+			&& currentCommand.getTarget()->exists()){
+			return;
+		}
+
+		BWAPI::Unit closestEnemy = scout->getClosestUnit(Filter::IsWorker && Filter::IsEnemy);
+		if (!closestEnemy){
+			// no workers, getting another closest target
+			closestEnemy = scout->getClosestUnit(Filter::IsEnemy);
+		}
+		scout->attack(closestEnemy);
+	}
 }
 
 ScoutManager& ScoutManager::getInstance(){ //Return ref to ScoutManager object

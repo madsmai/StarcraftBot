@@ -1,20 +1,8 @@
 #include "OffenseManager.h"
 
 using namespace BWAPI;
-/*
-TODO:
 
-- Abuse andre bots dårlig micro
-
-- Troops skal ikke bevæge sig ud af basen med mindre der ikke er nogle enemies i basen.
-
-- Hvis vores scout dør kan vi ikke angribe
-
-- EnemyAttackers liste bliver bugged når units går ind i bunkers fordi vi ikke længere kan se dem som attackers men de er ikke fjernet fra listen
-
-- Færdiggøre metoden til at beskytte vores base.
-
-*/
+// Author of class: Mads Maibohm
 
 void OffenseManager::onUnitDestroy(Unit unit){
 	if (unit->getPlayer() == Broodwar->self()) {
@@ -440,6 +428,7 @@ void OffenseManager::goScout(BWAPI::Unit scout){
 	}
 }
 
+// Author: Based on UAlbertaBot
 void OffenseManager::smartAttackUnit(BWAPI::Unit attacker, BWAPI::Unit target) {
 
 	if (!attacker || !target)
