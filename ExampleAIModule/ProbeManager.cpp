@@ -206,7 +206,11 @@ void ProbeManager::executeQueue(){
 			}
 
 			mineralProbes.erase(mineralProbes.begin());
-			queue.erase(queue.begin()); //Remove the request from the queue
+			
+			if (!queue.empty()){
+				queue.erase(queue.begin()); //Remove the request from the queue
+			}
+			
 
 		}
 
