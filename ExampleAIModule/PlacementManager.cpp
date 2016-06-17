@@ -2,6 +2,8 @@
 
 using namespace BWAPI;
 
+// Author of class: Mads Engberg
+
 void PlacementManager::onFrame(){
 	//drawReservedSpace();
 }

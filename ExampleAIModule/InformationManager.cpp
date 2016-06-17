@@ -1,25 +1,18 @@
 #include "InformationManager.h"
 #include <vector>
 
-// Author: Sami Ghali s144443
-
-/*
-TODO:
-- Gemme information om hvor modstanderen er og hvor godt deres forsvar er,
-dette skal være tilgængeligt for de andre klasser
-*/
-
 using namespace BWAPI;
 
 //Discover and destroy methods  
 
+
+
+// Author: Kasper
 void InformationManager::onStart(){
-
-
 	baseLocations = BWTA::getStartLocations();
-
 }
 
+// Author: Sami
 void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
 
@@ -66,7 +59,7 @@ void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 
 	if (unit->getPlayer() == Broodwar->self()
@@ -116,7 +109,7 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 }
 
 
-//Adding enemy units to vectors
+// Author: Sami
 void InformationManager::addEnemyBarracks(BWAPI::Unit barracks){
 
 	bool exists = false;
@@ -133,7 +126,7 @@ void InformationManager::addEnemyBarracks(BWAPI::Unit barracks){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::addEnemyAttackers(BWAPI::Unit attacker){
 
 	bool exists = false;
@@ -150,7 +143,7 @@ void InformationManager::addEnemyAttackers(BWAPI::Unit attacker){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::addEnemyWorkers(BWAPI::Unit worker){
 
 	bool exists = false;
@@ -167,8 +160,7 @@ void InformationManager::addEnemyWorkers(BWAPI::Unit worker){
 	}
 
 }
-
-
+// Author: Sami
 void InformationManager::addDarkTemplar(BWAPI::Unit darkTemplar){
 
 	bool exists = false;
@@ -185,7 +177,7 @@ void InformationManager::addDarkTemplar(BWAPI::Unit darkTemplar){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::addEnemyTowers(BWAPI::Unit tower){
 
 	bool exists = false;
@@ -202,7 +194,7 @@ void InformationManager::addEnemyTowers(BWAPI::Unit tower){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
 	bool exists = false;
@@ -220,8 +212,7 @@ void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
 }
 
-
-//Removing enemy units to vectors
+// Author: Sami
 void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -236,7 +227,7 @@ void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::removeEnemyAttackers(Unit attacker){
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -251,7 +242,7 @@ void InformationManager::removeEnemyAttackers(Unit attacker){
 		}
 	}
 }
-
+// Author: Sami
 void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -266,8 +257,7 @@ void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 	}
 
 }
-
-
+// Author: Sami
 void InformationManager::removeDarkTemplar(BWAPI::Unit darkTemplar){
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -282,7 +272,7 @@ void InformationManager::removeDarkTemplar(BWAPI::Unit darkTemplar){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -297,7 +287,7 @@ void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 	}
 
 }
-
+// Author: Sami
 void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
 	std::vector<BWAPI::Unit>::iterator it;
@@ -312,7 +302,7 @@ void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding
 	}
 }
 
-//Prints the current count of enemy units
+// Author: Sami
 void InformationManager::currentStatus(){
 	Broodwar << "Current Status: \n" << enemyAttackers.size() << "  enemy attacker(s) \n"
 		<< enemyBarracks.size() << "  enemy barrack(s) \n"
@@ -322,7 +312,6 @@ void InformationManager::currentStatus(){
 		" Any Templar Archives? " << templarArchives << "\n"
 		<< enemyTowers.size() << "  enemy dark templars(s) \n"
 		<< enemyPassiveBuildings.size() << "  passive enemy building(s) \n" << std::endl;
-
 }
 
 InformationManager& InformationManager::getInstance(){ //Return ref to InformationManager object
@@ -330,6 +319,7 @@ InformationManager& InformationManager::getInstance(){ //Return ref to Informati
 	return i;
 }
 
+// Author: Mads Maibohm
 int InformationManager::calculateArmyStrength(BWAPI::Unitset fighters) {
 	int sum = 0;
 	for (Unit u : fighters) {
@@ -346,6 +336,7 @@ int InformationManager::calculateArmyStrength(BWAPI::Unitset fighters) {
 	return sum;
 }
 
+// Author: Sami
 void InformationManager::enemyArmyStatus(){
 	Unitset fighters;
 
@@ -407,6 +398,7 @@ void InformationManager::enemyArmyStatus(){
 
 }
 
+// Author: Sami
 void InformationManager::ourArmyStatus(){
 	Unitset fighters;
 
@@ -443,6 +435,7 @@ void InformationManager::ourArmyStatus(){
 		<< totalHp << "  Our effective hp in total" << std::endl;
 }
 
+// Author: Mads Maibohm
 int InformationManager::writeToLog(std::string text) {
 	if (logging) {
 		auto t = std::time(nullptr);
@@ -456,6 +449,7 @@ int InformationManager::writeToLog(std::string text) {
 	return 42;
 }
 
+// Author: Mads Maibohm
 int InformationManager::calculateUnitStrength(BWAPI::UnitType troop) {
 	int damage = 0;
 	int strength = 0;
@@ -472,6 +466,7 @@ int InformationManager::calculateUnitStrength(BWAPI::UnitType troop) {
 
 	return strength;
 }
+// Author: Mads Maibohm
 int InformationManager::calculateEnemyArmyStrength() {
 	std::vector<BWAPI::Unit>::iterator it;
 	int sum = 0;

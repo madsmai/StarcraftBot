@@ -1,5 +1,6 @@
 #include "EarlyDarkTemplar.h"
 
+//Author of class: Kasper
 
 EarlyDarkTemplar::EarlyDarkTemplar() {
 

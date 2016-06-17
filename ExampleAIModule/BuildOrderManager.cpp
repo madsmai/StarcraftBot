@@ -1,6 +1,8 @@
 #include "BuildOrderManager.h"
 using namespace BWAPI;
 
+//Author of class: Kasper
+
 void BuildOrderManager::onStart(){
 
 	// initializes the basic build

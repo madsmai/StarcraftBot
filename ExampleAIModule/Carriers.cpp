@@ -1,5 +1,7 @@
 #include "Carriers.h"
 
+//Author of class: Kasper
+
 Carriers::Carriers() {
 
 	setSquadSize(12);

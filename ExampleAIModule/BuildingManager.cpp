@@ -1,9 +1,6 @@
 #include "BuildingManager.h"
 
-/*
-TODO:
-- Hvis en bygning ikke eksisterer så units/upgrade ikke kan laves, bliver køen stoppet til
-*/
+// Author of class: Kasper
 
 void BuildingManager::onFrame(){
 	//Construct the next unit in the queue
@@ -26,8 +23,8 @@ void BuildingManager::onFrame(){
 					BWAPI::Unit unit = *it;
 					if (unit->canTrain(type) &&
 						unit->isIdle() &&
-						BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
-						BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) {
+						Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
+						Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) {
 
 						unit->train(type);
 						queue.erase(queue.begin());

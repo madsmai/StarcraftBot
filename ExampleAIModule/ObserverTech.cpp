@@ -1,5 +1,7 @@
 #include "ObserverTech.h"
 
+//Author of class: Kasper
+
 ObserverTech::ObserverTech() {
 
 	setSquadSize(6);

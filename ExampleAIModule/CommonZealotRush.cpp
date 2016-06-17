@@ -1,5 +1,6 @@
 #include "CommonZealotRush.h"
 
+//Author of class: Kasper
 
 CommonZealotRush::CommonZealotRush(){
 

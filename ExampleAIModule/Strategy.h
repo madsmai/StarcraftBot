@@ -4,6 +4,8 @@
 
 using namespace BWAPI;
 
+//Author of class: Kasper
+
 class Strategy {
 public:
 
