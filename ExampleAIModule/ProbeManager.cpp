@@ -195,7 +195,7 @@ void ProbeManager::executeQueue(){
 		int request = queue.front().getRequestType();
 		//Make a scout
 
-		if (request == BuildOrderType::scoutRequest
+		if (request == BuildOrderType::scoutRequest && builder != NULL
 			&& builder->getLastCommand().getType() != UnitCommandTypes::Build){
 
 			ScoutManager::getInstance().scoutSent = true;
