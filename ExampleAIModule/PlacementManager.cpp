@@ -3,7 +3,7 @@
 using namespace BWAPI;
 
 void PlacementManager::onFrame(){
-	//drawReservedSpace();
+	drawReservedSpace();
 }
 
 void PlacementManager::onUnitDestroy(BWAPI::Unit unit){
@@ -100,9 +100,9 @@ int PlacementManager::findNearest(TilePosition position, UnitType anchor, UnitTy
 			}
 
 			//DEBUGGING//
-			//Broodwar->registerEvent([building, type](Game*)
-			//{Broodwar->drawBoxMap(Position(building), Position(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight())), Colors::Yellow, false); }
-			//, nullptr, type.buildTime() + 10);
+			Broodwar->registerEvent([building, type](Game*)
+			{Broodwar->drawBoxMap(Position(building), Position(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight())), Colors::Yellow, false); }
+			, nullptr, type.buildTime() + 10);
 		}
 	}
 
@@ -149,9 +149,9 @@ int PlacementManager::findNearest(TilePosition position, UnitType anchor){
 			}
 
 			//DEBUGGING//
-			//Broodwar->registerEvent([building, type](Game*)
-			//{Broodwar->drawBoxMap(Position(building), Position(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight())), Colors::Yellow, false); }
-			//, nullptr, type.buildTime() + 10);
+			Broodwar->registerEvent([building, type](Game*)
+			{Broodwar->drawBoxMap(Position(building), Position(TilePosition(building.x + type.tileWidth(), building.y + type.tileHeight())), Colors::Yellow, false); }
+			, nullptr, type.buildTime() + 10);
 		}
 	}
 
@@ -180,21 +180,16 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 	TilePosition cannonPos = pointBetween(ourBase, chokePoint, 5);
 	
 	//DEBUGGING
-	//Broodwar->registerEvent([midWay, type](Game*)
-	//{Broodwar->drawTextMap(Position(TilePosition(midWay.x, midWay.y)), "MidWayPoint"); 
-	//Broodwar->drawCircleMap(Position(TilePosition(midWay.x, midWay.y)), 16, Colors::Yellow, false); }
-	//, nullptr, type.buildTime() + 1000);
-	//
-	//Broodwar->registerEvent([cannonPos, type](Game*)
-	//{Broodwar->drawTextMap(Position(TilePosition(cannonPos.x, cannonPos.y)), "9/10 Point");
-	//Broodwar->drawCircleMap(Position(TilePosition(cannonPos.x, cannonPos.y)), 16, Colors::Yellow, false); }
-	//, nullptr, type.buildTime() + 1000);
-	//
-	//TilePosition nearest = findNearest(pos, UnitTypes::Protoss_Pylon);
-	//Broodwar->registerEvent([nearest, type](Game*)
-	//{Broodwar->drawTextMap(Position(TilePosition(nearest.x, nearest.y)), "Closest pylon");
-	//Broodwar->drawCircleMap(Position(TilePosition(nearest.x, nearest.y)), 16, Colors::Yellow, false); }
-	//, nullptr, type.buildTime() + 1000);
+	Broodwar->registerEvent([midWay, type](Game*)
+	{Broodwar->drawTextMap(Position(TilePosition(midWay.x, midWay.y)), "MidWayPoint"); 
+	Broodwar->drawCircleMap(Position(TilePosition(midWay.x, midWay.y)), 16, Colors::Yellow, false); }
+	, nullptr, type.buildTime() + 1000);
+	
+	Broodwar->registerEvent([cannonPos, type](Game*)
+	{Broodwar->drawTextMap(Position(TilePosition(cannonPos.x, cannonPos.y)), "9/10 Point");
+	Broodwar->drawCircleMap(Position(TilePosition(cannonPos.x, cannonPos.y)), 16, Colors::Yellow, false); }
+	, nullptr, type.buildTime() + 1000);
+	
 	
 	//Make a queue of possible places to put a building, push midWay onto it
 	//If it's a cannon we want to place it elsewhere

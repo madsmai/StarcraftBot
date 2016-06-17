@@ -21,7 +21,7 @@ void ProbeManager::onFrame(){
 		Broodwar->drawTextMap(builder->getPosition(), isConstr);
 	}
 
-	//Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
+	Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 	////DEBUGGING////
 
 	//If probe under attack, fight back

@@ -243,21 +243,6 @@ void OffenseManager::searchAndDestroy(BWAPI::Unit attacker) {
 		FixWrongPriority(closest);
 		return;
 	}
-	if (!InformationManager::getInstance().enemyAttackers.empty()) {
-		smartAttackUnit(attacker, InformationManager::getInstance().enemyAttackers.front());
-	}
-	else if (!InformationManager::getInstance().enemyTowers.empty()) {
-		smartAttackUnit(attacker, InformationManager::getInstance().enemyTowers.front());
-	}
-	else if (!InformationManager::getInstance().enemyWorkers.empty()) {
-		smartAttackUnit(attacker, InformationManager::getInstance().enemyWorkers.front());
-	}
-	else if (!InformationManager::getInstance().enemyBarracks.empty()) {
-		smartAttackUnit(attacker, InformationManager::getInstance().enemyBarracks.front());
-	}
-	else if (!InformationManager::getInstance().enemyPassiveBuildings.empty()) {
-		smartAttackUnit(attacker, InformationManager::getInstance().enemyPassiveBuildings.front());
-	}
 
 }
 
