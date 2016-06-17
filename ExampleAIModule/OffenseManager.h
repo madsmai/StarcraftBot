@@ -6,7 +6,7 @@
 class OffenseManager {
 public:
 
-	bool debugging = true;
+	bool debugging = false;
 
 	void onUnitDestroy(BWAPI::Unit unit);
 	void onUnitComplete(BWAPI::Unit unit);
@@ -37,12 +37,9 @@ private:
 	bool fightBack(BWAPI::Unit);
 	bool getHelp(BWAPI::Unit, BWAPI::Unit);
 	void searchAndDestroy(BWAPI::Unit);
-	bool avoidTowers(BWAPI::Unit);
 	int calculatePriority(BWAPI::Unit, BWAPI::Unit);
 	bool isFighter(BWAPI::Unit);
 	void fillReaverOrCarrier(BWAPI::Unit);
-
-	bool properTarget(BWAPI::Unit, BWAPI::Unit);
 	bool checkedMainBase = false;
 
 

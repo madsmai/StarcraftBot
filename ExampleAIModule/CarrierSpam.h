@@ -4,6 +4,7 @@
 #include "OffenseManager.h"
 #include "BuildOrderManager.h"
 #include "StrategyManager.h"
+#include "ProbeManager.h"
 
 class CarrierSpam : public Strategy {
 public:

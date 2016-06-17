@@ -14,7 +14,7 @@ void GameManager::onStart(){
 		BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
 	}
 
-	
+
 
 	/*
 	For printing out amount of reservedMinerals:
@@ -85,14 +85,12 @@ void GameManager::onFrame(){
 		Broodwar->drawTextScreen(300, 100, "Current Strategy: %d \n Next Strategy: %d",
 			StrategyManager::getInstance().getCurrentStrategy(), StrategyManager::getInstance().getNextStrategy());
 
-		
+		Broodwar->drawTextScreen(300, 0, "Squadsize: %d \n squad.size(): %d",
+			OffenseManager::getInstance().getSquadSize(), OffenseManager::getInstance().squad.size());
 
 		Broodwar->drawTextScreen(0, 100, "Our Army Strength: %d \n Enemy Army Strength: %d",
 			InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters), InformationManager::getInstance().enemyArmyStrength);
 	}
-	
-	Broodwar->drawTextScreen(300, 0, "Squadsize: %d \n squad.size(): %d",
-		OffenseManager::getInstance().getSquadSize(), OffenseManager::getInstance().squad.size());
 
 	if (analyzed & debugging) {
 		drawTerrainData();

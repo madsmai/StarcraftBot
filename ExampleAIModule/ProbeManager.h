@@ -28,6 +28,8 @@ public:
 
 	TilePosition getNewBuildLocation(BWAPI::UnitType type, TilePosition position);
 
+	std::vector<BWAPI::Unit> getGasProbes(){ return gasProbes; }
+
 private:
 	//The lists
 	std::vector<BWAPI::Unit> mineralProbes;
