@@ -9,7 +9,7 @@ int StrategyManager::setInitialStrategy(){
 	switch (enemyRace){
 
 	case Races::Enum::Protoss:
-		return earlyDarkTemplar;
+		return aggressiveZealotRush;
 		break;
 
 	case Races::Enum::Zerg:
@@ -17,7 +17,7 @@ int StrategyManager::setInitialStrategy(){
 		break;
 
 	case Races::Enum::Terran:
-		return commonZealotRush;
+		return earlyDarkTemplar;
 		break;
 
 	case Races::Enum::Unknown:
