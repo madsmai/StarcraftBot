@@ -336,7 +336,7 @@ int InformationManager::calculateArmyStrength(BWAPI::Unitset fighters) {
 		if (u->isVisible()) {
 			if (u->getType() == UnitTypes::Protoss_Carrier) {
 				int effectiveHp = u->getType().maxHitPoints() + u->getType().maxShields();
-				int damage = u->getInterceptorCount * Broodwar->self()->damage(UnitTypes::Protoss_Interceptor.groundWeapon());
+				int damage = u->getInterceptorCount() * Broodwar->self()->damage(UnitTypes::Protoss_Interceptor.groundWeapon());
 				sum += effectiveHp * damage;
 				continue;
 			}
