@@ -331,31 +331,13 @@ InformationManager& InformationManager::getInstance(){ //Return ref to Informati
 }
 
 int InformationManager::calculateArmyStrength(BWAPI::Unitset fighters) {
-	int armyStrength = 0;
-	int damage = 0;
-	int strength = 0;
-	int effectiveHp = 0;
-
-	for (Unit troop : fighters) {
-		if (troop->isVisible()){
-
-			effectiveHp = troop->getHitPoints() + troop->getShields();
-
-			damage = (troop->getPlayer()->damage(troop->getType().groundWeapon())) * troop->getType().maxGroundHits();
-			if (troop->getType().groundWeapon().maxRange() > 100) {
-				damage = (damage * 6) / 5;
-			}
-			if (!observatory && troop->getType() == UnitTypes::Protoss_Dark_Templar) {
-				effectiveHp = effectiveHp * 100;
-			}
-			if (troop->getType() == UnitTypes::Protoss_Carrier) {
-				damage = troop->getInterceptorCount() * troop->getPlayer()->damage(UnitTypes::Protoss_Interceptor.groundWeapon());
-			}
-
-			strength = effectiveHp * damage;
-			armyStrength = armyStrength + strength;
+	int sum = 0;
+	for (Unit u : fighters) {
+		if (u->isVisible()) {
+			sum += calculateUnitStrength(u->getType());
 		}
-	} return armyStrength;
+	}
+	return sum;
 }
 
 void InformationManager::enemyArmyStatus(){
