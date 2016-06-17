@@ -36,7 +36,6 @@ void OffenseManager::onUnitComplete(Unit unit){
 			unit->move(InformationManager::getInstance().enemyBase->getPosition());
 		}
 		else {
-			unit->move(InformationManager::getInstance().ourBase->getPosition());
 			squad.insert(unit);
 		}
 	}
