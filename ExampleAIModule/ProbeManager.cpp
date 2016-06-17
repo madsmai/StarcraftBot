@@ -31,7 +31,9 @@ void ProbeManager::onFrame(){
 		if (unit->isUnderAttack() && AttackingProbes.size() < 2) {
 			probeFightBack(unit);
 		}
-		else if (AttackingProbes.find(unit) != AttackingProbes.end() && (BWTA::getRegion(unit->getPosition()) != InformationManager::getInstance().ourBase->getRegion() || runFrames + 300 < Broodwar->getFrameCount())) {
+		else if (AttackingProbes.find(unit) != AttackingProbes.end() 
+			&& (BWTA::getRegion(unit->getPosition()) != InformationManager::getInstance().ourBase->getRegion() 
+			|| runFrames + 300 < Broodwar->getFrameCount())) {
 			unit->gather(unit->getClosestUnit(Filter::IsMineralField));
 			AttackingProbes.erase(AttackingProbes.find(unit));
 		}
