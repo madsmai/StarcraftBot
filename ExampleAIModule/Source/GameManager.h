@@ -18,7 +18,7 @@ class GameManager : public BWAPI::AIModule
 {
 public:
 
-	bool debugging = true;
+	bool debugging = false;
 
 	virtual void onStart();
 	virtual void onFrame();

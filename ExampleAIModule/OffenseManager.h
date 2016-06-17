@@ -6,7 +6,7 @@
 class OffenseManager {
 public:
 
-	bool debugging = true;
+	bool debugging = false;
 
 	void onUnitDestroy(BWAPI::Unit unit);
 	void onUnitComplete(BWAPI::Unit unit);
