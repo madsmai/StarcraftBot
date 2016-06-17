@@ -3,7 +3,7 @@
 
 ContinueZealotRush::ContinueZealotRush() {
 
-	setSquadSize(6);
+	setSquadSize(1);
 	setStrategyVariables();
 
 	if (Broodwar->self()->minerals() > 700){
@@ -38,7 +38,7 @@ void ContinueZealotRush::evaluateStrategy(){
 	else {
 		if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
 			>= InformationManager::getInstance().enemyArmyStrength
-			&& rand() % 2 > 0.5
+			&& rand() % 2 > 0.7
 			//|| InformationManager::getInstance().enemyTowers.size() >= 6
 			){
 
