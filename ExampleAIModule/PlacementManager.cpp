@@ -249,7 +249,7 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 				}
 			}
 			else if (type == UnitTypes::Protoss_Gateway){
-				if (findNearest(returnPos, type) > 0
+				if (findNearest(returnPos, type) > 1
 					&& findNearest(returnPos, type, UnitTypes::Protoss_Pylon) < 7){
 					return returnPos;
 				}
