@@ -6,14 +6,18 @@ ContinueZealotRush::ContinueZealotRush() {
 	setSquadSize(6);
 	setStrategyVariables();
 
-	if (Broodwar->self()->allUnitCount(cybercore) >= 1){
-		buildOrder = { zealot, dragoon, dragoon, 
-			zealot, zealot, zealot, 
+	if (Broodwar->self()->minerals() > 700){
+		buildOrder = { gateway, evaluateStrategyRequest };
+	}
+
+	else if (Broodwar->self()->allUnitCount(cybercore) >= 1){
+		buildOrder = { zealot, dragoon, dragoon,
+			zealot, zealot, zealot,
 			evaluateStrategyRequest };
 	}
 	else {
 		buildOrder = { zealot, zealot, zealot,
-			zealot, zealot, zealot, 
+			zealot, zealot, zealot,
 			evaluateStrategyRequest };
 	}
 
@@ -34,7 +38,7 @@ void ContinueZealotRush::evaluateStrategy(){
 	else {
 		if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
 			>= InformationManager::getInstance().enemyArmyStrength
-			|| InformationManager::getInstance().enemyTowers.size() >= 2){
+			|| InformationManager::getInstance().enemyTowers.size() >= 6){
 
 			// convert to midgame
 			StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);
