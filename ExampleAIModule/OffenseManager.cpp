@@ -37,6 +37,10 @@ void OffenseManager::onUnitComplete(Unit unit){
 		}
 		else {
 			squad.insert(unit);
+			Unit closestTower = unit->getClosestUnit(Filter::IsBuilding && Filter::CanAttack && Filter::IsAlly, 2240);
+			if (closestTower) {
+				unit->move(closestTower->getPosition());
+			}
 		}
 	}
 
