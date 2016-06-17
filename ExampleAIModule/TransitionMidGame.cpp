@@ -51,10 +51,6 @@ TransitionMidGame::TransitionMidGame() {
 			evaluateStrategyRequest };
 	}
 
-	else {
-		Broodwar << "Add more cases to midGame transition strategy" << std::endl;
-	}
-
 
 	// queue it up
 	for (BuildOrderType order : buildOrder){
