@@ -21,15 +21,18 @@ void BuildingManager::onFrame(){
 			int gasPrice = type.gasPrice(); //Price of unit
 
 			std::vector<BWAPI::Unit>::iterator it;
-			for (it = buildings.begin(); it != buildings.end(); it++){
-				BWAPI::Unit unit = *it;
-				if (unit->canTrain(type) &&
-					unit->isIdle() &&
-					BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
-					BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) {
+			if (!buildings.empty()) {
+				for (it = buildings.begin(); it != buildings.end(); it++){
+					BWAPI::Unit unit = *it;
+					if (unit->canTrain(type) &&
+						unit->isIdle() &&
+						BWAPI::Broodwar->self()->minerals() - ResourceManager::getInstance().getReservedMinerals() >= minPrice &&
+						BWAPI::Broodwar->self()->gas() - ResourceManager::getInstance().getReservedGas() >= gasPrice) {
 
-					unit->train(type);
-					queue.erase(queue.begin());
+						unit->train(type);
+						queue.erase(queue.begin());
+						return;
+					}
 				}
 			}
 		}
@@ -52,6 +55,7 @@ void BuildingManager::onFrame(){
 
 				unit->upgrade(type);
 				queue.erase(queue.begin());
+				return;
 			}
 		}
 	}
@@ -73,6 +77,7 @@ void BuildingManager::onFrame(){
 
 				unit->research(type);
 				queue.erase(queue.begin());
+				return;
 			}
 		}
 	}
@@ -102,13 +107,6 @@ void BuildingManager::onUnitDestroy(BWAPI::Unit unit){
 		}
 
 	}
-
-	
-
-
-
-
-	
 }
 
 void BuildingManager::onUnitComplete(BWAPI::Unit unit){
