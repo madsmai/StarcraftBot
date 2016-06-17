@@ -13,6 +13,13 @@ using namespace BWAPI;
 
 //Discover and destroy methods  
 
+void InformationManager::onStart(){
+
+
+	baseLocations = BWTA::getStartLocations();
+
+}
+
 void InformationManager::onUnitDiscover(BWAPI::Unit unit){
 	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
 

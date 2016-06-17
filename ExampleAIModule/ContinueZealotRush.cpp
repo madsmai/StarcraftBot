@@ -38,7 +38,9 @@ void ContinueZealotRush::evaluateStrategy(){
 	else {
 		if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
 			>= InformationManager::getInstance().enemyArmyStrength
-			|| InformationManager::getInstance().enemyTowers.size() >= 6){
+			&& rand() % 2 > 0.5
+			//|| InformationManager::getInstance().enemyTowers.size() >= 6
+			){
 
 			// convert to midgame
 			StrategyManager::getInstance().setNextStrategy(StrategyManager::transitionMidGame);

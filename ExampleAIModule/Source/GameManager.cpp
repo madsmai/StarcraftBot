@@ -31,6 +31,9 @@ void GameManager::onStart(){
 	//Call on starts
 	BuildOrderManager::getInstance().onStart();
 	//BWAPI::Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;
+
+	InformationManager::getInstance().onStart();
+
 }
 
 void GameManager::onEnd(bool isWinner){
