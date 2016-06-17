@@ -1,5 +1,6 @@
 #include "ContinueZealotRush.h"
 
+//Author of class: Kasper
 
 ContinueZealotRush::ContinueZealotRush() {
 

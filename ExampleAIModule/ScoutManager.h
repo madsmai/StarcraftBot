@@ -22,6 +22,9 @@ public:
 	bool scoutSent = false;
 	bool doneScouting = false;
 
+	bool attackTheirWorkers(BWAPI::Unit unit);
+	bool keepAttackTheirWorkers(BWAPI::Unit unit);
+
 	static ScoutManager& getInstance();
 
 	void addScout(BWAPI::Unit scout);
@@ -30,8 +33,6 @@ public:
 	std::vector<BWAPI::Unit> const &getInactiveScouts() { return inactiveScouts; }
 
 private:
-
-	bool checkAgain();
 
 	std::vector<BWAPI::Unit> activeScouts;
 	std::vector<BWAPI::Unit> inactiveScouts;

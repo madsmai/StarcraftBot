@@ -1,6 +1,7 @@
 #include "StrategyManager.h"
 using namespace BWAPI;
 
+//Author of class: Kasper
 
 int StrategyManager::setInitialStrategy(){
 
@@ -28,13 +29,6 @@ int StrategyManager::setInitialStrategy(){
 }
 
 void StrategyManager::evaluateStrategies(){
-
-	/*std::ofstream log;
-	log.open("bwapi-data//AI/Strategies.txt", std::ios::app);
-	log << "Evaluating: " << getCurrentStrategy() << "\n";
-	log.flush();
-	log.close();*/
-
 
 	switch (getCurrentStrategy()){
 

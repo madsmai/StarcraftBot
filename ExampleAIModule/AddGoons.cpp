@@ -1,5 +1,7 @@
 #include "AddGoons.h"
 
+//Author of class: Kasper
+
 AddGoons::AddGoons() {
 
 	setSquadSize(6);

@@ -1,5 +1,6 @@
 #include "TransitionMidGame.h"
 
+//Author of class: Kasper
 
 TransitionMidGame::TransitionMidGame() {
 

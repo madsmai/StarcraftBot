@@ -1,9 +1,7 @@
 #include "ResourceManager.h"
 
-/*
-TODO:
+// Author of class: Kasper
 
-*/
 using namespace BWAPI;
 //Currently only possible to reserve/release minerals for buildings
 //Reserve mins

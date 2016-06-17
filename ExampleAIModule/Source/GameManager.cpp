@@ -6,6 +6,7 @@ using namespace Filter;
 bool analyzed;
 bool analysis_just_finished;
 
+// Author: Most of this class was given. A few methods has been added.
 
 void GameManager::onStart(){
 	//Enable user input
@@ -36,6 +37,7 @@ void GameManager::onStart(){
 
 }
 
+// Author: Sami (used for statistics)
 void GameManager::onEnd(bool isWinner){
 	std::ofstream log;
 	if (BWAPI::Broodwar->enemy()->getRace() == Races::Protoss){
@@ -71,8 +73,6 @@ void GameManager::onEnd(bool isWinner){
 		log.flush();
 		log.close();
 	}
-
-
 }
 
 
@@ -200,6 +200,7 @@ void GameManager::onUnitDiscover(BWAPI::Unit unit) {
 	ScoutManager::getInstance().onUnitDiscover(unit);
 }
 
+// Author: BWTA
 DWORD WINAPI AnalyzeThread() {
 	//BWTA::analyze();
 
@@ -208,6 +209,7 @@ DWORD WINAPI AnalyzeThread() {
 	return 0;
 }
 
+// Author: BWTA
 void GameManager::drawTerrainData() {
 	//we will iterate through all the base locations, and draw their outlines.
 	for (const auto& baseLocation : BWTA::getBaseLocations()) {

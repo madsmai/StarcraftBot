@@ -1,5 +1,7 @@
 #include "CarrierSpam.h"
 
+//Author of class: Kasper
+
 CarrierSpam::CarrierSpam() {
 
 	setSquadSize(OffenseManager::getInstance().getSquadSize());

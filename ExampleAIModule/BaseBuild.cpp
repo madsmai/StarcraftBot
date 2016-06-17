@@ -1,5 +1,6 @@
 #include "BaseBuild.h"
 
+//Author of class: Kasper
 
 BaseBuild::BaseBuild() {
 

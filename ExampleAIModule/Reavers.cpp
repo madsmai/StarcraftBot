@@ -1,5 +1,7 @@
 #include "Reavers.h"
 
+//Author of class: Kasper
+
 Reavers::Reavers() {
 
 	setSquadSize(6);
