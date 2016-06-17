@@ -5,6 +5,7 @@ using namespace BWAPI;
 // Author of class: Mads Engberg
 
 void PlacementManager::onFrame(){
+	//Debugging
 	//drawReservedSpace();
 }
 
@@ -186,7 +187,6 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 	//{Broodwar->drawTextMap(Position(TilePosition(midWay.x, midWay.y)), "MidWayPoint"); 
 	//Broodwar->drawCircleMap(Position(TilePosition(midWay.x, midWay.y)), 16, Colors::Yellow, false); }
 	//, nullptr, type.buildTime() + 1000);
-	//
 	//Broodwar->registerEvent([cannonPos, type](Game*)
 	//{Broodwar->drawTextMap(Position(TilePosition(cannonPos.x, cannonPos.y)), "9/10 Point");
 	//Broodwar->drawCircleMap(Position(TilePosition(cannonPos.x, cannonPos.y)), 16, Colors::Yellow, false); }
@@ -251,7 +251,7 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 					return returnPos;
 				}
 			}
-			else if (findNearest(returnPos, type, UnitTypes::Protoss_Pylon) < 7){
+			else if (findNearest(returnPos, type, UnitTypes::Protoss_Pylon) < 7 && findNearest(returnPos, type, UnitTypes::Protoss_Gateway) > 1){
 				return returnPos;
 			}
 		}
@@ -286,6 +286,7 @@ TilePosition PlacementManager::getBuildingPlacement(UnitType type, TilePosition 
 	
 
 	TilePosition backupPos = Broodwar->getBuildLocation(type, pos);
+
 	//DEBUGGING//
 	//Broodwar->registerEvent([backupPos, type, midWay](Game*)
 	//{Broodwar->drawBoxMap(Position(TilePosition(backupPos.x, backupPos.y)),

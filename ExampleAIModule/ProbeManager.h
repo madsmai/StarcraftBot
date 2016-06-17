@@ -18,7 +18,6 @@ public:
 	void onFrame();
 	void onUnitDestroy(BWAPI::Unit unit);
 	void onUnitComplete(BWAPI::Unit unit);
-	//void onStart();
 
 	//Function for getting an instance
 	static ProbeManager& getInstance();

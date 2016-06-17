@@ -6,22 +6,13 @@ using namespace Filter;
 bool analyzed;
 bool analysis_just_finished;
 
-// Author: Most of this class was given. A few methods has been added.
+// Author: Most of this class was given. A few methods has been added by all of us.
 
 void GameManager::onStart(){
 	//Enable user input
-
 	if (debugging){
 		BWAPI::Broodwar->enableFlag(BWAPI::Flag::UserInput);
 	}
-
-
-
-	/*
-	For printing out amount of reservedMinerals:
-	int  min = ResourceManager::getInstance().getReservedMinerals();
-	BWAPI::Broodwar->sendText(std::to_string(min).c_str());
-	*/
 
 	BWTA::readMap();
 	BWTA::analyze();
@@ -31,8 +22,6 @@ void GameManager::onStart(){
 
 	//Call on starts
 	BuildOrderManager::getInstance().onStart();
-	//BWAPI::Broodwar << BuildOrderManager::getInstance().getNewFixedOrderQueue().size() << std::endl;
-
 	InformationManager::getInstance().onStart();
 
 }
@@ -99,7 +88,6 @@ void GameManager::onFrame(){
 		drawTerrainData();
 	}
 	if (analysis_just_finished) {
-		//Broodwar << "Finished analyzing map." << std::endl;;
 		analysis_just_finished = false;
 	}
 

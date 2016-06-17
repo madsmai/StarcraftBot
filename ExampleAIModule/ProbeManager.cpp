@@ -6,20 +6,18 @@ using namespace BWAPI;
 // Author: Mads Maibohm
 void ProbeManager::onFrame(){
 
-	////DEBUGGING////
-	const char* isConstr;
-	if (builder != NULL){
-		if (builder->isConstructing()){
-			isConstr = "Constructing";
-		}
-		else{
-			isConstr = "Mining/Moving";
-		}
-		Broodwar->drawTextMap(builder->getPosition(), isConstr);
-	}
-
-	/*Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);*/
-	////DEBUGGING////
+	//DEBUGGING//
+	//const char* isConstr;
+	//if (builder != NULL){
+	//	if (builder->isConstructing()){
+	//		isConstr = "Constructing";
+	//	}
+	//	else{
+	//		isConstr = "Mining/Moving";
+	//	}
+	//	Broodwar->drawTextMap(builder->getPosition(), isConstr);
+	//}
+	//Broodwar->drawCircleMap(Position(buildingPosition), 30, Colors::Purple, true);
 
 	//If probe under attack, fight back
 	std::vector<Unit>::iterator it;
@@ -177,7 +175,7 @@ void ProbeManager::executeQueue(){
 			builder->move(Position(buildingPosition));
 			builderMoving = true;
 		}
-		else if (builder->build(type, buildingPosition)){ //MOVE THIS AROUND
+		else if (builder->build(type, buildingPosition)){
 			builderMoving = false;
 			if (Broodwar->getLastError() != Errors::Unbuildable_Location ||
 				Broodwar->getLastError() != Errors::Invalid_Tile_Position){
@@ -260,7 +258,7 @@ bool ProbeManager::checkAndAddSupply(){
 	if (Broodwar->self()->supplyTotal() / 2 + Broodwar->self()->incompleteUnitCount(pylon) * 8 - 6
 		<= Broodwar->self()->supplyUsed() / 2
 		&& (!InformationManager::getInstance().starter 
-		|| Broodwar->getLastError() == BWAPI::Errors::Insufficient_Supply) // something went wrong in a starter
+		|| Broodwar->getLastError() == BWAPI::Errors::Insufficient_Supply)
 		&& !builder->isConstructing()
 		&& lastChecked + pylon.buildTime() < Broodwar->getFrameCount()){
 

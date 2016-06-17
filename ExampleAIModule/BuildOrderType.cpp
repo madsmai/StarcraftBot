@@ -1,6 +1,6 @@
 #include "BuildOrderType.h"
 
-//Author of class: Maids Engberg
+//Author of class: Mads Engberg
 
 BuildOrderType::BuildOrderType(int request){
 	type = types::MetaRequestType;
