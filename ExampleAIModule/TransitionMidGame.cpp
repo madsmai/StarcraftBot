@@ -52,7 +52,6 @@ TransitionMidGame::TransitionMidGame() {
 
 	else {
 		Broodwar << "Add more cases to midGame transition strategy" << std::endl;
-		abort();
 	}
 
 
