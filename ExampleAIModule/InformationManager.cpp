@@ -67,8 +67,6 @@ void InformationManager::onUnitDestroy(BWAPI::Unit unit){
 		hasInvisDetection = false;
 	}
 
-
-
 	if (unit->getPlayer()->isEnemy(Broodwar->self()) && !unit->getPlayer()->isNeutral()){
 
 		if (unit->getType().isWorker()){
@@ -126,6 +124,7 @@ void InformationManager::addEnemyBarracks(BWAPI::Unit barracks){
 	}
 
 }
+
 // Author: Sami
 void InformationManager::addEnemyAttackers(BWAPI::Unit attacker){
 
@@ -143,6 +142,7 @@ void InformationManager::addEnemyAttackers(BWAPI::Unit attacker){
 	}
 
 }
+
 // Author: Sami
 void InformationManager::addEnemyWorkers(BWAPI::Unit worker){
 
@@ -158,8 +158,8 @@ void InformationManager::addEnemyWorkers(BWAPI::Unit worker){
 	if (!exists) {
 		enemyWorkers.push_back(worker);
 	}
-
 }
+
 // Author: Sami
 void InformationManager::addDarkTemplar(BWAPI::Unit darkTemplar){
 
@@ -175,8 +175,8 @@ void InformationManager::addDarkTemplar(BWAPI::Unit darkTemplar){
 	if (!exists) {
 		darkTemplars.push_back(darkTemplar);
 	}
-
 }
+
 // Author: Sami
 void InformationManager::addEnemyTowers(BWAPI::Unit tower){
 
@@ -192,8 +192,8 @@ void InformationManager::addEnemyTowers(BWAPI::Unit tower){
 	if (!exists) {
 		enemyTowers.push_back(tower);
 	}
-
 }
+
 // Author: Sami
 void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
@@ -209,7 +209,6 @@ void InformationManager::addEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 	if (!exists) {
 		enemyPassiveBuildings.push_back(passiveBuilding);
 	}
-
 }
 
 // Author: Sami
@@ -225,8 +224,8 @@ void InformationManager::removeEnemyBarracks(BWAPI::Unit barracks){
 			it++;
 		}
 	}
-
 }
+
 // Author: Sami
 void InformationManager::removeEnemyAttackers(Unit attacker){
 
@@ -242,6 +241,7 @@ void InformationManager::removeEnemyAttackers(Unit attacker){
 		}
 	}
 }
+
 // Author: Sami
 void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 
@@ -255,8 +255,8 @@ void InformationManager::removeEnemyWorkers(BWAPI::Unit worker){
 			it++;
 		}
 	}
-
 }
+
 // Author: Sami
 void InformationManager::removeDarkTemplar(BWAPI::Unit darkTemplar){
 
@@ -270,8 +270,8 @@ void InformationManager::removeDarkTemplar(BWAPI::Unit darkTemplar){
 			it++;
 		}
 	}
-
 }
+
 // Author: Sami
 void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 
@@ -285,8 +285,8 @@ void InformationManager::removeEnemyTowers(BWAPI::Unit tower){
 			it++;
 		}
 	}
-
 }
+
 // Author: Sami
 void InformationManager::removeEnemyPassiveBuildings(BWAPI::Unit passiveBuilding){
 
@@ -312,11 +312,6 @@ void InformationManager::currentStatus(){
 		" Any Templar Archives? " << templarArchives << "\n"
 		<< enemyTowers.size() << "  enemy dark templars(s) \n"
 		<< enemyPassiveBuildings.size() << "  passive enemy building(s) \n" << std::endl;
-}
-
-InformationManager& InformationManager::getInstance(){ //Return ref to InformationManager object
-	static InformationManager i; //Make static instance i
-	return i;
 }
 
 // Author: Mads Maibohm
@@ -466,6 +461,7 @@ int InformationManager::calculateUnitStrength(BWAPI::UnitType troop) {
 
 	return strength;
 }
+
 // Author: Mads Maibohm
 int InformationManager::calculateEnemyArmyStrength() {
 	std::vector<BWAPI::Unit>::iterator it;
@@ -477,4 +473,9 @@ int InformationManager::calculateEnemyArmyStrength() {
 		}
 	}
 	return sum;
+}
+
+InformationManager& InformationManager::getInstance(){ //Return ref to InformationManager object
+	static InformationManager i; //Make static instance i
+	return i;
 }

@@ -165,7 +165,7 @@ void ScoutManager::removeScout(BWAPI::Unit scout){
 }
 
 //Author: Kasper
-bool ScoutManager::attackTheirWorkers(BWAPI::Unit unit){
+void ScoutManager::attackTheirWorkers(BWAPI::Unit unit){
 	BWAPI::Unit scout = activeScouts.front();
 	UnitCommand currentCommand = scout->getLastCommand();
 
@@ -177,7 +177,7 @@ bool ScoutManager::attackTheirWorkers(BWAPI::Unit unit){
 }
 
 //Author: Kasper
-bool ScoutManager::keepAttackTheirWorkers(BWAPI::Unit unit){
+void ScoutManager::keepAttackTheirWorkers(BWAPI::Unit unit){
 	if (unit->getType().isWorker()
 		&& unit->getPlayer()->isEnemy(Broodwar->self())
 		&& !retreating){

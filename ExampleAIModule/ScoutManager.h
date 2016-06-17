@@ -22,8 +22,8 @@ public:
 	bool scoutSent = false;
 	bool doneScouting = false;
 
-	bool attackTheirWorkers(BWAPI::Unit unit);
-	bool keepAttackTheirWorkers(BWAPI::Unit unit);
+	void attackTheirWorkers(BWAPI::Unit unit);
+	void keepAttackTheirWorkers(BWAPI::Unit unit);
 
 	static ScoutManager& getInstance();
 
