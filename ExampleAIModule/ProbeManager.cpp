@@ -185,6 +185,7 @@ void ProbeManager::executeQueue(){
 				ResourceManager::getInstance().reserveMinerals(type);
 				ResourceManager::getInstance().reserveGas(type);
 				queue.erase(queue.begin()); //Remove building from queue
+				return;
 			}
 		}
 	}
@@ -207,9 +208,8 @@ void ProbeManager::executeQueue(){
 
 			mineralProbes.erase(mineralProbes.begin());
 			
-			if (!queue.empty()){
 				queue.erase(queue.begin()); //Remove the request from the queue
-			}
+				return;
 			
 
 		}
@@ -224,6 +224,7 @@ void ProbeManager::executeQueue(){
 						mineralProbes.erase(it); //Remove probe from list by number in array
 						gasProbes.push_back(unit); //Add unit to gasWorkerList
 						queue.erase(queue.begin()); //Remove the request from the queue
+						return;
 					}
 					else {
 						Broodwar << Broodwar->getLastError() << std::endl;
@@ -239,6 +240,7 @@ void ProbeManager::executeQueue(){
 
 			StrategyManager::getInstance().evaluateStrategies();
 			queue.erase(queue.begin()); //Remove the request from the queue
+			return;
 		}
 	}
 }
