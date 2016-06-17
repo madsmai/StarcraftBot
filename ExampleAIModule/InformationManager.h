@@ -25,6 +25,7 @@ public:
 
 	void onUnitDiscover(BWAPI::Unit);
 	void onUnitDestroy(BWAPI::Unit);
+	void onStart();
 
 	void currentStatus();
 

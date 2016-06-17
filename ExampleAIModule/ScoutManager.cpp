@@ -67,7 +67,7 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit unit){
 		if (InformationManager::getInstance().enemyBase == NULL){
 			std::vector<BuildOrderType>::iterator it;
 			it = BuildOrderManager::getInstance().getNewFixedOrderQueue().begin();
-			BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, BuildOrderType::scoutRequest);
+			BuildOrderManager::getInstance().getNewFixedOrderQueue().insert(it, BuildOrderType::requests::scoutRequest);
 		}
 	}
 
@@ -143,7 +143,7 @@ void ScoutManager::onUnitDiscover(BWAPI::Unit unit){
 }
 
 void ScoutManager::goScout(BWAPI::Unit scout){
-	InformationManager::getInstance().baseLocations = BWTA::getStartLocations();
+	//InformationManager::getInstance().baseLocations = BWTA::getStartLocations();
 	double minDistance = 9999999;
 
 	std::set<BWTA::BaseLocation*>::iterator it; 		// iteratation set
