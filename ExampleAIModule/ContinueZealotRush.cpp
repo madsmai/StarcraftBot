@@ -38,7 +38,7 @@ void ContinueZealotRush::evaluateStrategy(){
 	else {
 		if (InformationManager::getInstance().calculateArmyStrength(OffenseManager::getInstance().fighters)
 			>= InformationManager::getInstance().enemyArmyStrength
-			&& rand() % 2 > 0.7
+			&& rand() % 2 > 0.5
 			//|| InformationManager::getInstance().enemyTowers.size() >= 6
 			){
 
