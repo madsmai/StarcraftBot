@@ -13,7 +13,7 @@ CarrierSpam::CarrierSpam() {
 	else if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Air_Armor) == 0
 		&& !Broodwar->self()->isUpgrading(UpgradeTypes::Protoss_Air_Armor)
 		&& !Broodwar->self()->isUpgrading(UpgradeTypes::Protoss_Air_Weapons)){
-		buildOrder = { UpgradeTypes::Protoss_Air_Weapons, evaluateStrategyRequest };
+		buildOrder = { UpgradeTypes::Protoss_Air_Armor, evaluateStrategyRequest };
 	}
 	else if (Broodwar->self()->minerals() > 1200
 		&& Broodwar->self()->gas() > 700){
