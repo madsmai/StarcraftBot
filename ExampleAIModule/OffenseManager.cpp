@@ -75,7 +75,7 @@ void OffenseManager::onFrame(){
 			}
 		}
 		else if (unit->getLastCommand().getType() != NULL && unit != NULL && InformationManager::getInstance().enemyBase != NULL
-			&& (rushOngoing || !getEnemiesInOurRegion().empty())
+			&& (rushOngoing || !getEnemiesInOurRegion().empty() || unit->getType() == UnitTypes::Hero_Dark_Templar)
 			&& (unit->isIdle()
 			|| (unit->getLastCommand().getType() == UnitCommandTypes::Move && unit->getLastCommand().getTargetPosition() != InformationManager::getInstance().ourBase->getPosition())
 			|| (unit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && !unit->isAttacking()))) {

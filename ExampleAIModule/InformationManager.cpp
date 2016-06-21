@@ -325,6 +325,10 @@ int InformationManager::calculateArmyStrength(BWAPI::Unitset fighters) {
 				sum += effectiveHp * damage;
 				continue;
 			}
+			if (u->getType() == UnitTypes::Hero_Dark_Templar && !observatory) {
+				sum += calculateUnitStrength(u->getType()) * 100;
+				continue;
+			}
 			sum += calculateUnitStrength(u->getType());
 		}
 	}
